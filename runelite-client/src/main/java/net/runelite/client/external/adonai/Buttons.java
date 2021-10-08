@@ -9,7 +9,8 @@ public class Buttons
 {
 	public static Client client;
 
-	enum ToolbarTabs {
+	enum ToolbarTabs
+	{
 		COMBAT_OPTIONS,
 		SKILLS,
 		QUEST_LIST,
@@ -25,7 +26,8 @@ public class Buttons
 		MUSIC_PLAYER
 	}
 
-	private static HashMap<ToolbarTabs, int[]> toolbarTabs = new HashMap<>() {{
+	private static HashMap<ToolbarTabs, int[]> toolbarTabs = new HashMap<>()
+	{{
 		put(ToolbarTabs.COMBAT_OPTIONS, new int[]{164, 66});
 		put(ToolbarTabs.SKILLS, new int[]{164, 67});
 		put(ToolbarTabs.QUEST_LIST, new int[]{164, 68});
@@ -42,14 +44,16 @@ public class Buttons
 		put(ToolbarTabs.MUSIC_PLAYER, new int[]{164, 55});
 	}};
 
-	enum MapTabs {
+	enum MapTabs
+	{
 		ACTIVATE_QUICK_PRAYERS,
 		TOGGLE_RUN,
 		SPECIAL_ATTACK,
 		WORLD_MAP
 	}
 
-	private static HashMap<MapTabs, int[]> mapTabs = new HashMap<>() {{
+	private static HashMap<MapTabs, int[]> mapTabs = new HashMap<>()
+	{{
 		put(MapTabs.ACTIVATE_QUICK_PRAYERS, new int[]{160, 17});
 		put(MapTabs.SPECIAL_ATTACK, new int[]{160, 33});
 		put(MapTabs.WORLD_MAP, new int[]{160, 48});
@@ -68,7 +72,8 @@ public class Buttons
 		return client.getWidget(tabWidget[0], tabWidget[1]);
 	}
 
-	enum FloatingMap {
+	enum FloatingMap
+	{
 		SEARCH, // 595.25
 		MAP, // 595, 9
 		KEY_SCROLL_BAR, // 595, 20[1]
@@ -86,7 +91,8 @@ public class Buttons
 		CLOSE // 595.38
 	}
 
-	enum CombatOptionsTab {
+	enum CombatOptionsTab
+	{
 		ATTACK_TOP_LEFT, // 593.4
 		ATTACK_TOP_RIGHT, // 593.8
 		ATTACK_BOTTOM_LEFT, // 593.12
@@ -95,7 +101,8 @@ public class Buttons
 		SPECIAL_ATTACK // 593.35
 	}
 
-	enum CombatTab {
+	enum CombatTab
+	{
 		ATTACK_TOP_LEFT, // 15.3
 		ATTACK_TOP_RIGHT, // 593.8
 		ATTACK_BOTTOM_LEFT, // 593.12

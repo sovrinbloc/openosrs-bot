@@ -34,7 +34,8 @@ public class MenuMap
 	{
 		MenuEntry[] b = new MenuEntry[n];
 		int j = n;
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n; i++)
+		{
 			b[j - 1] = a[i];
 			j = j - 1;
 		}
@@ -44,10 +45,11 @@ public class MenuMap
 	public Point getMenuCanvasLocation(MenuEntry item)
 	{
 		int i = 0;
-		for(MenuEntry e : menuItems) {
+		for (MenuEntry e : menuItems)
+		{
 			if (e.getMenuAction().getId() == item.getMenuAction().getId())
 			{
-				return new Point((int) (MenuPosition.getX() + MenuDimensions.getX() / 2.0f), (MenuPosition.getY() + OFFSET_DOWN) + (FONT_SIZE / 2) + ( i * MENU_ITEM_HEIGHT));
+				return new Point((int) (MenuPosition.getX() + MenuDimensions.getX() / 2.0f), (MenuPosition.getY() + OFFSET_DOWN) + (FONT_SIZE / 2) + (i * MENU_ITEM_HEIGHT));
 			}
 			i++;
 		}

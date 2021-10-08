@@ -56,10 +56,12 @@ public class ExtUtils
 	}
 
 	// find in game items
-	
-	static class AdonaiGameObjects {
+
+	static class AdonaiGameObjects
+	{
 
 		public static Client client;
+
 		@Nullable
 		public static GameObject findNearestGameObject(int... ids)
 		{
@@ -153,10 +155,12 @@ public class ExtUtils
 					.list;
 		}
 	}
-	
-	static class AdonaiWallObjects {
+
+	static class AdonaiWallObjects
+	{
 
 		public static Client client;
+
 		@Nullable
 		public static WallObject findNearestWallObject(int... ids)
 		{
@@ -250,11 +254,12 @@ public class ExtUtils
 					.list;
 		}
 	}
-	
-	static class AdonaiDecorativeObjects {
+
+	static class AdonaiDecorativeObjects
+	{
 
 		public static Client client;
-		
+
 		@Nullable
 		public static DecorativeObject findNearestDecorObject(int... ids)
 		{
@@ -347,11 +352,13 @@ public class ExtUtils
 					.result(client)
 					.list;
 		}
-		
+
 	}
-	
-	static class AdonaiGroundObjects {
+
+	static class AdonaiGroundObjects
+	{
 		public static Client client;
+
 		@Nullable
 		public static GroundObject findNearestGroundObject(int... ids)
 		{
@@ -444,13 +451,14 @@ public class ExtUtils
 					.result(client)
 					.list;
 		}
-		
+
 	}
-	
-	static class AdonaiNPCObjects {
+
+	static class AdonaiNPCObjects
+	{
 
 		public static Client client;
-		
+
 		@Nullable
 		public NPC findNearestNPC(int... ids)
 		{
@@ -500,26 +508,12 @@ public class ExtUtils
 		}
 	}
 
-	
 
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	static class AdonaiObjects {
+	static class AdonaiObjects
+	{
 
 		public static Client client;
-		
+
 		@Nullable
 		public TileObject findNearestObject(int... ids)
 		{
@@ -572,10 +566,12 @@ public class ExtUtils
 			return AdonaiGroundObjects.findNearestGroundObject(names);
 		}
 	}
-	
-	static class AdonaiWidgetItems {
+
+	static class AdonaiWidgetItems
+	{
 
 		public static Client client;
+
 		public static List<WidgetItem> getItems(int... itemIDs)
 		{
 			assert client.isClientThread();
@@ -609,15 +605,15 @@ public class ExtUtils
 					.result(client)
 					.list;
 		}
-		
+
 	}
-	
-	
+
 
 	// widget items
 
 
-	static class AdonaiEquippedItems {
+	static class AdonaiEquippedItems
+	{
 		public static Client client;
 
 		public static List<Widget> getEquippedItems(int[] itemIds)

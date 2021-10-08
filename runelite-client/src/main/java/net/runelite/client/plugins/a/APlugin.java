@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.a;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
@@ -12,7 +11,6 @@ import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.external.ExternalPlugins.OneClick.Comparables.skilling.Spell;
 import net.runelite.client.external.adonai.MenuMap;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
@@ -21,9 +19,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.util.Random;
 import java.util.concurrent.*;
-import java.util.stream.IntStream;
 
 @PluginDescriptor(
 		name = "A Plugin",

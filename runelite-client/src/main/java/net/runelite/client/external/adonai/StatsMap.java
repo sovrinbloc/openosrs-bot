@@ -8,11 +8,7 @@ package net.runelite.client.external.adonai;
 import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.runelite.api.Skill;
-import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.plugins.itemstats.stats.EnergyStat;
-import net.runelite.client.plugins.itemstats.stats.SkillStat;
-import net.runelite.client.plugins.itemstats.stats.Stat;
+import net.runelite.client.external.adonai.widgets.WidgetInfo;
 
 import javax.annotation.Nullable;
 import java.util.Map;
