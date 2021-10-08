@@ -8,8 +8,8 @@ package net.runelite.client.external.adonai;
 import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
+//import net.runelite.client.external.adonai.widgets.WidgetInfo;
 
 import javax.annotation.Nullable;
 import java.util.Map;

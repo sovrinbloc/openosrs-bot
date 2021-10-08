@@ -8,7 +8,6 @@ package net.runelite.client.external.adonai;
 import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
 
 import javax.annotation.Nullable;
@@ -18,7 +17,6 @@ import java.util.Map;
 @AllArgsConstructor
 public enum EquipmentMap
 {
-
 
 
 	HELMET("Helmet", WidgetInfo.EQUIPMENT_HELMET),
@@ -32,7 +30,7 @@ public enum EquipmentMap
 	BOOTS("Boots", WidgetInfo.EQUIPMENT_BOOTS),
 	RING("Ring", WidgetInfo.EQUIPMENT_RING),
 	AMMO("Ammo", WidgetInfo.EQUIPMENT_AMMO);
-	
+
 
 	private final String name;
 	private final WidgetInfo info;

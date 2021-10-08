@@ -929,7 +929,7 @@ public class ExtUtils
 		put(MapTabs.TOGGLE_RUN, new int[]{160, 25});
 	}};
 
-	boolean inventoryContains(String ... names)
+	boolean inventoryContains(String... names)
 	{
 		if (isTabOpen(WidgetInfo.INVENTORY))
 		{
@@ -940,7 +940,7 @@ public class ExtUtils
 				assert children != null;
 				for (String name : names)
 				{
-					for( Widget child : children)
+					for (Widget child : children)
 					{
 						if (child.getName().contains(name))
 						{
@@ -963,7 +963,7 @@ public class ExtUtils
 			{
 				Widget[] children = widget.getChildren();
 				assert children != null;
-				for( Widget child : children)
+				for (Widget child : children)
 				{
 					if (child.getName().contains(name))
 					{
@@ -984,7 +984,7 @@ public class ExtUtils
 			{
 				Widget[] children = widget.getChildren();
 				assert children != null;
-				for( Widget child : children)
+				for (Widget child : children)
 				{
 					if (child.getName().contains(name))
 					{
@@ -1021,7 +1021,7 @@ public class ExtUtils
 				.list;
 	}
 
-	List<WidgetItem> getInventorySlots(int ... ids)
+	List<WidgetItem> getInventorySlots(int... ids)
 	{
 		return new InventoryWidgetItemQuery()
 				.idEquals(ids)
@@ -1029,7 +1029,7 @@ public class ExtUtils
 				.list;
 	}
 
-	WidgetItem getRandomInventorySlot(int ... ids)
+	WidgetItem getRandomInventorySlot(int... ids)
 	{
 		ArrayList<WidgetItem> list = new InventoryWidgetItemQuery()
 				.idEquals(ids)
@@ -1038,9 +1038,9 @@ public class ExtUtils
 		return list.get(new Random().nextInt(list.size()));
 	}
 
-	WidgetItem getFirstInventorySlot(int ... ids)
+	WidgetItem getFirstInventorySlot(int... ids)
 	{
-		return  new InventoryWidgetItemQuery()
+		return new InventoryWidgetItemQuery()
 				.idEquals(ids)
 				.result(client)
 				.first();
