@@ -8,6 +8,8 @@ package net.runelite.client.plugins.a;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.queries.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -42,12 +44,12 @@ public class ExtUtils
 		this.keyboard = keyboard;
 	}
 
-	ExtUtils(Client client)
+	public ExtUtils(Client client)
 	{
 		this.client = client;
 	}
 
-	public int[] stringToIntArray(String string)
+	public static int[] stringToIntArray(String string)
 	{
 		return Arrays.stream(string.split(",")).map(String::trim).mapToInt(Integer::parseInt).toArray();
 	}
@@ -830,6 +832,79 @@ public class ExtUtils
 	{
 		return (point.getX() >= 0 && point.getX() <= client.getCanvasWidth() && point.getY() >= 0 &&
 				point.getY() <= client.getCanvasHeight());
+	}
+
+	public boolean isOnScreen(LocalPoint lp, int plane)
+	{
+		if (isOnMinimap(lp))
+		{
+			return true;
+		}
+		return isOnTile(lp, plane);
+	}
+
+	public boolean isOnMinimap(LocalPoint lp)
+	{
+		Point posOnMinimap = Perspective.localToMinimap(client, lp);
+
+		if (posOnMinimap == null)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public boolean isOnTile(LocalPoint lp, int plane)
+	{
+		Point posOnCanvas = Perspective.localToCanvas(client, lp, plane);
+
+		if (posOnCanvas == null)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public Point mapWorldPointToGraphicsPoint(WorldPoint worldPoint)
+	{
+		RenderOverview ro = client.getRenderOverview();
+
+		if (!ro.getWorldMapData().surfaceContainsPosition(worldPoint.getX(), worldPoint.getY()))
+		{
+			return null;
+		}
+
+		float pixelsPerTile = ro.getWorldMapZoom();
+
+		Widget map = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
+		if (map != null)
+		{
+			Rectangle worldMapRect = map.getBounds();
+
+			int widthInTiles = (int) Math.ceil(worldMapRect.getWidth() / pixelsPerTile);
+			int heightInTiles = (int) Math.ceil(worldMapRect.getHeight() / pixelsPerTile);
+
+			Point worldMapPosition = ro.getWorldMapPosition();
+
+			//Offset in tiles from anchor sides
+			int yTileMax = worldMapPosition.getY() - heightInTiles / 2;
+			int yTileOffset = (yTileMax - worldPoint.getY() - 1) * -1;
+			int xTileOffset = worldPoint.getX() + widthInTiles / 2 - worldMapPosition.getX();
+
+			int xGraphDiff = ((int) (xTileOffset * pixelsPerTile));
+			int yGraphDiff = (int) (yTileOffset * pixelsPerTile);
+
+			//Center on tile.
+			yGraphDiff -= pixelsPerTile - Math.ceil(pixelsPerTile / 2);
+			xGraphDiff += pixelsPerTile - Math.ceil(pixelsPerTile / 2);
+
+			yGraphDiff = worldMapRect.height - yGraphDiff;
+			yGraphDiff += (int) worldMapRect.getY();
+			xGraphDiff += (int) worldMapRect.getX();
+
+			return new Point(xGraphDiff, yGraphDiff);
+		}
+		return null;
 	}
 
 

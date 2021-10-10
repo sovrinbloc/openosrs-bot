@@ -116,7 +116,8 @@ public enum WidgetInfo
 		return groupId << 16 | childId;
 	}
 
-	public static int WIDTH(Client client) {
+	public static int WIDTH(Client client)
+	{
 		Widget widget = client.getWidget(15, 3);
 		if (widget != null)
 		{
