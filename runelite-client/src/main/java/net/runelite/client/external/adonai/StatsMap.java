@@ -8,7 +8,9 @@ package net.runelite.client.external.adonai;
 import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.external.adonai.widgets.WidgetInfo;
+import net.runelite.client.plugins.a.Adonai;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -62,5 +64,11 @@ public enum StatsMap
 	public static WidgetInfo getWidget(String skill)
 	{
 		return map.getOrDefault(skill, null);
+	}
+
+	public static Widget getWidgetInfo(String skill)
+	{
+		WidgetInfo w = map.getOrDefault(skill, null);
+		return Adonai.client.getWidget(w.getGroupId(), w.getChildId());
 	}
 }

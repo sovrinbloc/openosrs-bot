@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.a;
+package net.runelite.client.plugins.a.utils;
 
 import net.runelite.api.Point;
 import net.runelite.api.*;
@@ -7,10 +7,12 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
+import net.runelite.client.plugins.a.Adonai;
+import net.runelite.client.plugins.a.toolbox.ScreenMath;
 
 import java.awt.*;
 
-public class ScreenUtils
+public class Screen
 {
 	public static boolean isOnScreen(TileObject point)
 	{
@@ -107,8 +109,7 @@ public class ScreenUtils
 		return isOnTile(LocalPoint.fromWorld(Adonai.client, wp), plane);
 	}
 
-
-	private java.awt.Point tileCenter(WorldPoint b)
+	public java.awt.Point tileCenter(WorldPoint b)
 	{
 		Client client = Adonai.client;
 
@@ -134,13 +135,46 @@ public class ScreenUtils
 		return new java.awt.Point(cx, cy);
 	}
 
+	public java.awt.Point tileCenter(LocalPoint lp)
+	{
+		Client client = Adonai.client;
+
+		return tileCenter(WorldPoint.fromLocal(Adonai.client, lp));
+	}
+
+	public java.awt.Point tileCenter(WidgetInfo widget)
+	{
+		Widget poly = Adonai.client.getWidget(widget);
+		assert poly != null;
+
+		if (poly.isHidden())
+		{
+			return null;
+		}
+
+		int cx = poly.getBounds().x + poly.getBounds().width / 2;
+		int cy = poly.getBounds().y + poly.getBounds().height / 2;
+
+		return new java.awt.Point(cx, cy);
+	}
+
+	public static java.awt.Point getAbsoluteScreenLocation()
+	{
+		return Adonai.client.getCanvas().getLocationOnScreen();
+	}
+
+	public static Point mapWorldPointToGraphicsPoint(LocalPoint lp)
+	{
+		return mapWorldPointToGraphicsPoint(WorldPoint.fromLocal(Adonai.client, lp));
+	}
+
 	public static Point mapWorldPointToGraphicsPoint(WorldPoint worldPoint)
 	{
 		assert Adonai.client != null;
 
 		RenderOverview ro = Adonai.client.getRenderOverview();
 
-		if (!ro.getWorldMapData().surfaceContainsPosition(worldPoint.getX(), worldPoint.getY()))
+		if (! ro.getWorldMapData().surfaceContainsPosition(worldPoint.getX(), worldPoint.getY()))
 		{
 			return null;
 		}
@@ -159,7 +193,7 @@ public class ScreenUtils
 
 			//Offset in tiles from anchor sides
 			int yTileMax = worldMapPosition.getY() - heightInTiles / 2;
-			int yTileOffset = (yTileMax - worldPoint.getY() - 1) * -1;
+			int yTileOffset = (yTileMax - worldPoint.getY() - 1) * - 1;
 			int xTileOffset = worldPoint.getX() + widthInTiles / 2 - worldMapPosition.getX();
 
 			int xGraphDiff = ((int) (xTileOffset * pixelsPerTile));
@@ -176,5 +210,27 @@ public class ScreenUtils
 			return new Point(xGraphDiff, yGraphDiff);
 		}
 		return null;
+	}
+
+	/**
+	 * Converts the canvas location of a screen object to the absolute screen position.
+	 *
+	 * @param point
+	 * @return
+	 */
+	public static Point toAbsoluteScreenPosition(Point point)
+	{
+		return ScreenMath.add(point, ScreenMath.convertToPoint(getAbsoluteScreenLocation()));
+	}
+
+	/**
+	 * Converts the double precision location of a screen object into the absolute screen position.
+	 *
+	 * @param point
+	 * @return
+	 */
+	public static java.awt.Point toAbsoluteScreenPosition(java.awt.Point point)
+	{
+		return ScreenMath.add(point, getAbsoluteScreenLocation());
 	}
 }
