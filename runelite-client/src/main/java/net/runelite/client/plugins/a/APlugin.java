@@ -12,6 +12,7 @@ import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.external.adonai.MenuMap;
+import net.runelite.client.external.adonai.TabMap;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -116,6 +117,13 @@ public class APlugin extends Plugin
 		}
 		sendChatMessage("This is the distance of " + player.getLocalLocation().distanceTo(localLocation));
 		sendChatMessage("Is it on the screen?: " + utils.isOnScreen(object));
+	}
+
+	private void getTabInterface()
+	{
+		client.getWidget(TabMap.getWidget("Root Interface Container")).isHidden();
+		client.getWidget(TabMap.getWidget("")).isHidden();
+
 	}
 
 	private void randomCameraEvent()
