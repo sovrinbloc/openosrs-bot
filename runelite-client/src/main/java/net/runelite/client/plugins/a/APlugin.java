@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.events.*;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.events.MenuOpened;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
@@ -16,11 +17,16 @@ import net.runelite.client.external.adonai.TabMap;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.a.objects.Objects;
+import net.runelite.client.plugins.a.utils.Screen;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @PluginDescriptor(
 		name = "A Plugin",
@@ -66,6 +72,7 @@ public class APlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
+		Adonai.client = client;
 		executor = Executors.newFixedThreadPool(1);
 
 		try
@@ -83,8 +90,8 @@ public class APlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
-		randomCameraEvent();
 
+//		randomCameraEvent();
 		player = client.getLocalPlayer();
 
 		if (isPlayerLocationChanged())
@@ -92,7 +99,7 @@ public class APlugin extends Plugin
 			sendChatMessage("Your character has moved.");
 		}
 
-		GameObject object = utils.findNearestGameObject(10819);
+		GameObject object = Objects.findNearestGameObject(10819);
 		if (object == null)
 		{
 			return;
@@ -116,7 +123,7 @@ public class APlugin extends Plugin
 			sendChatMessage("Options for:" + object.getName());
 		}
 		sendChatMessage("This is the distance of " + player.getLocalLocation().distanceTo(localLocation));
-		sendChatMessage("Is it on the screen?: " + utils.isOnScreen(object));
+		sendChatMessage("Is it on the screen?: " + Screen.isOnScreen(object));
 	}
 
 	private void getTabInterface()
@@ -201,8 +208,26 @@ public class APlugin extends Plugin
 	@Subscribe
 	public void onMenuOpened(MenuOpened event)
 	{
+
 		MenuMap menuMap = new MenuMap(client, event);
-		menuMap.getMenuCanvasLocation(menuMap.menuItems[1]);
+
+		menuMap.getMenuPosition();
+
+		log.info("Menu Position: ({}, {})", MenuMap.MenuPosition.getX(), MenuMap.MenuPosition.getY());
+
+		log.info("Menu W/H: ({}, {})", MenuMap.MenuDimensions.getX(), MenuMap.MenuPosition.getY());
+
+//		Point menuCanvasLocation = menuMap.getMenuCanvasLocation(menuMap.menuItems[1]);
+//
+//		Point walk = menuMap.getMenuCanvasLocation("Walk");
+//
+//		Point point = Screen.toAbsoluteScreenPosition(walk);
+
+//		log.info("Menu X,Y ({}, {})", client.getMenuX(), client.getMenuY());
+//
+//		log.info("Width Menu  W,H ({}, {})", client.getMenuWidth(), client.getMenuHeight());
+//
+//		log.info("Mouse Canvas Location: {}", client.getMouseCanvasPosition().toString());
 	}
 
 	TileObject findTileObject(int x, int y, int id)
