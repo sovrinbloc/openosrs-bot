@@ -11,6 +11,7 @@ import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.plugins.a.ExtUtils;
+import net.runelite.client.plugins.a.utils.Screen;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -76,7 +77,7 @@ public class PathMinimapOverlay extends Overlay
 				Point minimapPoint = Perspective.localToMinimap(client, localPoint);
 				if (minimapPoint != null)
 				{
-					if (u.isOnScreen(minimapPoint))
+					if (Screen.isOnScreen(minimapPoint))
 					{
 						LocalPoint lpUser = client.getLocalPlayer().getLocalLocation();
 						if (furthest == null || point.equals(plugin.path.get(plugin.path.size() - 1)) || furthest.distanceTo(lpUser) < localPoint.distanceTo(lpUser))
@@ -108,7 +109,7 @@ public class PathMinimapOverlay extends Overlay
 				Point minimapPoint = Perspective.localToMinimap(client, localPoint);
 				if (minimapPoint != null)
 				{
-					if (u.isOnScreen(minimapPoint))
+					if (Screen.isOnScreen(minimapPoint))
 					{
 						LocalPoint lpUser = client.getLocalPlayer().getLocalLocation();
 
@@ -117,7 +118,7 @@ public class PathMinimapOverlay extends Overlay
 						{
 							furthest = localPoint;
 							plugin.endInSight = true;
-						} else if (furthest == null || ((furthest.distanceTo(lpUser) < localPoint.distanceTo(lpUser)) && (u.isOnScreen(LocalPoint.fromWorld(client, plugin.end), plugin.end.getPlane()))))
+						} else if (furthest == null || ((furthest.distanceTo(lpUser) < localPoint.distanceTo(lpUser)) && (Screen.isOnScreen(LocalPoint.fromWorld(client, plugin.end), plugin.end.getPlane()))))
 						{
 							furthest = localPoint;
 							plugin.endInSight = false;

@@ -233,4 +233,20 @@ public class Screen
 	{
 		return ScreenMath.add(point, getAbsoluteScreenLocation());
 	}
+
+	public static Tile getTileLocation(LocalPoint point)
+	{
+		return getTileLocation(WorldPoint.fromLocal(Adonai.client, point));
+	}
+
+	public static Tile getTileLocation(WorldPoint point)
+	{
+		LocalPoint local = LocalPoint.fromWorld(Adonai.client, point);
+
+		Tile[][][] tiles = Adonai.client.getScene().getTiles();
+
+		assert local != null;
+
+		return tiles[point.getPlane()][local.getSceneX()][local.getSceneY()];
+	}
 }

@@ -30,22 +30,19 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.inject.Provides;
+
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.InventoryID;
-import net.runelite.api.Item;
-import net.runelite.api.ItemComposition;
-import net.runelite.api.ItemContainer;
-import net.runelite.api.ItemID;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.ScriptID;
-import net.runelite.api.VarClientStr;
+import net.runelite.api.*;
+import net.runelite.api.Point;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuShouldLeftClick;
@@ -65,6 +62,7 @@ import net.runelite.client.input.KeyListener;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.a.toolbox.ScreenMath;
 import net.runelite.client.util.QuantityFormatter;
 
 @PluginDescriptor(
@@ -281,9 +279,11 @@ public class BankPlugin extends Plugin
 			if (bankContainer != null && children != null)
 			{
 				log.debug("Computing bank price of {} items", bankContainer.size());
+				log.info("Bank canvas location: {}", bankItemContainer.getCanvasLocation().toString());
 
 				// The first components are the bank items, followed by tabs etc. There are always 816 components regardless
 				// of bank size, but we only need to check up to the bank size.
+				Map<Integer, Map<Integer, Item>> bankMap = new HashMap<Integer, Map<Integer, Item>>();
 				for (int i = 0; i < bankContainer.size(); ++i)
 				{
 					Widget child = children[i];
@@ -292,8 +292,30 @@ public class BankPlugin extends Plugin
 						final int alchPrice = getHaPrice(child.getItemId());
 						geTotal += (long) itemManager.getItemPrice(child.getItemId()) * child.getItemQuantity();
 						haTotal += (long) alchPrice * child.getItemQuantity();
+						log.info("Widget {}: id: {}, child name: {}, (x, y): ({}, {})", i, child.getItemId(), child.getName(), child.getBounds().getX(), child.getBounds().getY());
+						log.info("Canvas: (x, y): ({}, {})", child.getCanvasLocation().getX(), child.getCanvasLocation().getY());
+
+//						Rectangle bankBounds = bankItemContainer.getBounds();
+//						log.info("Is item visible? {}", bankBounds.contains(ScreenMath.convertToPoint(bankItemContainer.getCanvasLocation())));
+						log.info("Item item {}: id: {}", i, bankContainer.getItem(i).getId());
+
 					}
 				}
+
+				Point bankCanvas = bankItemContainer.getCanvasLocation();
+				int width = bankItemContainer.getWidth();
+				int height = bankItemContainer.getHeight();
+				int x = bankItemContainer.getBounds().x;
+				int y = bankItemContainer.getBounds().y;
+				String bounds = bankItemContainer.getBounds().toString();
+				int originalX = bankItemContainer.getOriginalX();
+				int originalY = bankItemContainer.getOriginalY();
+				log.info("canvas: {}", bankCanvas);
+				log.info("width, height: ({}, {})", width, height);
+				log.info("bounds: {}, (x, y): ({}, {})", bounds.toString(), x, y);
+				log.info("originalX/Y: (x, y): ({}, {})", originalX, originalY);
+				log.info("originalWidth/Height: ({}, {})", bankItemContainer.getOriginalWidth(), bankItemContainer.getOriginalHeight());
+
 
 				Widget bankTitle = client.getWidget(WidgetInfo.BANK_TITLE_BAR);
 				bankTitle.setText(bankTitle.getText() + createValueText(geTotal, haTotal));
