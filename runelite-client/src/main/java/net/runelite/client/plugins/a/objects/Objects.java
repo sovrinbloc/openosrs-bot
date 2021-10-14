@@ -247,6 +247,32 @@ public  class Objects
 		return findNearestGroundObject(names);
 	}
 
+	@Nullable
+	public static TileObject findNearestObject(String name)
+	{
+		GameObject gameObject = findNearestGameObject(obj -> obj.getName().contains(name));
+
+		if (gameObject != null)
+		{
+			return gameObject;
+		}
+
+		WallObject wallObject = findNearestWallObject(obj -> obj.getName().contains(name));
+
+		if (wallObject != null)
+		{
+			return wallObject;
+		}
+		DecorativeObject decorativeObject = findNearestDecorObject(obj -> obj.getName().contains(name));
+
+		if (decorativeObject != null)
+		{
+			return decorativeObject;
+		}
+
+		return findNearestGroundObject(obj -> obj.getName().contains(name));
+	}
+
 
 	// find in game items
 

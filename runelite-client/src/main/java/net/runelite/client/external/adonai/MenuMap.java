@@ -7,23 +7,18 @@ import net.runelite.api.events.MenuOpened;
 import net.runelite.client.plugins.a.Adonai;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 @Slf4j
 public class MenuMap
 {
 	MenuOpened menu;
-	public Point getMenuPosition = new Point(103, 22);
-	public Point getMenuDimensions = new Point(0, 0);
+	public Point menuPosition = new Point(103, 22);
+	public Point menuDimensions = new Point(0, 0);
 	public Point mousePosition;
 	public Canvas canvasCoordinates;
 
-	// offset, 20 down -- 33 (12 Pt Text)
-	public static final int OFFSET_DOWN = 20;
-	public static final int MENU_ITEM_HEIGHT = 15;
-	public static final int FONT_SIZE = 12;
-
 	public static MenuEntry[] menuItems;
-	public static Point mouseClicked;
 	public static MenuOpened menuOpened;
 
 	public MenuMap(MenuOpened menu)
@@ -36,34 +31,33 @@ public class MenuMap
 		MenuEntry[] menuEntries = menu.getMenuEntries();
 		menuOpened = menu;
 		menuItems = reverse(menuEntries, menuEntries.length);
-		mouseClicked = Adonai.client.getMouseCanvasPosition();
-		getMenuPosition = new Point(Adonai.client.getMenuX(), Adonai.client.getMenuY());
+		menuPosition = new Point(Adonai.client.getMenuX(), Adonai.client.getMenuY());
 		mousePosition = Adonai.client.getMouseCanvasPosition();
-		getMenuDimensions = new Point(Adonai.client.getMenuWidth(), Adonai.client.getMenuHeight());
+		menuDimensions = new Point(Adonai.client.getMenuWidth(), Adonai.client.getMenuHeight());
 		canvasCoordinates = Adonai.client.getCanvas();
-		getGetMenuPosition();
+		getMenuPosition();
 	}
 
-	public Point getGetMenuPosition()
+	public Point getMenuPosition()
 	{
 		int x, y;
-		if (mousePosition.getX() > (getMenuDimensions.getX() / 2) &&
-				mousePosition.getX() < (canvasCoordinates.getWidth() - (getMenuDimensions.getX() / 2)))
+		if (mousePosition.getX() > (menuDimensions.getX() / 2) &&
+				mousePosition.getX() < (canvasCoordinates.getWidth() - (menuDimensions.getX() / 2)))
 		{
-			x = mousePosition.getX() - (getMenuDimensions.getX() / 2);
+			x = mousePosition.getX() - (menuDimensions.getX() / 2);
 		}
-		else if (mousePosition.getX() > (canvasCoordinates.getWidth() - (getMenuDimensions.getX() / 2)))
+		else if (mousePosition.getX() > (canvasCoordinates.getWidth() - (menuDimensions.getX() / 2)))
 		{
-			x = canvasCoordinates.getX() - getMenuDimensions.getX();
+			x = canvasCoordinates.getX() - menuDimensions.getX();
 		}
 		else
 		{
 			x = 0;
 		}
 
-		if (mousePosition.getY() > (canvasCoordinates.getHeight() - getMenuDimensions.getY()))
+		if (mousePosition.getY() > (canvasCoordinates.getHeight() - menuDimensions.getY()))
 		{
-			y = canvasCoordinates.getY() - getMenuDimensions.getY();
+			y = canvasCoordinates.getY() - menuDimensions.getY();
 		}
 		else if (mousePosition.getY() <= 0)
 		{
@@ -74,8 +68,8 @@ public class MenuMap
 			y = mousePosition.getY();
 		}
 
-		getMenuPosition = new Point(x, y);
-		return getMenuPosition;
+		menuPosition = new Point(x, y);
+		return menuPosition;
 	}
 
 	/* function that reverses array and stores it
@@ -92,35 +86,47 @@ public class MenuMap
 		return b;
 	}
 
-	public Point getMenuCanvasLocation(MenuEntry item)
+	public MenuOption getMenuOption(String name)
 	{
 		int i = 0;
 		for (MenuEntry e : menuItems)
 		{
-			if (e.getMenuAction().getId() == item.getMenuAction().getId())
+			log.info("e.getMenuAction() {}", e.getMenuAction().toString());
+			log.info("e.getTarget() {}", e.getTarget());
+			String option = e.getOption();
+			if (option.contains(name) || option.toLowerCase().contains(name.toLowerCase()))
 			{
-				return new Point(
-						(int) (getMenuPosition.getX() + getMenuDimensions.getX() / 2.0f),
-						(getMenuPosition.getY() + OFFSET_DOWN) + (FONT_SIZE / 2) + (i * MENU_ITEM_HEIGHT)
-				);
+				return new MenuOption(e, new Point(
+						(int) (menuPosition.getX() + menuDimensions.getX() / 2.0f),
+						MenuOption.OFFSET_DOWN_Y + menuPosition.getY() + (MenuOption.FONT_SIZE / 2) + (i * MenuOption.MENU_ITEM_HEIGHT_MARGIN_Y + MenuOption.FONT_SIZE)
+				), i);
 			}
 			i++;
 		}
 		return null;
 	}
 
-	public Point getMenuCanvasLocation(String name)
+	public MenuOption getMenuOptions()
+	{
+		java.util.List<MenuOption> menuOptions = new ArrayList<MenuOption>();
+		for (int i = 0; i < menuItems.length; i++)
+		{
+			menuOptions.add(new MenuOption(menuItems[i], menuPosition, menuDimensions, i));
+		}
+		return null;
+	}
+
+	public MenuOption getMenuOption(MenuEntry entry)
 	{
 		int i = 0;
 		for (MenuEntry e : menuItems)
 		{
-			String option = e.getOption();
-			if (option.contains(name) || option.toLowerCase().contains(name.toLowerCase()))
+			if (e.equals(entry))
 			{
-				return new Point(
-						(int) (getMenuPosition.getX() + getMenuDimensions.getX() / 2.0f),
-						(getMenuPosition.getY() + OFFSET_DOWN) + (FONT_SIZE / 2) + (i * MENU_ITEM_HEIGHT)
-				);
+				return new MenuOption(e, new Point(
+						(int) (menuPosition.getX() + menuDimensions.getX() / 2.0f),
+						(menuPosition.getY() + MenuOption.OFFSET_DOWN_Y) + (MenuOption.FONT_SIZE / 2) + (i * MenuOption.MENU_ITEM_HEIGHT_MARGIN_Y + MenuOption.FONT_SIZE)
+				), i);
 			}
 			i++;
 		}

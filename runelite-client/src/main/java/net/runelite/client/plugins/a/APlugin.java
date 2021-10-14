@@ -211,13 +211,14 @@ public class APlugin extends Plugin
 
 		MenuMap menuMap = new MenuMap(event);
 
-		menuMap.getGetMenuPosition();
+		menuMap.getMenuPosition();
 
-		log.info("Menu Position: ({}, {})", menuMap.getMenuPosition.getX(), menuMap.getMenuPosition.getY());
-		log.info("Menu W/H: ({}, {})", menuMap.getMenuDimensions.getX(), menuMap.getMenuPosition.getY());
-		log.info("Finding: {}", menuMap.getMenuCanvasLocation("Walk").toString());
-		log.info("Finding: {}", menuMap.getMenuCanvasLocation("Trade").toString());
-		log.info("Cancel: {}", menuMap.getMenuCanvasLocation("Cancel").toString());
+		log.info("Menu Position: ({}, {})", menuMap.menuPosition.getX(), menuMap.menuPosition.getY());
+		log.info("Menu W/H: ({}, {})", menuMap.menuDimensions.getX(), menuMap.menuPosition.getY());
+		log.info("Finding: {}", menuMap.getMenuOption("Walk").getExactCanvasLocation().toString());
+		log.info("Finding: {}", menuMap.getMenuOption("Trade").getExactCanvasLocation().toString());
+		log.info("Cancel: {}", menuMap.getMenuOption("Cancel").getExactCanvasLocation().toString());
+		TileObject oak = Objects.findNearestObject("Oak");
 	}
 
 	TileObject findTileObject(int x, int y, int id)
