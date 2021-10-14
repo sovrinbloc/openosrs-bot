@@ -72,7 +72,7 @@ public class APlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		Adonai.client = client;
+		Adonai.client = this.client;
 		executor = Executors.newFixedThreadPool(1);
 
 		try
@@ -209,25 +209,16 @@ public class APlugin extends Plugin
 	public void onMenuOpened(MenuOpened event)
 	{
 
-		MenuMap menuMap = new MenuMap(client, event);
+		MenuMap menuMap = new MenuMap(event);
 
 		menuMap.getMenuPosition();
 
-		log.info("Menu Position: ({}, {})", MenuMap.MenuPosition.getX(), MenuMap.MenuPosition.getY());
-
-		log.info("Menu W/H: ({}, {})", MenuMap.MenuDimensions.getX(), MenuMap.MenuPosition.getY());
-
-//		Point menuCanvasLocation = menuMap.getMenuCanvasLocation(menuMap.menuItems[1]);
-//
-//		Point walk = menuMap.getMenuCanvasLocation("Walk");
-//
-//		Point point = Screen.toAbsoluteScreenPosition(walk);
-
-//		log.info("Menu X,Y ({}, {})", client.getMenuX(), client.getMenuY());
-//
-//		log.info("Width Menu  W,H ({}, {})", client.getMenuWidth(), client.getMenuHeight());
-//
-//		log.info("Mouse Canvas Location: {}", client.getMouseCanvasPosition().toString());
+		log.info("Menu Position: ({}, {})", menuMap.menuPosition.getX(), menuMap.menuPosition.getY());
+		log.info("Menu W/H: ({}, {})", menuMap.menuDimensions.getX(), menuMap.menuPosition.getY());
+		log.info("Finding: {}", menuMap.getMenuOption("Walk").getExactCanvasLocation().toString());
+		log.info("Finding: {}", menuMap.getMenuOption("Trade").getExactCanvasLocation().toString());
+		log.info("Cancel: {}", menuMap.getMenuOption("Cancel").getExactCanvasLocation().toString());
+		TileObject oak = Objects.findNearestObject("Oak");
 	}
 
 	TileObject findTileObject(int x, int y, int id)

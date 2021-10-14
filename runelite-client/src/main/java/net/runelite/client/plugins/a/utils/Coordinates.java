@@ -21,6 +21,6 @@ public class Coordinates
 
 	public static MenuMap getMenu(MenuOpened menu)
 	{
-		return new MenuMap(Adonai.client, menu);
+		return new MenuMap(menu);
 	}
 }

@@ -1,88 +1,76 @@
 package net.runelite.client.external.adonai;
 
-import net.runelite.api.Client;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
 import net.runelite.api.events.MenuOpened;
+import net.runelite.client.plugins.a.Adonai;
 
 import java.awt.*;
+import java.util.ArrayList;
 
+@Slf4j
 public class MenuMap
 {
 	MenuOpened menu;
-	public static Point MenuPosition = new Point(103, 22);
-	public static Point MenuDimensions = new Point(0, 0);
-	public static Point MousePosition;
-	public static Canvas CanvasCoordinates;
+	public Point menuPosition = new Point(103, 22);
+	public Point menuDimensions = new Point(0, 0);
+	public Point mousePosition;
+	public Canvas canvasCoordinates;
 
-	// offset, 20 down -- 33 (12 Pt Text)
-	public static final int OFFSET_DOWN = 20;
-	public static final int MENU_ITEM_HEIGHT = 15;
-	public static final int FONT_SIZE = 12;
+	public static MenuEntry[] menuItems;
+	public static MenuOpened menuOpened;
 
-	public MenuEntry[] menuItems;
-	public Point mouseClicked;
-	public MenuOpened menuOpened;
+	public MenuMap(MenuOpened menu)
+	{
+		initialize(menu);
+	}
 
-	public MenuMap(Client client, MenuOpened menu)
+	private void initialize(MenuOpened menu)
 	{
 		MenuEntry[] menuEntries = menu.getMenuEntries();
-		// mouse is directly on top of, and in the middle of menu
-		// if mouse.X > menu.getWidth() / 2  (normal menu)
-		// 	then menu.x = -> ( (mouse.getX()) - (menu.getWidth() / 2) )
-		//
-		// if (mouse.X < menu.getWidth() / 2); (mouse geared to left)
-		// 	then ( menu.x = 0 )
-		//
-		// if (mouse.y > canvas.Height - menu.getHeight() ) (mouse down low)
-		// 	then menu.y > canvas.Height - menu.getHeight()
-		//
-		// if (mouse.x > (canvas.width - (menu.width() / 2))
-		// 	then menu.x = canvas.width - menu.width
-
-		this.menuOpened = menu;
+		menuOpened = menu;
 		menuItems = reverse(menuEntries, menuEntries.length);
-		mouseClicked = client.getMouseCanvasPosition();
-		MenuPosition = new Point(client.getMenuX(), client.getMenuY());
-		MousePosition = client.getMouseCanvasPosition();
-		MenuDimensions = new Point(client.getMenuWidth(), client.getMenuHeight());
-		CanvasCoordinates = client.getCanvas();
+		menuPosition = new Point(Adonai.client.getMenuX(), Adonai.client.getMenuY());
+		mousePosition = Adonai.client.getMouseCanvasPosition();
+		menuDimensions = new Point(Adonai.client.getMenuWidth(), Adonai.client.getMenuHeight());
+		canvasCoordinates = Adonai.client.getCanvas();
 		getMenuPosition();
 	}
 
 	public Point getMenuPosition()
 	{
 		int x, y;
-		if (MousePosition.getX() > (MenuDimensions.getX() / 2) &&
-				MousePosition.getX() < (CanvasCoordinates.getWidth() - (MenuDimensions.getX() / 2)))
+		if (mousePosition.getX() > (menuDimensions.getX() / 2) &&
+				mousePosition.getX() < (canvasCoordinates.getWidth() - (menuDimensions.getX() / 2)))
 		{
-			x = MousePosition.getX() + (MenuDimensions.getX() / 2);
+			x = mousePosition.getX() - (menuDimensions.getX() / 2);
 		}
-		else if (MousePosition.getX() > (CanvasCoordinates.getWidth() - (MenuDimensions.getX() / 2)))
+		else if (mousePosition.getX() > (canvasCoordinates.getWidth() - (menuDimensions.getX() / 2)))
 		{
-			x = CanvasCoordinates.getX() - MenuDimensions.getX();
+			x = canvasCoordinates.getX() - menuDimensions.getX();
 		}
 		else
 		{
 			x = 0;
 		}
 
-		if (MousePosition.getY() > (CanvasCoordinates.getHeight() - MenuDimensions.getY()))
+		if (mousePosition.getY() > (canvasCoordinates.getHeight() - menuDimensions.getY()))
 		{
-			y = CanvasCoordinates.getY() - MenuDimensions.getY();
+			y = canvasCoordinates.getY() - menuDimensions.getY();
 		}
-		else if (MousePosition.getY() <= 0)
+		else if (mousePosition.getY() <= 0)
 		{
 			y = 0;
 		}
 		else
 		{
-			y = MousePosition.getY();
+			y = mousePosition.getY();
 		}
-		MenuPosition = new Point(x, y);
-		return MenuPosition;
-	}
 
+		menuPosition = new Point(x, y);
+		return menuPosition;
+	}
 
 	/* function that reverses array and stores it
        in another array*/
@@ -98,32 +86,50 @@ public class MenuMap
 		return b;
 	}
 
-	public Point getMenuCanvasLocation(MenuEntry item)
+	public MenuOption getMenuOption(String name)
 	{
 		int i = 0;
 		for (MenuEntry e : menuItems)
 		{
-			if (e.getMenuAction().getId() == item.getMenuAction().getId())
+			log.info("e.getMenuAction() {}", e.getMenuAction().toString());
+			log.info("e.getTarget() {}", e.getTarget());
+			String option = e.getOption();
+			if (option.contains(name) || option.toLowerCase().contains(name.toLowerCase()))
 			{
-				return new Point((int) (MenuPosition.getX() + MenuDimensions.getX() / 2.0f), (MenuPosition.getY() + OFFSET_DOWN) + (FONT_SIZE / 2) + (i * MENU_ITEM_HEIGHT));
+				return new MenuOption(e, new Point(
+						(int) (menuPosition.getX() + menuDimensions.getX() / 2.0f),
+						MenuOption.OFFSET_DOWN_Y + menuPosition.getY() + (MenuOption.FONT_SIZE / 2) + (i * MenuOption.MENU_ITEM_HEIGHT_MARGIN_Y + MenuOption.FONT_SIZE)
+				), i);
 			}
 			i++;
 		}
 		return null;
 	}
 
-	public Point getMenuCanvasLocation(String name)
+	public MenuOption getMenuOptions()
+	{
+		java.util.List<MenuOption> menuOptions = new ArrayList<MenuOption>();
+		for (int i = 0; i < menuItems.length; i++)
+		{
+			menuOptions.add(new MenuOption(menuItems[i], menuPosition, menuDimensions, i));
+		}
+		return null;
+	}
+
+	public MenuOption getMenuOption(MenuEntry entry)
 	{
 		int i = 0;
 		for (MenuEntry e : menuItems)
 		{
-			if (e.getOption().contains(name))
+			if (e.equals(entry))
 			{
-				return new Point((int) (MenuPosition.getX() + MenuDimensions.getX() / 2.0f), (MenuPosition.getY() + OFFSET_DOWN) + (FONT_SIZE / 2) + (i * MENU_ITEM_HEIGHT));
+				return new MenuOption(e, new Point(
+						(int) (menuPosition.getX() + menuDimensions.getX() / 2.0f),
+						(menuPosition.getY() + MenuOption.OFFSET_DOWN_Y) + (MenuOption.FONT_SIZE / 2) + (i * MenuOption.MENU_ITEM_HEIGHT_MARGIN_Y + MenuOption.FONT_SIZE)
+				), i);
 			}
 			i++;
 		}
 		return null;
 	}
-
 }

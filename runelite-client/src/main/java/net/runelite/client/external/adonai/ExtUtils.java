@@ -15,6 +15,7 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.external.PrayerMap;
 import net.runelite.client.external.Spells;
 import net.runelite.client.external.Tab;
+import net.runelite.client.plugins.a.Adonai;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -34,7 +35,7 @@ import static net.runelite.client.external.adonai.ExtUtils.AdonaiDecorativeObjec
 @Slf4j
 @SuppressWarnings("unused")
 @Singleton
-public class ExtUtils
+public class ExtUtils<operator, T2>
 {
 	final private Client client;
 	private Keyboard keyboard = null;
@@ -454,10 +455,9 @@ public class ExtUtils
 
 	}
 
-	static class AdonaiNPCObjects
+	static class NPCs
 	{
-
-		public static Client client;
+		public static Client client = Adonai.client;
 
 		@Nullable
 		public NPC findNearestNPC(int... ids)
@@ -812,10 +812,10 @@ public class ExtUtils
 
 		if (client.isStretchedEnabled())
 		{
-			final Dimension stretched = client.getStretchedDimensions();
-			final Dimension real = client.getRealDimensions();
-			final double width = (stretched.width / real.getWidth());
-			final double height = (stretched.height / real.getHeight());
+			final Dimension stretched = net.runelite.client.plugins.a.Adonai.client.getStretchedDimensions();
+			final Dimension realDimensions = net.runelite.client.plugins.a.Adonai.client.getRealDimensions();
+			final double width = (stretched.width / realDimensions.getWidth());
+			final double height = (stretched.height / realDimensions.getHeight());
 			final Point point = new Point((int) (p.getX() * width), (int) (p.getY() * height));
 			mouseEvent(501, point);
 			mouseEvent(502, point);
