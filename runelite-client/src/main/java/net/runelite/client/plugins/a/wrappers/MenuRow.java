@@ -1,4 +1,4 @@
-package net.runelite.client.external.adonai;
+package net.runelite.client.plugins.a.wrappers;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.MenuEntry;
@@ -10,7 +10,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 @Slf4j
-public class MenuMap
+public class MenuRow
 {
 	MenuOpened menu;
 	public Point menuPosition = new Point(103, 22);
@@ -21,7 +21,7 @@ public class MenuMap
 	public static MenuEntry[] menuItems;
 	public static MenuOpened menuOpened;
 
-	public MenuMap(MenuOpened menu)
+	public MenuRow(MenuOpened menu)
 	{
 		initialize(menu);
 	}
@@ -86,7 +86,7 @@ public class MenuMap
 		return b;
 	}
 
-	public MenuOption getMenuOption(String name)
+	public MenuOption getMenuRow(String name)
 	{
 		int i = 0;
 		for (MenuEntry e : menuItems)
@@ -106,7 +106,7 @@ public class MenuMap
 		return null;
 	}
 
-	public MenuOption getMenuOptions()
+	public MenuOption getMenuOption()
 	{
 		java.util.List<MenuOption> menuOptions = new ArrayList<MenuOption>();
 		for (int i = 0; i < menuItems.length; i++)
@@ -116,7 +116,7 @@ public class MenuMap
 		return null;
 	}
 
-	public MenuOption getMenuOption(MenuEntry entry)
+	public MenuOption getMenuRow(MenuEntry entry)
 	{
 		int i = 0;
 		for (MenuEntry e : menuItems)
@@ -131,5 +131,51 @@ public class MenuMap
 			i++;
 		}
 		return null;
+	}
+
+
+
+
+
+	public String action;
+
+	public String object;
+
+	public int ID;
+
+	public int xCode;
+
+	public int yCode;
+
+	public int opCode;
+
+	public String getAction()
+	{
+		return action;
+	}
+
+	public String getObject()
+	{
+		return this.object;
+	}
+
+	public int getID()
+	{
+		return this.ID;
+	}
+
+	public int getXCode()
+	{
+		return this.xCode;
+	}
+
+	public int getYCode()
+	{
+		return this.yCode;
+	}
+
+	public int getOpCode()
+	{
+		return this.getMenuOption().getEntry().getOpcode();
 	}
 }

@@ -1,7 +1,10 @@
-package net.runelite.client.external.adonai;
+package net.runelite.client.plugins.a.wrappers;
 
 import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
+import net.runelite.api.TileObject;
+import net.runelite.client.external.adonai.ExtUtils;
+import net.runelite.client.plugins.a.npc.NPCs;
 
 public class MenuOption
 {
@@ -21,7 +24,6 @@ public class MenuOption
 		this.entry = entry;
 		this.canvasLocation = canvasLocation;
 		this.menuLocation = menuLocation;
-		new ExtUtils.NPCs();
 	}
 
 	public MenuOption(MenuEntry entry, Point menuPosition, Point menuDimensions, int menuLocation)
@@ -34,13 +36,18 @@ public class MenuOption
 		);
 		this.menuLocation = menuLocation;
 		this.bounds = new java.awt.Rectangle(menuPosition.getX(), canvasLocation.getY() - (MenuOption.FONT_SIZE / 2), menuDimensions.getX(), MenuOption.MENU_ITEM_HEIGHT_MARGIN_Y + MenuOption.FONT_SIZE);
-		new ExtUtils.NPCs();
+		new NPCs();
 	}
 
 	private enum OUT
 	{
 		OUT,
 		IN
+	}
+
+	public TileObject getObject()
+	{
+		return null;
 	}
 
 	public MenuEntry getEntry()

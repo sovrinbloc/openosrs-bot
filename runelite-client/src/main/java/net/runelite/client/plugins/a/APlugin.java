@@ -5,24 +5,28 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.MenuOpened;
+import net.runelite.api.events.*;
+import net.runelite.api.widgets.Menu.RightClickMenuHelper;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.external.adonai.MenuMap;
+import net.runelite.client.plugins.a.toolbox.Calculations;
+import net.runelite.client.plugins.a.wrappers.Menu;
 import net.runelite.client.external.adonai.TabMap;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.a.objects.Objects;
-import net.runelite.client.plugins.a.utils.Screen;
+import net.runelite.client.plugins.a.screen.Screen;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -60,7 +64,6 @@ public class APlugin extends Plugin
 
 	private Player player;
 
-
 	private boolean keyboard = true;
 
 
@@ -91,7 +94,10 @@ public class APlugin extends Plugin
 	public void onGameTick(GameTick event)
 	{
 
-//		randomCameraEvent();
+		if (moveCamera)
+		{
+			randomCameraEvent();
+		}
 		player = client.getLocalPlayer();
 
 		if (isPlayerLocationChanged())
@@ -109,9 +115,12 @@ public class APlugin extends Plugin
 		if (minimapLocation != null)
 		{
 			sendChatMessage("nearest game object minimap information: " + minimapLocation);
-			sendChatMessage("This is the distance on minimap of " + player.getMinimapLocation().distanceTo(minimapLocation));
-			object.getCanvasTilePoly().getBounds();
+			sendChatMessage("This is the distance on minimap of " + player.getMinimapLocation()
+					.distanceTo(minimapLocation));
+			object.getCanvasTilePoly()
+					.getBounds();
 		}
+
 		LocalPoint localDestinationLocation = client.getLocalDestinationLocation();
 
 		sendChatMessage("nearest game object information: " + object.getCanvasLocation());
@@ -122,14 +131,17 @@ public class APlugin extends Plugin
 		{
 			sendChatMessage("Options for:" + object.getName());
 		}
-		sendChatMessage("This is the distance of " + player.getLocalLocation().distanceTo(localLocation));
+		sendChatMessage("This is the distance of " + player.getLocalLocation()
+				.distanceTo(localLocation));
 		sendChatMessage("Is it on the screen?: " + Screen.isOnScreen(object));
 	}
 
 	private void getTabInterface()
 	{
-		client.getWidget(TabMap.getWidget("Root Interface Container")).isHidden();
-		client.getWidget(TabMap.getWidget("")).isHidden();
+		client.getWidget(TabMap.getWidget("Root Interface Container"))
+				.isHidden();
+		client.getWidget(TabMap.getWidget(""))
+				.isHidden();
 
 	}
 
@@ -209,15 +221,30 @@ public class APlugin extends Plugin
 	public void onMenuOpened(MenuOpened event)
 	{
 
-		MenuMap menuMap = new MenuMap(event);
+		Menu menu = new Menu(event);
 
-		menuMap.getMenuPosition();
+		menu.getMenuPosition();
 
-		log.info("Menu Position: ({}, {})", menuMap.menuPosition.getX(), menuMap.menuPosition.getY());
-		log.info("Menu W/H: ({}, {})", menuMap.menuDimensions.getX(), menuMap.menuPosition.getY());
-		log.info("Finding: {}", menuMap.getMenuOption("Walk").getExactCanvasLocation().toString());
-		log.info("Finding: {}", menuMap.getMenuOption("Trade").getExactCanvasLocation().toString());
-		log.info("Cancel: {}", menuMap.getMenuOption("Cancel").getExactCanvasLocation().toString());
+		log.info("Menu Position: ({}, {})", menu.menuPosition.getX(), menu.menuPosition.getY());
+		log.info("Menu W/H: ({}, {})", menu.menuDimensions.getX(), menu.menuPosition.getY());
+		log.info(
+				"Finding: {}",
+				menu.getMenuOption("Walk")
+						.getExactCanvasLocation()
+						.toString()
+		);
+		log.info(
+				"Finding: {}",
+				menu.getMenuOption("Trade")
+						.getExactCanvasLocation()
+						.toString()
+		);
+		log.info(
+				"Cancel: {}",
+				menu.getMenuOption("Cancel")
+						.getExactCanvasLocation()
+						.toString()
+		);
 		TileObject oak = Objects.findNearestObject("Oak");
 	}
 
@@ -257,21 +284,144 @@ public class APlugin extends Plugin
 		return null;
 	}
 
-	private void sendChatMessage(String chatMessage)
-	{
-		final String message = new ChatMessageBuilder()
-				.append(ChatColorType.HIGHLIGHT)
-				.append(chatMessage)
-				.build();
 
-		chatMessageManager.queue(
-				QueuedMessage.builder()
-						.type(ChatMessageType.CONSOLE)
-						.runeLiteFormattedMessage(message)
-						.build());
+	double seconds = -1;
+	private List<String> lastMenuItems = new ArrayList<>();
+	boolean modified = false;
+	float tickDiff = 0.0f;
+
+	@Subscribe
+	public void onClientTick(ClientTick tick)
+	{
+		RightClickMenuHelper helper = client.drawAdonaiMenu(Calculations.random(200, 255));
+		float newSeconds = (float) System.currentTimeMillis();
+		List<String> menuList = getMenuList();
+		tickDiff = ((float) (newSeconds - seconds)) / 1000.0f;
+		if (lastMenuItems.equals(menuList))
+		{
+			return;
+		}
+		// new info to share once the menu items have changed
+		log.info("loop beginning ended: {}ms", seconds);
+		log.info("loop ended: {}ms", newSeconds);
+		log.info("difference in seconds: {}s", tickDiff);
+
+		lastMenuItems = menuList;
+		log.info("what is love? {}", helper.getMenuItems().size());
+		log.info("menu items... {}", menuList);
+		for (RightClickMenuHelper.OptionHelper help : helper.getMenuItems())
+		{
+			log.info("getFullText(): {}", help.getFullText());
+			log.info("getActionId(): {}", help.getActionId());
+			log.info("getArguments0() {}", help.getArguments0());
+			log.info("getIdentifier() {}", help.getIdentifier());
+			log.info("getOpcode() {}", help.getOpCode());
+			log.info("getMenuEntryId() {}", help.getMenuEntryId());
+			log.info("getArguments1() {}", help.getArguments1());
+			log.info("getEntry().getParam1() {}", help.getEntry().getParam1());
+			log.info("getEntry().getParam0() {}", help.getEntry().getParam0());
+			log.info("getEntry().getId() {}", help.getEntry().getId());
+			log.info("getEntry().getActionParam1() {}", help.getEntry().getActionParam1());
+			log.info("getMenuAction().getId() {}", help.getEntry().getMenuAction().getId());
+			log.info("toString() {}", help.getEntry().getMenuAction().toString());
+		}
+		List<NPC> cachedNPCs = client.getNpcs();
+		log.info("There are {} cached NPC's.", cachedNPCs.size());
+		for (NPC n : cachedNPCs)
+		{
+			if (n != null)
+			log.info("{}", n.getCombatLevel());
+		}
 	}
 
-	private void sendChatMessage(String chatMessage, ChatColorType type)
+	@Subscribe
+	public void onBeforeMenuRender(BeforeMenuRender event)
+	{
+		RightClickMenuHelper helper = client.drawAdonaiMenu(Calculations.random(200, 255));
+		event.consume();
+		log.info("Beginning: ");
+		if(1 == 2)
+		for (RightClickMenuHelper.OptionHelper help : helper.getMenuItems())
+		{
+			log.info("getFullText(): {}", help.getFullText());
+			log.info("getActionId(): {}", help.getActionId());
+			log.info("getArguments0() {}", help.getArguments0());
+			log.info("getIdentifier() {}", help.getIdentifier());
+			log.info("getOpcode() {}", help.getOpCode());
+			log.info("getMenuEntryId() {}", help.getMenuEntryId());
+			log.info("getArguments1() {}", help.getArguments1());
+			log.info("getEntry().getParam1() {}", help.getEntry().getParam1());
+			log.info("getEntry().getParam0() {}", help.getEntry().getParam0());
+			log.info("getEntry().getId() {}", help.getEntry().getId());
+			log.info("getEntry().getActionParam1() {}", help.getEntry().getActionParam1());
+			log.info("getMenuAction().getId() {}", help.getEntry().getMenuAction().getId());
+			log.info("toString() {}", help.getEntry().getMenuAction().toString());
+		}
+		log.info("END");
+	}
+
+	private boolean moveCamera = true;
+	@Subscribe
+	public void onFocusChanged(FocusChanged event)
+	{
+		if (event.isFocused())
+		{
+			moveCamera = true;
+			return;
+		}
+		moveCamera = false;
+	}
+
+
+
+	private static float milliToSeconds(int ms)
+	{
+		return ((float) ms) / 1000.0f;
+	}
+
+	private static float secondsToMillis(int s)
+	{
+		return ((float) s) * 1000.0f;
+	}
+
+	private List<String> getMenuList()
+	{
+		String list = "";
+		List<String> menuList = new ArrayList<String>();
+		new ArrayList<MenuEntry>(
+				java.util.List.of(
+						client.getMenuEntries()
+				)
+		).forEach(
+				e -> menuList.add( e.getOption())
+		);
+		return menuList;
+	}
+
+	private void sendChatMessage(String pattern, Object... arguments)
+	{
+		sendChatMessage(MessageFormat.format(pattern, arguments));
+	}
+
+	private String messageArgs(String pattern, Object... arguments)
+	{
+		return MessageFormat.format(pattern, arguments);
+	}
+
+	private QueuedMessage toChatMessage(String pattern, Object... arguments)
+	{
+		return QueuedMessage.builder()
+				.type(ChatMessageType.CONSOLE)
+				.runeLiteFormattedMessage(MessageFormat.format(pattern, arguments))
+				.build();
+	}
+
+	public void sendChatMessage(QueuedMessage message)
+	{
+		chatMessageManager.queue(message);
+	}
+
+	private void sendChatMessage(String chatMessage)
 	{
 		final String message = new ChatMessageBuilder()
 				.append(ChatColorType.HIGHLIGHT)

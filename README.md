@@ -1,7 +1,6 @@
 ![](https://i.imgur.com/0D5106S.png)
 
 
-
 # OpenOSRS injected RuneLite 
 
 [![Build Status](https://github.com/open-osrs/runelite/workflows/OpenOSRS%20-%20CI%20(push)/badge.svg)](https://github.com/open-osrs/runelite/actions?query=workflow%3A%22OpenOSRS+-+CI+%28push%29%22)
@@ -33,10 +32,47 @@ Contributions are welcome, but there should be no changes made to runelite-clien
 - [runelite-client](runelite-client/src/main/java/net/runelite/client) - Game client with plugins
 - [wiki-scraper](wiki-scraper/src/main/java/net/runelite/data) - Scrapes the runescape wiki https://oldschool.runescape.wiki for the latest npc data
 
+## Modified Mixins (Menu)
+These are used to make a modified version of the OSRS Right-Click Context Menu. Including the ALai
+`git status`
+```
+modified:   ../../../../../../../../runelite-api/src/main/java/net/runelite/api/Client.java
+modified:   ../../../../../../../../runelite-api/src/main/java/net/runelite/api/widgets/Menu/RightClickMenuHelper.java
+modified:   ../../../../../../../../runelite-mixins/src/main/java/net/runelite/mixins/MenuMixin.java
+```
+
 ## Building  
 
-We have migrated the project to Gradle. Information on how to setup and build the project can be found at https://github.com/open-osrs/runelite/wiki/Building-with-IntelliJ-IDEA
+# Gradle Run Installation
 
+## Project Structure
+- File -> Project Structure -> Project Tab -> Project Settings
+  - SDK: Select `11 corretto-11 (java version "11.0.12")`   
+  - Language Level: Select `8 - Lambdas, type annotations etc.`
+  - 
+## More Compiler / Language Preferences
+  - Preferences  `CMD+,`
+    - `Build, Execution, Deployment` Section
+    - -> Compiler -> Java Compiler`
+        - Project bytecode version: Select `1.8`
+    - -> Build Tools -> Gradle`
+        - Gradle JVM: Select `corretto-11`
+## Gradle build Tasks
+  - Gradle Tab -> OpenOSRS -> Tasks
+    - build -> build (Right Click: `Modify Configuration`)
+    - Build Task: 
+      1. Modify contents inside Run from `build` to `build publishToMavenLocal -x test -x checkStyleMain -x checkStyleTest`
+      2. Checkbox the box that says `Store as project file`
+    - Run Task:
+      1. Duplicate `openosrs [build]` to `openosrs [run]`
+      2. Modify contents inside Run textbox
+         1. `build publishToMavenLocal -x test -x checkStyleMain -x checkStyleTest`
+         2. to `run publishToMavenLocal -x test -x checkStyleMain -x checkStyleTest`
+         3. Checkbox the box that says `Store as project file`
+
+
+
+We have migrated the project to Gradle. Information on how to setup and build the project can be found at https://github.com/open-osrs/runelite/wiki/Building-with-IntelliJ-IDEA
 ## Install from Pre-built Binaries 
 
 Installers for Windows, Mac and Linux can be found at https://github.com/open-osrs/launcher/releases

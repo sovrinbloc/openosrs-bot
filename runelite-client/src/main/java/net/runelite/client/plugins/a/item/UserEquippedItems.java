@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-public class EquippedItems
+public class UserEquippedItems
 {
 
 	public List<Widget> getEquippedItems(int[] itemIds)

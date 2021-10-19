@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.a.utils;
+package net.runelite.client.plugins.a.screen;
 
 import net.runelite.api.Point;
 import net.runelite.api.*;
@@ -158,7 +158,7 @@ public class Screen
 		return new java.awt.Point(cx, cy);
 	}
 
-	public static java.awt.Point getAbsoluteScreenLocation()
+	public static java.awt.Point getAbsoluteScreenLocationX0Y0()
 	{
 		return Adonai.client.getCanvas().getLocationOnScreen();
 	}
@@ -220,7 +220,7 @@ public class Screen
 	 */
 	public static Point toAbsoluteScreenPosition(Point point)
 	{
-		return ScreenMath.add(point, ScreenMath.convertToPoint(getAbsoluteScreenLocation()));
+		return ScreenMath.add(point, ScreenMath.convertToPoint(getAbsoluteScreenLocationX0Y0()));
 	}
 
 	/**
@@ -231,7 +231,7 @@ public class Screen
 	 */
 	public static java.awt.Point toAbsoluteScreenPosition(java.awt.Point point)
 	{
-		return ScreenMath.add(point, getAbsoluteScreenLocation());
+		return ScreenMath.add(point, getAbsoluteScreenLocationX0Y0());
 	}
 
 	public static Tile getTileLocation(LocalPoint point)
