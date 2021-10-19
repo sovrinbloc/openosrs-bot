@@ -1,25 +1,30 @@
 package net.runelite.client.plugins.a;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.*;
-import net.runelite.api.widgets.Menu.RightClickMenuHelper;
+import net.runelite.api.widgets.Menu.ContextMenu;
+import net.runelite.api.widgets.Menu.MenuRow;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.plugins.a.toolbox.Calculations;
-import net.runelite.client.plugins.a.wrappers.Menu;
 import net.runelite.client.external.adonai.TabMap;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.a.objects.Objects;
 import net.runelite.client.plugins.a.screen.Screen;
+import net.runelite.client.plugins.a.toolbox.Calculations;
+import net.runelite.client.plugins.a.toolbox.ScreenMath;
+import net.runelite.client.plugins.a.wrappers.Menu;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -27,19 +32,24 @@ import java.awt.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static net.runelite.api.MenuAction.MENU_ACTION_DEPRIORITIZE_OFFSET;
+
 @PluginDescriptor(
-		name = "A Plugin",
-		description = "Random Plugin Information"
+		name = "Adonai Core",
+		description = "Adonai Bot Core"
 )
 @Slf4j
 @SuppressWarnings("unused")
-public class APlugin extends Plugin
+public class AdonaiPlugin extends Plugin
 {
+	static final String CONFIG_GROUP = "adonai";
+
 	@Inject
 	private Client client;
 
@@ -53,7 +63,7 @@ public class APlugin extends Plugin
 	private OverlayManager overlayManager;
 
 	@Inject
-	private AOverlay aOverlay;
+	private AdonaiOverlay aOverlay;
 
 	private LocalPoint localLocation;
 
@@ -64,13 +74,22 @@ public class APlugin extends Plugin
 
 	private Player player;
 
+	@Inject
+	private AdonaiConfig config;
+
 	private boolean keyboard = true;
 
 
 	// to execute things like key press and click -- new thread
-	private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(1);
 
+	private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(1);
 	private ExecutorService executor;
+
+	@Provides
+	AdonaiConfig getConfig(ConfigManager configManager)
+	{
+		return configManager.getConfig(AdonaiConfig.class);
+	}
 
 	@Override
 	protected void startUp()
@@ -94,46 +113,54 @@ public class APlugin extends Plugin
 	public void onGameTick(GameTick event)
 	{
 
-		if (moveCamera)
+		if (config.randomCameraMovement())
 		{
 			randomCameraEvent();
 		}
+
 		player = client.getLocalPlayer();
 
-		if (isPlayerLocationChanged())
+		if (config.trackPlayerMovement())
 		{
-			sendChatMessage("Your character has moved.");
+			if (isPlayerLocationChanged())
+			{
+				sendChatMessage("Your character has moved.");
+			}
 		}
 
-		GameObject object = Objects.findNearestGameObject(10819);
-		if (object == null)
-		{
-			return;
-		}
 
-		minimapLocation = object.getMinimapLocation();
-		if (minimapLocation != null)
+		if (config.trackNearbyObjects())
 		{
-			sendChatMessage("nearest game object minimap information: " + minimapLocation);
-			sendChatMessage("This is the distance on minimap of " + player.getMinimapLocation()
-					.distanceTo(minimapLocation));
-			object.getCanvasTilePoly()
-					.getBounds();
-		}
+			GameObject object = Objects.findNearestGameObject(10819);
+			if (object == null)
+			{
+				return;
+			}
 
-		LocalPoint localDestinationLocation = client.getLocalDestinationLocation();
+			minimapLocation = object.getMinimapLocation();
+			if (minimapLocation != null)
+			{
+				sendChatMessage("nearest game object minimap information: " + minimapLocation);
+				sendChatMessage("This is the distance on minimap of " + player.getMinimapLocation()
+						.distanceTo(minimapLocation));
+				object.getCanvasTilePoly()
+						.getBounds();
+			}
 
-		sendChatMessage("nearest game object information: " + object.getCanvasLocation());
-		LocalPoint localLocation = object.getLocalLocation();
-		String[] actions = object.getActions();
-		for (String action :
-				actions)
-		{
-			sendChatMessage("Options for:" + object.getName());
+			LocalPoint localDestinationLocation = client.getLocalDestinationLocation();
+
+			sendChatMessage("nearest game object information: " + object.getCanvasLocation());
+			LocalPoint localLocation = object.getLocalLocation();
+			String[] actions = object.getActions();
+			for (String action :
+					actions)
+			{
+				sendChatMessage("Options for:" + object.getName());
+			}
+			sendChatMessage("This is the distance of " + player.getLocalLocation()
+					.distanceTo(localLocation));
+			sendChatMessage("Is it on the screen?: " + Screen.isOnScreen(object));
 		}
-		sendChatMessage("This is the distance of " + player.getLocalLocation()
-				.distanceTo(localLocation));
-		sendChatMessage("Is it on the screen?: " + Screen.isOnScreen(object));
 	}
 
 	private void getTabInterface()
@@ -142,7 +169,27 @@ public class APlugin extends Plugin
 				.isHidden();
 		client.getWidget(TabMap.getWidget(""))
 				.isHidden();
+	}
 
+
+	private static final Set<MenuAction> NPC_MENU_ACTIONS = ImmutableSet.of(MenuAction.NPC_FIRST_OPTION, MenuAction.NPC_SECOND_OPTION,
+			MenuAction.NPC_THIRD_OPTION, MenuAction.NPC_FOURTH_OPTION, MenuAction.NPC_FIFTH_OPTION, MenuAction.SPELL_CAST_ON_NPC,
+			MenuAction.ITEM_USE_ON_NPC);
+
+
+	@Subscribe
+	public void onMenuEntryAdded(MenuEntryAdded event)
+	{
+		int type = event.getType();
+
+		if (type >= MENU_ACTION_DEPRIORITIZE_OFFSET)
+		{
+			type -= MENU_ACTION_DEPRIORITIZE_OFFSET;
+		}
+
+		final MenuAction menuAction = MenuAction.of(type);
+
+		NPC npc = client.getCachedNPCs()[event.getIdentifier()];
 	}
 
 	private void randomCameraEvent()
@@ -212,6 +259,9 @@ public class APlugin extends Plugin
 	}
 
 
+	private boolean menuOpened = false;
+	private String menuHash = "";
+
 	/**
 	 * gets the location of the menu items
 	 *
@@ -220,6 +270,7 @@ public class APlugin extends Plugin
 	@Subscribe
 	public void onMenuOpened(MenuOpened event)
 	{
+		menuOpened = true;
 
 		Menu menu = new Menu(event);
 
@@ -234,133 +285,57 @@ public class APlugin extends Plugin
 						.toString()
 		);
 		log.info(
-				"Finding: {}",
-				menu.getMenuOption("Trade")
-						.getExactCanvasLocation()
-						.toString()
-		);
-		log.info(
 				"Cancel: {}",
 				menu.getMenuOption("Cancel")
 						.getExactCanvasLocation()
 						.toString()
 		);
-		TileObject oak = Objects.findNearestObject("Oak");
-	}
 
-	TileObject findTileObject(int x, int y, int id)
-	{
-		Scene scene = client.getScene();
-		Tile[][][] tiles = scene.getTiles();
-		Tile tile = tiles[client.getPlane()][x][y];
-		if (tile != null)
+		MenuRow activeMenu = contextMenu.getHovering(ScreenMath.convertToPoint(client.getMouseCanvasPosition()));
+		for (MenuRow row : contextMenu.getMenuItems())
 		{
-			for (GameObject gameObject : tile.getGameObjects())
-			{
-				if (gameObject != null && gameObject.getId() == id)
-				{
-					return gameObject;
-				}
-			}
-
-			WallObject wallObject = tile.getWallObject();
-			if (wallObject != null && wallObject.getId() == id)
-			{
-				return wallObject;
-			}
-
-			DecorativeObject decorativeObject = tile.getDecorativeObject();
-			if (decorativeObject != null && decorativeObject.getId() == id)
-			{
-				return decorativeObject;
-			}
-
-			GroundObject groundObject = tile.getGroundObject();
-			if (groundObject != null && groundObject.getId() == id)
-			{
-				return groundObject;
-			}
+			log.info("row: {}, target: {}", row.getOption(), row.getTarget());
 		}
-		return null;
 	}
-
 
 	double seconds = -1;
 	private List<String> lastMenuItems = new ArrayList<>();
+	ContextMenu contextMenu;
+	private MenuRow lastHovered = null;
 	boolean modified = false;
 	float tickDiff = 0.0f;
+
 
 	@Subscribe
 	public void onClientTick(ClientTick tick)
 	{
-		RightClickMenuHelper helper = client.drawAdonaiMenu(Calculations.random(200, 255));
+		contextMenu = client.drawAdonaiMenu(Calculations.random(200, 255));
 		float newSeconds = (float) System.currentTimeMillis();
 		List<String> menuList = getMenuList();
 		tickDiff = ((float) (newSeconds - seconds)) / 1000.0f;
-		if (lastMenuItems.equals(menuList))
+		MenuRow hovering = contextMenu.getHovering(ScreenMath.convertToPoint(client.getMouseCanvasPosition()));
+		if (lastMenuItems.equals(menuList) || hovering.equals(lastHovered))
 		{
 			return;
 		}
-		// new info to share once the menu items have changed
-		log.info("loop beginning ended: {}ms", seconds);
-		log.info("loop ended: {}ms", newSeconds);
-		log.info("difference in seconds: {}s", tickDiff);
+
+		log.info("Hovering over: {} with target: {}", hovering.getOption(), hovering.getTarget());
 
 		lastMenuItems = menuList;
-		log.info("what is love? {}", helper.getMenuItems().size());
+		lastHovered = hovering;
+		log.info("Menu Items {}", contextMenu.getMenuItems().size());
 		log.info("menu items... {}", menuList);
-		for (RightClickMenuHelper.OptionHelper help : helper.getMenuItems())
-		{
-			log.info("getFullText(): {}", help.getFullText());
-			log.info("getActionId(): {}", help.getActionId());
-			log.info("getArguments0() {}", help.getArguments0());
-			log.info("getIdentifier() {}", help.getIdentifier());
-			log.info("getOpcode() {}", help.getOpCode());
-			log.info("getMenuEntryId() {}", help.getMenuEntryId());
-			log.info("getArguments1() {}", help.getArguments1());
-			log.info("getEntry().getParam1() {}", help.getEntry().getParam1());
-			log.info("getEntry().getParam0() {}", help.getEntry().getParam0());
-			log.info("getEntry().getId() {}", help.getEntry().getId());
-			log.info("getEntry().getActionParam1() {}", help.getEntry().getActionParam1());
-			log.info("getMenuAction().getId() {}", help.getEntry().getMenuAction().getId());
-			log.info("toString() {}", help.getEntry().getMenuAction().toString());
-		}
-		List<NPC> cachedNPCs = client.getNpcs();
-		log.info("There are {} cached NPC's.", cachedNPCs.size());
-		for (NPC n : cachedNPCs)
-		{
-			if (n != null)
-			log.info("{}", n.getCombatLevel());
-		}
 	}
 
 	@Subscribe
 	public void onBeforeMenuRender(BeforeMenuRender event)
 	{
-		RightClickMenuHelper helper = client.drawAdonaiMenu(Calculations.random(200, 255));
+		ContextMenu helper = client.drawAdonaiMenu(Calculations.random(200, 255));
 		event.consume();
-		log.info("Beginning: ");
-		if(1 == 2)
-		for (RightClickMenuHelper.OptionHelper help : helper.getMenuItems())
-		{
-			log.info("getFullText(): {}", help.getFullText());
-			log.info("getActionId(): {}", help.getActionId());
-			log.info("getArguments0() {}", help.getArguments0());
-			log.info("getIdentifier() {}", help.getIdentifier());
-			log.info("getOpcode() {}", help.getOpCode());
-			log.info("getMenuEntryId() {}", help.getMenuEntryId());
-			log.info("getArguments1() {}", help.getArguments1());
-			log.info("getEntry().getParam1() {}", help.getEntry().getParam1());
-			log.info("getEntry().getParam0() {}", help.getEntry().getParam0());
-			log.info("getEntry().getId() {}", help.getEntry().getId());
-			log.info("getEntry().getActionParam1() {}", help.getEntry().getActionParam1());
-			log.info("getMenuAction().getId() {}", help.getEntry().getMenuAction().getId());
-			log.info("toString() {}", help.getEntry().getMenuAction().toString());
-		}
-		log.info("END");
 	}
 
 	private boolean moveCamera = true;
+
 	@Subscribe
 	public void onFocusChanged(FocusChanged event)
 	{
@@ -371,7 +346,6 @@ public class APlugin extends Plugin
 		}
 		moveCamera = false;
 	}
-
 
 
 	private static float milliToSeconds(int ms)
@@ -393,7 +367,7 @@ public class APlugin extends Plugin
 						client.getMenuEntries()
 				)
 		).forEach(
-				e -> menuList.add( e.getOption())
+				e -> menuList.add(e.getOption())
 		);
 		return menuList;
 	}

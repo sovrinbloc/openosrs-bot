@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
 import net.runelite.api.events.MenuOpened;
+import net.runelite.api.widgets.Menu.ContextMenu;
+import net.runelite.api.widgets.Menu.MenuRow;
 import net.runelite.client.plugins.a.Adonai;
 
 import java.awt.*;
@@ -18,13 +20,17 @@ public class Menu
 	public Point mousePosition;
 	public Canvas canvasCoordinates;
 
+
 	public static MenuEntry[] menuItems;
 	public static MenuOpened menuOpened;
+
 
 	public Menu(MenuOpened menu)
 	{
 		initialize(menu);
 	}
+
+	public ContextMenu contextMenu;
 
 	private void initialize(MenuOpened menu)
 	{
@@ -35,6 +41,15 @@ public class Menu
 		mousePosition = Adonai.client.getMouseCanvasPosition();
 		menuDimensions = new Point(Adonai.client.getMenuWidth(), Adonai.client.getMenuHeight());
 		canvasCoordinates = Adonai.client.getCanvas();
+		contextMenu = Adonai.client.drawAdonaiMenu(255);
+
+		// gets all the targets listed, see if this works based on last clicked, instead of live menu
+		// actively opened.
+
+		java.util.List<String> targets = new ArrayList<>();
+		contextMenu.getMenuItems().forEach(i -> targets.add(i.getTarget()));
+		log.info("contextMenu Targets: {}", targets.toString());
+
 		getMenuPosition();
 	}
 
