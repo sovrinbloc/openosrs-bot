@@ -467,4 +467,42 @@ public  class Objects
 				.result(Adonai.client)
 				.nearestTo(Adonai.client.getLocalPlayer());
 	}
+
+
+
+	TileObject findTileObject(int x, int y, int id)
+	{
+		Scene scene = Adonai.client.getScene();
+		Tile[][][] tiles = scene.getTiles();
+		Tile tile = tiles[Adonai.client.getPlane()][x][y];
+		if (tile != null)
+		{
+			for (GameObject gameObject : tile.getGameObjects())
+			{
+				if (gameObject != null && gameObject.getId() == id)
+				{
+					return gameObject;
+				}
+			}
+
+			WallObject wallObject = tile.getWallObject();
+			if (wallObject != null && wallObject.getId() == id)
+			{
+				return wallObject;
+			}
+
+			DecorativeObject decorativeObject = tile.getDecorativeObject();
+			if (decorativeObject != null && decorativeObject.getId() == id)
+			{
+				return decorativeObject;
+			}
+
+			GroundObject groundObject = tile.getGroundObject();
+			if (groundObject != null && groundObject.getId() == id)
+			{
+				return groundObject;
+			}
+		}
+		return null;
+	}
 }

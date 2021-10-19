@@ -50,6 +50,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.a.wrappers.MenuOption;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 @PluginDescriptor(

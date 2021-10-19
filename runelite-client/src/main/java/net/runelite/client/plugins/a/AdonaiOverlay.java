@@ -6,14 +6,14 @@ import net.runelite.client.ui.overlay.*;
 import javax.inject.Inject;
 import java.awt.*;
 
-public class AOverlay extends Overlay
+public class AdonaiOverlay extends Overlay
 {
 
 	private final Client client;
-	private final APlugin plugin;
+	private final AdonaiPlugin plugin;
 
 	@Inject
-	private AOverlay(Client client, APlugin plugin)
+	private AdonaiOverlay(Client client, AdonaiPlugin plugin)
 	{
 		this.client = client;
 		this.plugin = plugin;

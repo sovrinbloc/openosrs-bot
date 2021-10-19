@@ -30,7 +30,8 @@ import net.runelite.api.mixins.FieldHook;
 import net.runelite.api.mixins.Inject;
 import net.runelite.api.mixins.Mixin;
 import net.runelite.api.mixins.Shadow;
-import net.runelite.api.widgets.Menu.RightClickMenuHelper;
+import net.runelite.api.widgets.Menu.MenuRow;
+import net.runelite.api.widgets.Menu.ContextMenu;
 import net.runelite.rs.api.RSClient;
 import net.runelite.rs.api.RSFont;
 import net.runelite.rs.api.RSMenuAction;
@@ -38,14 +39,14 @@ import net.runelite.rs.api.RSMenuAction;
 @Mixin(RSClient.class)
 public abstract class MenuMixin implements RSClient
 {
-	private static final int MENU_BORDER_OUTER_2010 = 0x6D6A5B;
-	private static final int MENU_BORDER_INNER_2010 = 0x524A3D;
-	private static final int MENU_PADDING_2010 = 0x2B2622;
-	private static final int MENU_BACKGROUND_2010 = 0x2B271C;
-	private static final int MENU_TEXT_2010 = 0xC6B895;
-	private static final int MENU_HEADER_GRADIENT_TOP_2010 = 0x322E22;
-	private static final int MENU_HEADER_GRADIENT_BOTTOM_2010 = 0x090A04;
-	private static final int ORIGINAL_BG = 0x5D5447;
+	protected static final int MENU_BORDER_OUTER_2010 = 0x6D6A5B;
+	protected static final int MENU_BORDER_INNER_2010 = 0x524A3D;
+	protected static final int MENU_PADDING_2010 = 0x2B2622;
+	protected static final int MENU_BACKGROUND_2010 = 0x2B271C;
+	protected static final int MENU_TEXT_2010 = 0xC6B895;
+	protected static final int MENU_HEADER_GRADIENT_TOP_2010 = 0x322E22;
+	protected static final int MENU_HEADER_GRADIENT_BOTTOM_2010 = 0x090A04;
+	protected static final int ORIGINAL_BG = 0x5D5447;
 
 	@Shadow("client")
 	private static RSClient client;
@@ -55,13 +56,13 @@ public abstract class MenuMixin implements RSClient
 
 	@Inject
 	@Override
-	public RightClickMenuHelper drawAdonaiMenu(int alpha)
+	public ContextMenu drawAdonaiMenu(int alpha)
 	{
 		int x = getMenuX();
 		int y = getMenuY();
 		int w = getMenuWidth();
 		int h = getMenuHeight();
-		RightClickMenuHelper setHelper = new RightClickMenuHelper(x, y, w, h);
+		ContextMenu contextMenu = new ContextMenu(x, y, w, h);
 
 		// Outside border
 		rasterizerDrawHorizontalLineAlpha(x + 2, y, w - 4, MENU_BORDER_OUTER_2010, alpha);
@@ -105,13 +106,12 @@ public abstract class MenuMixin implements RSClient
 		rasterizerDrawCircleAlpha(x + w - 2, y + h - 2, 0, MENU_BORDER_OUTER_2010, alpha);
 
 		RSFont font = getFontBold12();
-		font.drawTextLeftAligned("Adonai, Choose...", x + 3, y + 14, MENU_TEXT_2010, -1);
+		font.drawTextLeftAligned("Choose...", x + 3, y + 14, MENU_TEXT_2010, -1);
 
 		int mouseX = getMouseX();
 		int mouseY = getMouseY();
 
-
-		setHelper.setMousePositions(mouseX, mouseY);
+		contextMenu.setMousePositions(mouseX, mouseY);
 
 		MenuEntry leftClickMenuEntry = getLeftClickMenuEntry();
 		int count = getMenuOptionCount();
@@ -136,7 +136,7 @@ public abstract class MenuMixin implements RSClient
 				rasterizerFillRectangleAlpha(x + 3, rowY - 12, w - 6, 15, 0xffff00, 120);
 			}
 			MenuEntry menuEntry = getMenuEntries()[i];
-			setHelper.setMenuOption(options[i], new RightClickMenuHelper.OptionHelper(x + 3,
+			contextMenu.setMenuOption(options[i], new MenuRow(x + 3,
 					rowY - 12,
 					w - 6,
 					15,
@@ -155,7 +155,7 @@ public abstract class MenuMixin implements RSClient
 					menuEntry.getMenuAction()
 			));
 		}
-		return setHelper;
+		return contextMenu;
 	}
 
 
