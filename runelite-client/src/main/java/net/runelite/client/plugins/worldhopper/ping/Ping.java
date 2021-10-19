@@ -208,7 +208,7 @@ public class Ping
 			short seq = (short) (((response.getByte(icmpHeaderOffset + 6) & 0xff) << 8) | response.getByte(icmpHeaderOffset + 7) & 0xff);
 			if (seqno != seq)
 			{
-				log.warn("sequence number mismatch ({} != {})", seqno, seq);
+//				log.warn("sequence number mismatch ({} != {})", seqno, seq);
 				return -1;
 			}
 

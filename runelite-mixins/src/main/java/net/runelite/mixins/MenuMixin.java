@@ -30,6 +30,7 @@ import net.runelite.api.mixins.FieldHook;
 import net.runelite.api.mixins.Inject;
 import net.runelite.api.mixins.Mixin;
 import net.runelite.api.mixins.Shadow;
+import net.runelite.api.widgets.Menu.RightClickMenuHelper;
 import net.runelite.rs.api.RSClient;
 import net.runelite.rs.api.RSFont;
 import net.runelite.rs.api.RSMenuAction;
@@ -54,6 +55,112 @@ public abstract class MenuMixin implements RSClient
 
 	@Inject
 	@Override
+	public RightClickMenuHelper drawAdonaiMenu(int alpha)
+	{
+		int x = getMenuX();
+		int y = getMenuY();
+		int w = getMenuWidth();
+		int h = getMenuHeight();
+		RightClickMenuHelper setHelper = new RightClickMenuHelper(x, y, w, h);
+
+		// Outside border
+		rasterizerDrawHorizontalLineAlpha(x + 2, y, w - 4, MENU_BORDER_OUTER_2010, alpha);
+		rasterizerDrawHorizontalLineAlpha(x + 2, y + h - 1, w - 4, MENU_BORDER_OUTER_2010, alpha);
+		rasterizerDrawVerticalLineAlpha(x, y + 2, h - 4, MENU_BORDER_OUTER_2010, alpha);
+		rasterizerDrawVerticalLineAlpha(x + w - 1, y + 2, h - 4, MENU_BORDER_OUTER_2010, alpha);
+
+		// Padding
+		rasterizerDrawRectangleAlpha(x + 1, y + 5, w - 2, h - 6, MENU_PADDING_2010, alpha);
+		rasterizerDrawHorizontalLineAlpha(x + 1, y + 17, w - 2, MENU_PADDING_2010, alpha);
+		rasterizerDrawCircleAlpha(x + 2, y + h - 3, 0, MENU_PADDING_2010, alpha);
+		rasterizerDrawCircleAlpha(x + w - 3, y + h - 3, 0, MENU_PADDING_2010, alpha);
+
+		// Header
+		rasterizerDrawGradientAlpha(
+				x + 2,
+				y + 1,
+				w - 4,
+				16,
+				MENU_HEADER_GRADIENT_TOP_2010,
+				MENU_HEADER_GRADIENT_BOTTOM_2010,
+				alpha,
+				alpha
+		);
+		rasterizerFillRectangleAlpha(x + 1, y + 1, 2, 4, MENU_PADDING_2010, alpha);
+		rasterizerFillRectangleAlpha(x + w - 3, y + 1, 2, 4, MENU_PADDING_2010, alpha);
+
+		// Inside border
+		rasterizerDrawHorizontalLineAlpha(x + 2, y + 18, w - 4, MENU_BORDER_INNER_2010, alpha);
+		rasterizerDrawHorizontalLineAlpha(x + 3, y + h - 3, w - 6, MENU_BORDER_INNER_2010, alpha);
+		rasterizerDrawVerticalLineAlpha(x + 2, y + 18, h - 21, MENU_BORDER_INNER_2010, alpha);
+		rasterizerDrawVerticalLineAlpha(x + w - 3, y + 18, h - 21, MENU_BORDER_INNER_2010, alpha);
+
+		// Options background
+		rasterizerFillRectangleAlpha(x + 3, y + 19, w - 6, h - 22, MENU_BACKGROUND_2010, alpha);
+
+		// Corner insets
+		rasterizerDrawCircleAlpha(x + 1, y + 1, 0, MENU_BORDER_OUTER_2010, alpha);
+		rasterizerDrawCircleAlpha(x + w - 2, y + 1, 0, MENU_BORDER_OUTER_2010, alpha);
+		rasterizerDrawCircleAlpha(x + 1, y + h - 2, 0, MENU_BORDER_OUTER_2010, alpha);
+		rasterizerDrawCircleAlpha(x + w - 2, y + h - 2, 0, MENU_BORDER_OUTER_2010, alpha);
+
+		RSFont font = getFontBold12();
+		font.drawTextLeftAligned("Adonai, Choose...", x + 3, y + 14, MENU_TEXT_2010, -1);
+
+		int mouseX = getMouseX();
+		int mouseY = getMouseY();
+
+
+		setHelper.setMousePositions(mouseX, mouseY);
+
+		MenuEntry leftClickMenuEntry = getLeftClickMenuEntry();
+		int count = getMenuOptionCount();
+		String[] targets = getMenuTargets();
+		String[] options = getMenuOptions();
+
+		for (int i = 0; i < count; i++)
+		{
+			int rowY = y + (count - 1 - i) * 15 + 31;
+
+			String s = options[i];
+			if (!targets[i].isEmpty())
+			{
+				s += " " + targets[i];
+			}
+
+			font.drawTextLeftAligned(s, x + 3, rowY, MENU_TEXT_2010, -1);
+
+			// Highlight current option
+			if (mouseX > x && mouseX < w + x && mouseY > rowY - 13 && mouseY < rowY + 3)
+			{
+				rasterizerFillRectangleAlpha(x + 3, rowY - 12, w - 6, 15, 0xffff00, 120);
+			}
+			MenuEntry menuEntry = getMenuEntries()[i];
+			setHelper.setMenuOption(options[i], new RightClickMenuHelper.OptionHelper(x + 3,
+					rowY - 12,
+					w - 6,
+					15,
+					i,
+					options[i],
+					targets[i],
+					s,
+					menuEntry.getIdentifier(),
+					menuEntry.getOpcode(),
+					menuEntry.getActionParam0(),
+					menuEntry.getActionParam1(),
+					menuEntry,
+					menuEntry.getMenuAction()
+							.getId(),
+					menuEntry.getId(),
+					menuEntry.getMenuAction()
+			));
+		}
+		return setHelper;
+	}
+
+
+	@Inject
+	@Override
 	public void draw2010Menu(int alpha)
 	{
 		int x = getMenuX();
@@ -74,7 +181,16 @@ public abstract class MenuMixin implements RSClient
 		rasterizerDrawCircleAlpha(x + w - 3, y + h - 3, 0, MENU_PADDING_2010, alpha);
 
 		// Header
-		rasterizerDrawGradientAlpha(x + 2, y + 1, w - 4, 16, MENU_HEADER_GRADIENT_TOP_2010, MENU_HEADER_GRADIENT_BOTTOM_2010, alpha, alpha);
+		rasterizerDrawGradientAlpha(
+				x + 2,
+				y + 1,
+				w - 4,
+				16,
+				MENU_HEADER_GRADIENT_TOP_2010,
+				MENU_HEADER_GRADIENT_BOTTOM_2010,
+				alpha,
+				alpha
+		);
 		rasterizerFillRectangleAlpha(x + 1, y + 1, 2, 4, MENU_PADDING_2010, alpha);
 		rasterizerFillRectangleAlpha(x + w - 3, y + 1, 2, 4, MENU_PADDING_2010, alpha);
 
@@ -169,13 +285,13 @@ public abstract class MenuMixin implements RSClient
 	{
 		final int i = getMenuOptionCount() - 1;
 		return new MenuEntry(
-			getMenuOptions()[i],
-			getMenuTargets()[i],
-			getMenuIdentifiers()[i],
-			getMenuOpcodes()[i],
-			getMenuArguments1()[i],
-			getMenuArguments2()[i],
-			getMenuForceLeftClick()[i]
+				getMenuOptions()[i],
+				getMenuTargets()[i],
+				getMenuIdentifiers()[i],
+				getMenuOpcodes()[i],
+				getMenuArguments1()[i],
+				getMenuArguments2()[i],
+				getMenuForceLeftClick()[i]
 		);
 	}
 
@@ -199,7 +315,8 @@ public abstract class MenuMixin implements RSClient
 	{
 		if (tempMenuAction != null)
 		{
-			client.getCallbacks().post(WidgetPressed.INSTANCE);
+			client.getCallbacks()
+					.post(WidgetPressed.INSTANCE);
 		}
 	}
 

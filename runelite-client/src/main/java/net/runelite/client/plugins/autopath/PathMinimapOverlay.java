@@ -11,7 +11,7 @@ import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.plugins.a.ExtUtils;
-import net.runelite.client.plugins.a.utils.Screen;
+import net.runelite.client.plugins.a.screen.Screen;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;

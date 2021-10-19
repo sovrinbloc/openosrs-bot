@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 @Slf4j
-public class Banks
+public class UserBank
 {
 	private static Map<Item, BankItem> bankMap = new HashMap<>();
 

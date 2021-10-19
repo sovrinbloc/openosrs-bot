@@ -1,18 +1,22 @@
 package net.runelite.client.plugins.a.item;
 
 import net.runelite.api.queries.InventoryWidgetItemQuery;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.a.Adonai;
+import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class InventoryItems
+public class UserInventory
 {
 
-	public List<WidgetItem> getItems(int... itemIDs)
+	public static List<WidgetItem> getItems(int... itemIDs)
 	{
 		assert Adonai.client.isClientThread();
 
@@ -22,7 +26,7 @@ public class InventoryItems
 				.list;
 	}
 
-	public List<WidgetItem> getItems(String... names)
+	public static List<WidgetItem> getItems(String... names)
 	{
 		assert Adonai.client.isClientThread();
 
@@ -31,12 +35,14 @@ public class InventoryItems
 				.list;
 
 		new ArrayList<>(Arrays.asList(names)).forEach(inventoryItem ->
-				items.removeIf(item -> item.getWidget().getName().equals(inventoryItem)));
+				items.removeIf(item -> item.getWidget()
+						.getName()
+						.equals(inventoryItem)));
 
 		return items;
 	}
 
-	public List<WidgetItem> getItems(Predicate<WidgetItem> filter)
+	public static List<WidgetItem> getItems(Predicate<WidgetItem> filter)
 	{
 		assert Adonai.client.isClientThread();
 
@@ -45,4 +51,18 @@ public class InventoryItems
 				.result(Adonai.client)
 				.list;
 	}
+
+	public static void getItemLocations()
+	{}
+
+	public static boolean isFull()
+	{
+		assert Adonai.client != null;
+
+		return Adonai.client.getWidget(WidgetInfo.INVENTORY)
+				.getWidgetItems()
+				.size() == 28;
+	}
+
+
 }
