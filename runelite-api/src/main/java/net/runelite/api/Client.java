@@ -1971,7 +1971,22 @@ public interface Client extends GameEngine
 	 *
 	 * @param alpha background transparency of the menu
 	 */
-	ContextMenu drawAdonaiMenu(int alpha);
+	void drawAdonaiMenu(int alpha);
+
+	/**
+	 * Gets the menu attributes for the Adonai Menu
+	 */
+	ContextMenu getAdonaiMenu();
+
+	/**
+	 * Gets the menu attributes for the Adonai Menu
+	 */
+	ContextMenu getOriginalMenu();
+
+	/**
+	 * Gets the menu attributes for the Adonai Menu
+	 */
+	ContextMenu get2010Menu();
 
 	/**
 	 * Gets all the menu contents.

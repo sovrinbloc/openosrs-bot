@@ -7,6 +7,7 @@ import net.runelite.api.events.MenuOpened;
 import net.runelite.api.widgets.Menu.ContextMenu;
 import net.runelite.api.widgets.Menu.MenuRow;
 import net.runelite.client.plugins.a.Adonai;
+import net.runelite.client.plugins.a.toolbox.ScreenMath;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -14,77 +15,27 @@ import java.util.ArrayList;
 @Slf4j
 public class Menu
 {
+	ContextMenu ctxMenu;
+
 	MenuOpened menu;
-	public Point menuPosition = new Point(103, 22);
-	public Point menuDimensions = new Point(0, 0);
 	public Point mousePosition;
 	public Canvas canvasCoordinates;
-
-
-	public static MenuEntry[] menuItems;
-	public static MenuOpened menuOpened;
-
-
-	public Menu(MenuOpened menu)
+	public Menu(ContextMenu ctxMenu, MenuOpened menu)
 	{
-		initialize(menu);
+		this.ctxMenu = ctxMenu;
+		this.menu = menu;
+		initialize(ctxMenu, menu);
 	}
 
-	public ContextMenu contextMenu;
-
-	private void initialize(MenuOpened menu)
+	private void initialize(ContextMenu ctxMenu, MenuOpened menu)
 	{
-		MenuEntry[] menuEntries = menu.getMenuEntries();
-		menuOpened = menu;
-		menuItems = reverse(menuEntries, menuEntries.length);
-		menuPosition = new Point(Adonai.client.getMenuX(), Adonai.client.getMenuY());
 		mousePosition = Adonai.client.getMouseCanvasPosition();
-		menuDimensions = new Point(Adonai.client.getMenuWidth(), Adonai.client.getMenuHeight());
 		canvasCoordinates = Adonai.client.getCanvas();
-		contextMenu = Adonai.client.drawAdonaiMenu(255);
-
-		// gets all the targets listed, see if this works based on last clicked, instead of live menu
-		// actively opened.
-
-		java.util.List<String> targets = new ArrayList<>();
-		contextMenu.getMenuItems().forEach(i -> targets.add(i.getTarget()));
-		log.info("contextMenu Targets: {}", targets.toString());
-
-		getMenuPosition();
 	}
 
-	public Point getMenuPosition()
+	public ContextMenu getCtxMenu()
 	{
-		int x, y;
-		if (mousePosition.getX() > (menuDimensions.getX() / 2) &&
-				mousePosition.getX() < (canvasCoordinates.getWidth() - (menuDimensions.getX() / 2)))
-		{
-			x = mousePosition.getX() - (menuDimensions.getX() / 2);
-		}
-		else if (mousePosition.getX() > (canvasCoordinates.getWidth() - (menuDimensions.getX() / 2)))
-		{
-			x = canvasCoordinates.getX() - menuDimensions.getX();
-		}
-		else
-		{
-			x = 0;
-		}
-
-		if (mousePosition.getY() > (canvasCoordinates.getHeight() - menuDimensions.getY()))
-		{
-			y = canvasCoordinates.getY() - menuDimensions.getY();
-		}
-		else if (mousePosition.getY() <= 0)
-		{
-			y = 0;
-		}
-		else
-		{
-			y = mousePosition.getY();
-		}
-
-		menuPosition = new Point(x, y);
-		return menuPosition;
+		return ctxMenu;
 	}
 
 	/* function that reverses array and stores it
@@ -101,55 +52,23 @@ public class Menu
 		return b;
 	}
 
-	public MenuOption getMenuOption(String name)
+	public MenuRow findFirstOptionRow(String option)
 	{
-		int i = 0;
-		for (MenuEntry e : menuItems)
+		MenuRow op = this.ctxMenu.findFirstOptionRow(option);
+		if (op == null)
 		{
-			log.info("e.getMenuAction() {}", e.getMenuAction().toString());
-			log.info("e.getTarget() {}", e.getTarget());
-			String option = e.getOption();
-			if (option.contains(name) || option.toLowerCase().contains(name.toLowerCase()))
-			{
-				return new MenuOption(e, new Point(
-						(int) (menuPosition.getX() + menuDimensions.getX() / 2.0f),
-						MenuOption.OFFSET_DOWN_Y + menuPosition.getY() + (MenuOption.FONT_SIZE / 2) + (i * MenuOption.MENU_ITEM_HEIGHT_MARGIN_Y + MenuOption.FONT_SIZE)
-				), i);
-			}
-			i++;
+			return null;
 		}
-		return null;
+		return op;
 	}
 
-	public MenuOption getMenuOptions()
+	public Point findExactCanvasLocation(String option)
 	{
-		java.util.List<MenuOption> menuOptions = new ArrayList<MenuOption>();
-		for (int i = 0; i < menuItems.length; i++)
+		MenuRow op = ctxMenu.findFirstOptionRow(option);
+		if (op == null)
 		{
-			menuOptions.add(new MenuOption(menuItems[i], menuPosition, menuDimensions, i));
+			return null;
 		}
-		return null;
-	}
-
-	public MenuOption getMenuOption(MenuEntry entry)
-	{
-		int i = 0;
-		for (MenuEntry e : menuItems)
-		{
-			if (e.equals(entry))
-			{
-				return new MenuOption(e, new Point(
-						(int) (menuPosition.getX() + menuDimensions.getX() / 2.0f),
-						(menuPosition.getY() + MenuOption.OFFSET_DOWN_Y) + (MenuOption.FONT_SIZE / 2) + (i * MenuOption.MENU_ITEM_HEIGHT_MARGIN_Y + MenuOption.FONT_SIZE)
-				), i);
-			}
-			i++;
-		}
-		return null;
-	}
-
-	public void menu()
-	{
-
+		return ScreenMath.add(ScreenMath.convertToPoint(op.getPosition()), Adonai.client.getMouseCanvasPosition());
 	}
 }
