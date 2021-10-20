@@ -1,10 +1,10 @@
 package net.runelite.client.plugins.a;
 
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.*;
 import net.runelite.client.plugins.animsmoothing.AnimationSmoothingPlugin;
+
+import java.awt.*;
 
 @ConfigGroup(AdonaiPlugin.CONFIG_GROUP)
 public interface AdonaiConfig extends Config
@@ -63,6 +63,55 @@ public interface AdonaiConfig extends Config
 	default boolean trackNearbyObjects()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+			keyName = "borderWidth",
+			name = "Border Width",
+			description = "Width of the outlined border",
+			position = 6
+	)
+	default int borderWidth()
+	{
+		return 4;
+	}
+
+	@Alpha
+	@ConfigItem(
+			keyName = "objectHoverHighlightColor",
+			name = "Object hover",
+			description = "The color of the hover outline for objects",
+			position = 7
+	)
+	default Color objectHoverHighlightColor()
+	{
+		return new Color(0x9000FFFF, true);
+	}
+
+	@ConfigItem(
+			keyName = "outlineFeather",
+			name = "Outline feather",
+			description = "Specify between 0-4 how much of the model outline should be faded",
+			position = 8
+	)
+	@Range(
+			max = 4
+	)
+	default int outlineFeather()
+	{
+		return 4;
+	}
+
+	@Alpha
+	@ConfigItem(
+			keyName = "objectInteractHighlightColor",
+			name = "Object interact",
+			description = "The color of the target outline for objects",
+			position = 9
+	)
+	default Color objectInteractHighlightColor()
+	{
+		return new Color(0x90FF0000, true);
 	}
 
 }

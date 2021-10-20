@@ -470,7 +470,7 @@ public  class Objects
 
 
 
-	TileObject findTileObject(int x, int y, int id)
+	public static TileObject findTileObject(int x, int y, int id)
 	{
 		Scene scene = Adonai.client.getScene();
 		Tile[][][] tiles = scene.getTiles();
