@@ -56,13 +56,12 @@ public abstract class MenuMixin implements RSClient
 
 	@Inject
 	@Override
-	public ContextMenu drawAdonaiMenu(int alpha)
+	public void drawAdonaiMenu(int alpha)
 	{
 		int x = getMenuX();
 		int y = getMenuY();
 		int w = getMenuWidth();
 		int h = getMenuHeight();
-		ContextMenu contextMenu = new ContextMenu(x, y, w, h);
 
 		// Outside border
 		rasterizerDrawHorizontalLineAlpha(x + 2, y, w - 4, MENU_BORDER_OUTER_2010, alpha);
@@ -111,12 +110,11 @@ public abstract class MenuMixin implements RSClient
 		int mouseX = getMouseX();
 		int mouseY = getMouseY();
 
-		contextMenu.setMousePositions(mouseX, mouseY);
-
-		MenuEntry leftClickMenuEntry = getLeftClickMenuEntry();
 		int count = getMenuOptionCount();
 		String[] targets = getMenuTargets();
 		String[] options = getMenuOptions();
+
+		MenuEntry[] menuEntries = getMenuEntries();
 
 		for (int i = 0; i < count; i++)
 		{
@@ -135,27 +133,7 @@ public abstract class MenuMixin implements RSClient
 			{
 				rasterizerFillRectangleAlpha(x + 3, rowY - 12, w - 6, 15, 0xffff00, 120);
 			}
-			MenuEntry menuEntry = getMenuEntries()[i];
-			contextMenu.setMenuOption(options[i], new MenuRow(x + 3,
-					rowY - 12,
-					w - 6,
-					15,
-					i,
-					options[i],
-					targets[i],
-					s,
-					menuEntry.getIdentifier(),
-					menuEntry.getOpcode(),
-					menuEntry.getActionParam0(),
-					menuEntry.getActionParam1(),
-					menuEntry,
-					menuEntry.getMenuAction()
-							.getId(),
-					menuEntry.getId(),
-					menuEntry.getMenuAction()
-			));
 		}
-		return contextMenu;
 	}
 
 
@@ -240,6 +218,118 @@ public abstract class MenuMixin implements RSClient
 
 	@Inject
 	@Override
+	public ContextMenu getAdonaiMenu()
+	{
+		int x = getMenuX();
+		int y = getMenuY();
+		int w = getMenuWidth();
+		int h = getMenuHeight();
+		ContextMenu contextMenu = new ContextMenu(x, y, w, h);
+		int mouseX = getMouseX();
+		int mouseY = getMouseY();
+		contextMenu.setMousePositions(mouseX, mouseY);
+		int count = getMenuOptionCount();
+		contextMenu.setMenuOptionCount(count);
+
+		String[] targets = getMenuTargets();
+		String[] options = getMenuOptions();
+
+		MenuEntry[] menuEntries = getMenuEntries();
+		contextMenu.setMenuEntries(menuEntries);
+		for (int i = 0; i < count; i++)
+		{
+			int rowY = y + (count - 1 - i) * 15 + 31;
+
+			String s = options[i];
+			if (!targets[i].isEmpty())
+			{
+				s += " " + targets[i];
+			}
+
+			MenuEntry menuEntry = menuEntries[i];
+			contextMenu.addMenuRowToTarget(options[i], new MenuRow(
+					x + 3,
+					rowY - 12,
+					w - 6,
+					15,
+					i,
+					options[i],
+					targets[i],
+					s,
+					menuEntry.getIdentifier(),
+					menuEntry.getOpcode(),
+					menuEntry.getActionParam0(),
+					menuEntry.getActionParam1(),
+					menuEntry,
+					menuEntry.getMenuAction()
+							.getId(),
+					menuEntry.getId(),
+					menuEntry.getMenuAction()
+			));
+		}
+		return contextMenu;
+	}
+
+
+	@Inject
+	@Override
+	public ContextMenu get2010Menu()
+	{
+		int x = getMenuX();
+		int y = getMenuY();
+		int w = getMenuWidth();
+		int h = getMenuHeight();
+		ContextMenu contextMenu = new ContextMenu(x, y, w, h);
+
+		int mouseX = getMouseX();
+		int mouseY = getMouseY();
+
+		contextMenu.setMousePositions(mouseX, mouseY);
+
+		int count = getMenuOptionCount();
+		contextMenu.setMenuOptionCount(count);
+
+		String[] targets = getMenuTargets();
+		String[] options = getMenuOptions();
+
+		MenuEntry[] menuEntries = getMenuEntries();
+		contextMenu.setMenuEntries(menuEntries);
+		for (int i = 0; i < count; i++)
+		{
+			int rowY = y + (count - 1 - i) * 15 + 31;
+
+			String s = options[i];
+			if (!targets[i].isEmpty())
+			{
+				s += " " + targets[i];
+			}
+
+			MenuEntry menuEntry = menuEntries[i];
+			contextMenu.addMenuRowToTarget(options[i], new MenuRow(
+					x + 3,
+					rowY - 12,
+					w - 6,
+					15,
+					i,
+					options[i],
+					targets[i],
+					s,
+					menuEntry.getIdentifier(),
+					menuEntry.getOpcode(),
+					menuEntry.getActionParam0(),
+					menuEntry.getActionParam1(),
+					menuEntry,
+					menuEntry.getMenuAction()
+							.getId(),
+					menuEntry.getId(),
+					menuEntry.getMenuAction()
+			));
+		}
+		return contextMenu;
+	}
+
+	@Inject
+	@Override
 	public void drawOriginalMenu(int alpha)
 	{
 		int x = getMenuX();
@@ -277,6 +367,64 @@ public abstract class MenuMixin implements RSClient
 
 			font.drawTextLeftAligned(s, x + 3, rowY, highlight, -1);
 		}
+	}
+
+	@Inject
+	@Override
+	public ContextMenu getOriginalMenu()
+	{
+		int x = getMenuX();
+		int y = getMenuY();
+		int w = getMenuWidth();
+		int h = getMenuHeight();
+		ContextMenu contextMenu = new ContextMenu(x, y, w, h);
+
+		int mouseX = getMouseX();
+		int mouseY = getMouseY();
+		contextMenu.setMousePositions(mouseX, mouseY);
+		int count = getMenuOptionCount();
+		contextMenu.setMenuOptionCount(count);
+
+		String[] targets = getMenuTargets();
+		String[] options = getMenuOptions();
+
+		MenuEntry[] menuEntries = getMenuEntries();
+		contextMenu.setMenuEntries(menuEntries);
+
+		for (int i = 0; i < count; i++)
+		{
+			int rowY = y + (count - 1 - i) * 15 + 31;
+
+			String s = options[i];
+			if (!targets[i].isEmpty())
+			{
+				s += " " + targets[i];
+			}
+
+
+			MenuEntry menuEntry = menuEntries[i];
+
+			contextMenu.addMenuRowToTarget(options[i], new MenuRow(
+					x + 3,
+					rowY - 12,
+					w - 6,
+					15,
+					i,
+					options[i],
+					targets[i],
+					s,
+					menuEntry.getIdentifier(),
+					menuEntry.getOpcode(),
+					menuEntry.getActionParam0(),
+					menuEntry.getActionParam1(),
+					menuEntry,
+					menuEntry.getMenuAction()
+							.getId(),
+					menuEntry.getId(),
+					menuEntry.getMenuAction()
+			));
+		}
+		return contextMenu;
 	}
 
 	@Inject

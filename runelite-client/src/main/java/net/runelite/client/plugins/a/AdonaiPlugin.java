@@ -81,8 +81,8 @@ public class AdonaiPlugin extends Plugin
 
 
 	// to execute things like key press and click -- new thread
-
 	private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(1);
+
 	private ExecutorService executor;
 
 	@Provides
@@ -163,19 +163,62 @@ public class AdonaiPlugin extends Plugin
 		}
 	}
 
-	private void getTabInterface()
+	/**
+	 * gets the location of the menu items
+	 *
+	 * @param event
+	 */
+	@Subscribe
+	public void onMenuOpened(MenuOpened event)
 	{
-		client.getWidget(TabMap.getWidget("Root Interface Container"))
-				.isHidden();
-		client.getWidget(TabMap.getWidget(""))
-				.isHidden();
+
+		menuOpened = true;
+
+		ContextMenu cm = client.getAdonaiMenu();
+		Menu menu = new Menu(client.getAdonaiMenu(), event);
+
+		log.info(
+				"Menu Position: ({}, {})",
+				menu.getCtxMenu()
+						.getMenuPosition()
+						.getX(),
+				menu.getCtxMenu()
+						.getMenuPosition()
+						.getY()
+		);
+
+		log.info("{}",
+				menu.getCtxMenu()
+						.getMenuItems()
+						.toString()
+		);
+		log.info(
+				"Menu W/H: ({}, {})",
+				menu.getCtxMenu()
+						.getDimensions()
+						.getX(),
+				menu.getCtxMenu()
+						.getDimensions()
+						.getY()
+		);
+		log.info(
+				"Finding: {}",
+				menu.findExactCanvasLocation("Walk")
+						.toString()
+		);
+
+		log.info(
+				"Cancel: {}",
+				menu.findExactCanvasLocation("Cancel")
+						.toString()
+		);
+
+		MenuRow activeMenu = this.ctxMenu.getHovering(ScreenMath.convertToPoint(client.getMouseCanvasPosition()));
+		for (MenuRow row : this.ctxMenu.getAllMenuRows())
+		{
+			log.info("row: {}, target: {}", row.getOption(), row.getTarget());
+		}
 	}
-
-
-	private static final Set<MenuAction> NPC_MENU_ACTIONS = ImmutableSet.of(MenuAction.NPC_FIRST_OPTION, MenuAction.NPC_SECOND_OPTION,
-			MenuAction.NPC_THIRD_OPTION, MenuAction.NPC_FOURTH_OPTION, MenuAction.NPC_FIFTH_OPTION, MenuAction.SPELL_CAST_ON_NPC,
-			MenuAction.ITEM_USE_ON_NPC);
-
 
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event)
@@ -191,6 +234,71 @@ public class AdonaiPlugin extends Plugin
 
 		NPC npc = client.getCachedNPCs()[event.getIdentifier()];
 	}
+
+	@Subscribe
+	public void onClientTick(ClientTick tick)
+	{
+		ctxMenu = client.getAdonaiMenu();
+		for (MenuRow row : ctxMenu.getAllMenuRows())
+		{
+			log.info("option: {}", row.getOption());
+		}
+
+		float newSeconds = (float) System.currentTimeMillis();
+		List<String> menuList = getMenuList();
+		tickDiff = ((float) (newSeconds - seconds)) / 1000.0f;
+
+		MenuRow hovering = ctxMenu.getHovering(ScreenMath.convertToPoint(client.getMouseCanvasPosition()));
+		if (lastMenuItems != null && lastHovered != null && lastMenuItems.equals(menuList) || hovering.equals(
+				lastHovered))
+		{
+			return;
+		}
+
+		log.info("Hovering: {}", hovering.toString());
+		log.info("Hovering over: {} with target: {}", hovering.getOption(), hovering.getTarget());
+
+		lastMenuItems = menuList;
+		lastHovered = hovering;
+		log.info(
+				"Menu Items {}",
+				ctxMenu.getMenuItems()
+						.size()
+		);
+
+		log.info(
+				"menu items... {}",
+				menuList
+		);
+	}
+
+	@Subscribe
+	public void onBeforeMenuRender(BeforeMenuRender event)
+	{
+		client.drawAdonaiMenu(200);
+		ctxMenu = client.getAdonaiMenu();
+		event.consume();
+	}
+
+	private void getTabInterface()
+	{
+		client.getWidget(TabMap.getWidget("Root Interface Container"))
+				.isHidden();
+		client.getWidget(TabMap.getWidget(""))
+				.isHidden();
+	}
+
+
+	private static final Set<MenuAction> NPC_MENU_ACTIONS = ImmutableSet.of(
+			MenuAction.NPC_FIRST_OPTION,
+			MenuAction.NPC_SECOND_OPTION,
+			MenuAction.NPC_THIRD_OPTION,
+			MenuAction.NPC_FOURTH_OPTION,
+			MenuAction.NPC_FIFTH_OPTION,
+			MenuAction.SPELL_CAST_ON_NPC,
+			MenuAction.ITEM_USE_ON_NPC
+	);
+
 
 	private void randomCameraEvent()
 	{
@@ -258,81 +366,17 @@ public class AdonaiPlugin extends Plugin
 		overlayManager.remove(aOverlay);
 	}
 
-
 	private boolean menuOpened = false;
+
 	private String menuHash = "";
-
-	/**
-	 * gets the location of the menu items
-	 *
-	 * @param event
-	 */
-	@Subscribe
-	public void onMenuOpened(MenuOpened event)
-	{
-		menuOpened = true;
-
-		Menu menu = new Menu(event);
-
-		menu.getMenuPosition();
-
-		log.info("Menu Position: ({}, {})", menu.menuPosition.getX(), menu.menuPosition.getY());
-		log.info("Menu W/H: ({}, {})", menu.menuDimensions.getX(), menu.menuPosition.getY());
-		log.info(
-				"Finding: {}",
-				menu.getMenuOption("Walk")
-						.getExactCanvasLocation()
-						.toString()
-		);
-		log.info(
-				"Cancel: {}",
-				menu.getMenuOption("Cancel")
-						.getExactCanvasLocation()
-						.toString()
-		);
-
-		MenuRow activeMenu = contextMenu.getHovering(ScreenMath.convertToPoint(client.getMouseCanvasPosition()));
-		for (MenuRow row : contextMenu.getMenuItems())
-		{
-			log.info("row: {}, target: {}", row.getOption(), row.getTarget());
-		}
-	}
-
 	double seconds = -1;
 	private List<String> lastMenuItems = new ArrayList<>();
-	ContextMenu contextMenu;
+	ContextMenu ctxMenu;
 	private MenuRow lastHovered = null;
 	boolean modified = false;
+
 	float tickDiff = 0.0f;
 
-
-	@Subscribe
-	public void onClientTick(ClientTick tick)
-	{
-		contextMenu = client.drawAdonaiMenu(Calculations.random(200, 255));
-		float newSeconds = (float) System.currentTimeMillis();
-		List<String> menuList = getMenuList();
-		tickDiff = ((float) (newSeconds - seconds)) / 1000.0f;
-		MenuRow hovering = contextMenu.getHovering(ScreenMath.convertToPoint(client.getMouseCanvasPosition()));
-		if (lastMenuItems.equals(menuList) || hovering.equals(lastHovered))
-		{
-			return;
-		}
-
-		log.info("Hovering over: {} with target: {}", hovering.getOption(), hovering.getTarget());
-
-		lastMenuItems = menuList;
-		lastHovered = hovering;
-		log.info("Menu Items {}", contextMenu.getMenuItems().size());
-		log.info("menu items... {}", menuList);
-	}
-
-	@Subscribe
-	public void onBeforeMenuRender(BeforeMenuRender event)
-	{
-		ContextMenu helper = client.drawAdonaiMenu(Calculations.random(200, 255));
-		event.consume();
-	}
 
 	private boolean moveCamera = true;
 
