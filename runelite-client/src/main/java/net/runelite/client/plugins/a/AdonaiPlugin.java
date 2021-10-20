@@ -270,6 +270,7 @@ public class AdonaiPlugin extends Plugin
 				"menu items... {}",
 				menuList
 		);
+		client.getLocalPlayer().getInteracting().getName();
 	}
 
 	@Subscribe
@@ -288,6 +289,10 @@ public class AdonaiPlugin extends Plugin
 				.isHidden();
 	}
 
+	NPC findNpc(int id)
+	{
+		return client.getCachedNPCs()[id];
+	}
 
 	private static final Set<MenuAction> NPC_MENU_ACTIONS = ImmutableSet.of(
 			MenuAction.NPC_FIRST_OPTION,
