@@ -10,10 +10,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.widgets.Menu.ContextMenu;
 import net.runelite.api.widgets.Menu.MenuRow;
-import net.runelite.client.chat.ChatColorType;
-import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
-import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.external.adonai.TabMap;
@@ -22,15 +19,15 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.a.objects.Objects;
 import net.runelite.client.plugins.a.screen.Screen;
-import net.runelite.client.plugins.a.toolbox.Calculations;
 import net.runelite.client.plugins.a.toolbox.ScreenMath;
+import net.runelite.client.plugins.a.utils.ChatMessages;
 import net.runelite.client.plugins.a.wrappers.Menu;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -77,13 +74,20 @@ public class AdonaiPlugin extends Plugin
 	@Inject
 	private AdonaiConfig config;
 
-	private boolean keyboard = true;
-
-
 	// to execute things like key press and click -- new thread
 	private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(1);
 
 	private ExecutorService executor;
+
+	private boolean menuOpened = false;
+
+	private boolean moveCamera = true;
+
+	private ContextMenu ctxMenu;
+
+	private List<String> lastMenuItems = new ArrayList<>();
+
+	private MenuRow lastHovered = null;
 
 	@Provides
 	AdonaiConfig getConfig(ConfigManager configManager)
@@ -95,11 +99,16 @@ public class AdonaiPlugin extends Plugin
 	protected void startUp()
 	{
 		Adonai.client = this.client;
+		Adonai.chatManager = this.chatMessageManager;
+		ChatMessages.initialize(chatMessageManager);
+		ChatMessages.sendChatMessage("Adonai ChatMessages Initialized.");
+
 		executor = Executors.newFixedThreadPool(1);
 
 		try
 		{
 			this.utils = new ExtUtils(client, new Keyboard());
+			this.utils.setChatMessageManager(chatMessageManager);
 		}
 		catch (AWTException e)
 		{
@@ -124,10 +133,9 @@ public class AdonaiPlugin extends Plugin
 		{
 			if (isPlayerLocationChanged())
 			{
-				sendChatMessage("Your character has moved.");
+				ChatMessages.sendChatMessage("Your character has moved.");
 			}
 		}
-
 
 		if (config.trackNearbyObjects())
 		{
@@ -140,8 +148,8 @@ public class AdonaiPlugin extends Plugin
 			minimapLocation = object.getMinimapLocation();
 			if (minimapLocation != null)
 			{
-				sendChatMessage("nearest game object minimap information: " + minimapLocation);
-				sendChatMessage("This is the distance on minimap of " + player.getMinimapLocation()
+				ChatMessages.sendChatMessage("nearest game object minimap information: " + minimapLocation);
+				ChatMessages.sendChatMessage("This is the distance on minimap of " + player.getMinimapLocation()
 						.distanceTo(minimapLocation));
 				object.getCanvasTilePoly()
 						.getBounds();
@@ -149,17 +157,17 @@ public class AdonaiPlugin extends Plugin
 
 			LocalPoint localDestinationLocation = client.getLocalDestinationLocation();
 
-			sendChatMessage("nearest game object information: " + object.getCanvasLocation());
+			ChatMessages.sendChatMessage("nearest game object information: " + object.getCanvasLocation());
 			LocalPoint localLocation = object.getLocalLocation();
 			String[] actions = object.getActions();
 			for (String action :
 					actions)
 			{
-				sendChatMessage("Options for:" + object.getName());
+				ChatMessages.sendChatMessage("Options for:" + object.getName());
 			}
-			sendChatMessage("This is the distance of " + player.getLocalLocation()
+			ChatMessages.sendChatMessage("This is the distance of " + player.getLocalLocation()
 					.distanceTo(localLocation));
-			sendChatMessage("Is it on the screen?: " + Screen.isOnScreen(object));
+			ChatMessages.sendChatMessage("Is it on the screen?: " + Screen.isOnScreen(object));
 		}
 	}
 
@@ -174,44 +182,22 @@ public class AdonaiPlugin extends Plugin
 
 		menuOpened = true;
 
-		ContextMenu cm = client.getAdonaiMenu();
+		ctxMenu = client.getAdonaiMenu();
 		Menu menu = new Menu(client.getAdonaiMenu(), event);
 
-		log.info(
-				"Menu Position: ({}, {})",
-				menu.getCtxMenu()
-						.getMenuPosition()
-						.getX(),
-				menu.getCtxMenu()
-						.getMenuPosition()
-						.getY()
-		);
-
-		log.info("{}",
-				menu.getCtxMenu()
-						.getMenuItems()
-						.toString()
-		);
-		log.info(
-				"Menu W/H: ({}, {})",
-				menu.getCtxMenu()
-						.getDimensions()
-						.getX(),
-				menu.getCtxMenu()
-						.getDimensions()
-						.getY()
-		);
-		log.info(
-				"Finding: {}",
-				menu.findExactCanvasLocation("Walk")
-						.toString()
-		);
-
-		log.info(
-				"Cancel: {}",
-				menu.findExactCanvasLocation("Cancel")
-						.toString()
-		);
+		//		// not working:
+		//		log.info(
+		//				"Finding: {}",
+		//				menu.findExactCanvasLocation("Walk")
+		//						.toString()
+		//		);
+		//
+		//		// not working:
+		//		log.info(
+		//				"Cancel: {}",
+		//				menu.findExactCanvasLocation("Cancel")
+		//						.toString()
+		//		);
 
 		MenuRow activeMenu = this.ctxMenu.getHovering(ScreenMath.convertToPoint(client.getMouseCanvasPosition()));
 		for (MenuRow row : this.ctxMenu.getAllMenuRows())
@@ -235,31 +221,38 @@ public class AdonaiPlugin extends Plugin
 		NPC npc = client.getCachedNPCs()[event.getIdentifier()];
 	}
 
+	private int gameTicks = 0;
+
+
 	@Subscribe
 	public void onClientTick(ClientTick tick)
 	{
 		ctxMenu = client.getAdonaiMenu();
-		for (MenuRow row : ctxMenu.getAllMenuRows())
+		MenuRow hNew = getHovering();
+
+		if (hNew != null)
 		{
-			log.info("option: {}", row.getOption());
+			logOnTick(hNew.getOption(), 500);
 		}
 
-		float newSeconds = (float) System.currentTimeMillis();
 		List<String> menuList = getMenuList();
-		tickDiff = ((float) (newSeconds - seconds)) / 1000.0f;
-
-		MenuRow hovering = ctxMenu.getHovering(ScreenMath.convertToPoint(client.getMouseCanvasPosition()));
-		if (lastMenuItems != null && lastHovered != null && lastMenuItems.equals(menuList) || hovering.equals(
+		if (lastMenuItems != null && lastHovered != null && lastMenuItems.equals(menuList) || hNew.equals(
 				lastHovered))
 		{
 			return;
 		}
 
-		log.info("Hovering: {}", hovering.toString());
-		log.info("Hovering over: {} with target: {}", hovering.getOption(), hovering.getTarget());
+		// getting menu objects?
+		List<TileObject> menuObjects = getMenuObjects();
+		for (TileObject o : menuObjects)
+		{
+			log.info("MenuObject: {}", o.getName());
+		}
+
+		refreshMenuOpened();
 
 		lastMenuItems = menuList;
-		lastHovered = hovering;
+		lastHovered = hNew;
 		log.info(
 				"Menu Items {}",
 				ctxMenu.getMenuItems()
@@ -270,7 +263,84 @@ public class AdonaiPlugin extends Plugin
 				"menu items... {}",
 				menuList
 		);
-		client.getLocalPlayer().getInteracting().getName();
+	}
+
+	/**
+	 * Gets the current context-menu option the mouse is hovered over
+	 */
+	private MenuRow getHovering()
+	{
+		return ctxMenu.getHovering(client.getMouseCanvasPosition());
+	}
+
+	private List<TileObject> getMenuObjects()
+	{
+		List<TileObject> tileObjects = new ArrayList<>();
+
+		log.info("Getting the menu rows for the entire context menu...");
+		for (MenuRow r : ctxMenu.getAllMenuRows())
+		{
+			log.info("Menu data (needed to get the TileObject from the context menu): {}", r.getObjectData());
+			log.info("Menu entry from the previous menu row: {}", r.getEntry());
+
+			TileObject obj = Objects.findTileObject(r.getObjectData());
+			if (obj != null)
+			{
+				if (!java.util.Objects.equals(obj.getName(), ""))
+				{
+					log.info(
+							"obj.getName(): {}\n" +
+							"obj.getCanvasLocation(): {}\n" +
+							"obj.getLocalLocation(): {}\n" +
+							"obj.getMinimapLocation(): {}\n" +
+							"obj.getWorldLocation(): {}\n" +
+							"obj.getClickbox(): {}\n" +
+							"obj.getCanvasTilePoly(): {}\n",
+							obj.getName(),
+							obj.getCanvasLocation(),
+							obj.getLocalLocation(),
+							obj.getMinimapLocation(),
+							obj.getWorldLocation(),
+							obj.getClickbox(),
+							obj.getCanvasTilePoly()
+					);
+				}
+				tileObjects.add(obj);
+			}
+		}
+		return tileObjects;
+	}
+
+	@Subscribe
+	public void onFocusChanged(FocusChanged event)
+	{
+		if (event.isFocused())
+		{
+			moveCamera = true;
+			return;
+		}
+		moveCamera = false;
+	}
+
+	private void logOnTick(String info, int ticks)
+	{
+		gameTicks++;
+		if (gameTicks % ticks == 0)
+		{
+			log.info("Logging the HOVERED one on tick");
+			log.info(info);
+		}
+	}
+
+
+	private void refreshMenuOpened()
+	{
+		ctxMenu = client.getAdonaiMenu();
+
+		for (MenuRow row : ctxMenu.getAllMenuRows())
+		{
+			log.info("refreshed option: {}", row.getOption());
+		}
 	}
 
 	@Subscribe
@@ -292,6 +362,11 @@ public class AdonaiPlugin extends Plugin
 	NPC findNpc(int id)
 	{
 		return client.getCachedNPCs()[id];
+	}
+
+	Player findPlayer(int id)
+	{
+		return client.getCachedPlayers()[id];
 	}
 
 	private static final Set<MenuAction> NPC_MENU_ACTIONS = ImmutableSet.of(
@@ -371,32 +446,6 @@ public class AdonaiPlugin extends Plugin
 		overlayManager.remove(aOverlay);
 	}
 
-	private boolean menuOpened = false;
-
-	private String menuHash = "";
-	double seconds = -1;
-	private List<String> lastMenuItems = new ArrayList<>();
-	ContextMenu ctxMenu;
-	private MenuRow lastHovered = null;
-	boolean modified = false;
-
-	float tickDiff = 0.0f;
-
-
-	private boolean moveCamera = true;
-
-	@Subscribe
-	public void onFocusChanged(FocusChanged event)
-	{
-		if (event.isFocused())
-		{
-			moveCamera = true;
-			return;
-		}
-		moveCamera = false;
-	}
-
-
 	private static float milliToSeconds(int ms)
 	{
 		return ((float) ms) / 1000.0f;
@@ -419,42 +468,5 @@ public class AdonaiPlugin extends Plugin
 				e -> menuList.add(e.getOption())
 		);
 		return menuList;
-	}
-
-	private void sendChatMessage(String pattern, Object... arguments)
-	{
-		sendChatMessage(MessageFormat.format(pattern, arguments));
-	}
-
-	private String messageArgs(String pattern, Object... arguments)
-	{
-		return MessageFormat.format(pattern, arguments);
-	}
-
-	private QueuedMessage toChatMessage(String pattern, Object... arguments)
-	{
-		return QueuedMessage.builder()
-				.type(ChatMessageType.CONSOLE)
-				.runeLiteFormattedMessage(MessageFormat.format(pattern, arguments))
-				.build();
-	}
-
-	public void sendChatMessage(QueuedMessage message)
-	{
-		chatMessageManager.queue(message);
-	}
-
-	private void sendChatMessage(String chatMessage)
-	{
-		final String message = new ChatMessageBuilder()
-				.append(ChatColorType.HIGHLIGHT)
-				.append(chatMessage)
-				.build();
-
-		chatMessageManager.queue(
-				QueuedMessage.builder()
-						.type(ChatMessageType.CONSOLE)
-						.runeLiteFormattedMessage(message)
-						.build());
 	}
 }

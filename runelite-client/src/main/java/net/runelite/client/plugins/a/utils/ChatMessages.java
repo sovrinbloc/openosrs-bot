@@ -5,13 +5,13 @@ import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
+import net.runelite.client.plugins.a.Adonai;
 
 import javax.inject.Inject;
 import java.text.MessageFormat;
 
 public class ChatMessages
 {
-	@Inject
 	public static ChatMessageManager chatMessageManager;
 
 	public static void initialize(ChatMessageManager chatMessageManager)
@@ -24,12 +24,12 @@ public class ChatMessages
 		sendChatMessage(MessageFormat.format(pattern, arguments));
 	}
 
-	public static String messageArgs(String pattern, Object... arguments)
+	private static String messageArgs(String pattern, Object... arguments)
 	{
 		return MessageFormat.format(pattern, arguments);
 	}
 
-	public static QueuedMessage toChatMessage(String pattern, Object... arguments)
+	private static QueuedMessage toChatMessage(String pattern, Object... arguments)
 	{
 		return QueuedMessage.builder()
 				.type(ChatMessageType.CONSOLE)
@@ -39,11 +39,15 @@ public class ChatMessages
 
 	public static void sendChatMessage(QueuedMessage message)
 	{
+		assert chatMessageManager != null;
+
 		chatMessageManager.queue(message);
 	}
 
 	public static void sendChatMessage(String chatMessage)
 	{
+		assert chatMessageManager != null;
+
 		final String message = new ChatMessageBuilder()
 				.append(ChatColorType.HIGHLIGHT)
 				.append(chatMessage)

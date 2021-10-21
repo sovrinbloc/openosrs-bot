@@ -105,7 +105,7 @@ public abstract class MenuMixin implements RSClient
 		rasterizerDrawCircleAlpha(x + w - 2, y + h - 2, 0, MENU_BORDER_OUTER_2010, alpha);
 
 		RSFont font = getFontBold12();
-		font.drawTextLeftAligned("Choose...", x + 3, y + 14, MENU_TEXT_2010, -1);
+		font.drawTextLeftAligned("Choose Option", x + 3, y + 14, MENU_TEXT_2010, -1);
 
 		int mouseX = getMouseX();
 		int mouseY = getMouseY();

@@ -1,5 +1,6 @@
 package net.runelite.api.widgets.Menu;
 
+import lombok.Getter;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 
@@ -8,22 +9,40 @@ import java.text.MessageFormat;
 
 public class MenuRow
 {
-	private int x, y;
-	private int height, width;
-	private int index;
-	private String option;
-	private String target;
-	private String fullText;
-	private int opCode;
-	private int arguments0;
-	private int arguments1;
-	private MenuEntry entry;
-	private int actionId;
-	private int identifier;
+	@Getter
+	private final int x, y, height, width;
 
+	@Getter
+	private final int index;
+
+	@Getter
+	private final String option, target;
+
+	@Getter
+	private final String fullText;
+
+	@Getter
+	private final int opCode;
+
+	@Getter
+	private final int arguments0, arguments1;
+
+	@Getter
+	private final MenuEntry entry;
+
+	@Getter
+	private final int actionId;
+
+	@Getter
+	private final int identifier;
+
+	@Getter
 	private final int menuEntryId;
 
+	@Getter
 	private final MenuAction menuAction;
+
+	@Getter
 	private final java.awt.Rectangle hitBox;
 
 	/**
@@ -70,211 +89,11 @@ public class MenuRow
 	}
 
 	/**
-	 * Gets the menuEntryId of the right-click option.
-	 */
-	public int getMenuEntryId()
-	{
-		return menuEntryId;
-	}
-
-	/**
-	 * Gets the menuOption for the right-click option.
-	 */
-	public MenuAction getMenuAction()
-	{
-		return menuAction;
-	}
-
-	/**
-	 * Gets the hitbox for the right-click row.
-	 */
-	public Rectangle getHitBox()
-	{
-		return hitBox;
-	}
-
-	/**
-	 * Gets the entry of the right-click option.
-	 */
-	public MenuEntry getEntry()
-	{
-		return entry;
-	}
-
-	/**
-	 * Sets the entry of the right-click option.
-	 *
-	 * @param entry the entry for the right-click option.
-	 */
-	public void setEntry(MenuEntry entry)
-	{
-		this.entry = entry;
-	}
-
-	/**
-	 * Gets the identifier of the right-click option.
-	 */
-	public int getIdentifier()
-	{
-		return identifier;
-	}
-
-	/**
-	 * Sets the identifier of the right-click option.
-	 *
-	 * @param identifier the identifier of the right-click option.
-	 */
-	public void setIdentifier(int identifier)
-	{
-		this.identifier = identifier;
-	}
-
-	/**
-	 * Gets the OpCode of the right-click option.
-	 */
-	public int getOpCode()
-	{
-		return opCode;
-	}
-
-	/**
-	 * Sets the OpCode of the right-click option
-	 *
-	 * @param opCode the opCode for the right-click option.
-	 */
-	public void setOpCode(int opCode)
-	{
-		this.opCode = opCode;
-	}
-
-	/**
-	 * Gets Argument0 of the right-click option.
-	 */
-	public int getArguments0()
-	{
-		return arguments0;
-	}
-
-	/**
-	 * Sets the argument0 of the right-click option.
-	 *
-	 * @param arguments0 the argument0 of the right-click option.
-	 */
-	public void setArguments0(int arguments0)
-	{
-		this.arguments0 = arguments0;
-	}
-
-	/**
-	 * Gets the argument1 of the right-click option.
-	 */
-	public int getArguments1()
-	{
-		return arguments1;
-	}
-
-	/**
-	 * Sets the argument1 of the right-click option.
-	 *
-	 * @param arguments1 the argument1 of the right-click option.
-	 */
-	public void setArguments1(int arguments1)
-	{
-		this.arguments1 = arguments1;
-	}
-
-	/**
-	 * Gets the action ID of the option.
-	 */
-	public int getActionId()
-	{
-		return actionId;
-	}
-
-	/**
-	 * Sets the action ID of the right-click option.
-	 *
-	 * @param actionId the actionID of the right-click option.
-	 */
-	public void setActionId(int actionId)
-	{
-		this.actionId = actionId;
-	}
-
-	/**
-	 * Gets the X position of the row.
-	 */
-	public int getX()
-	{
-		return x;
-	}
-
-	/**
-	 * Gets the Y position of the row.
-	 */
-	public int getY()
-	{
-		return y;
-	}
-
-	/**
 	 * Gets the relative canvas position of the menu item.
 	 */
 	public Point getPosition()
 	{
 		return new Point(x, y);
-	}
-
-	/**
-	 *
-	 */
-
-	/**
-	 * Gets the height of the row.
-	 */
-	public int getHeight()
-	{
-		return height;
-	}
-
-	/**
-	 * Gets the width of the row.
-	 */
-	public int getWidth()
-	{
-		return width;
-	}
-
-	/**
-	 * Gets the index of the row.
-	 */
-	public int getIndex()
-	{
-		return index;
-	}
-
-	/**
-	 * Gets the option of the row.
-	 */
-	public String getOption()
-	{
-		return option;
-	}
-
-	/**
-	 * Gets the target of the MenuRow
-	 */
-	public String getTarget()
-	{
-		return target;
-	}
-
-	/**
-	 * Gets the full text of the option and the target
-	 */
-	public String getFullText()
-	{
-		return fullText;
 	}
 
 	/**
@@ -315,5 +134,13 @@ public class MenuRow
 				this.menuEntryId,
 				this.menuAction
 		);
+	}
+
+	/**
+	 * Get the object data to be used to find the actual physical NPC or Object on the map.
+	 */
+	public MenuTileObject getObjectData()
+	{
+		return new MenuTileObject(entry);
 	}
 }

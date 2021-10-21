@@ -8,28 +8,29 @@ package net.runelite.client.plugins.a;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.api.*;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.queries.*;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
+import net.runelite.client.chat.ChatColorType;
+import net.runelite.client.chat.ChatMessageBuilder;
+import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.external.PrayerMap;
 import net.runelite.client.external.Spells;
 import net.runelite.client.external.Tab;
-import net.runelite.client.plugins.bank.BankSearch;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 
 @Slf4j
 @SuppressWarnings("unused")
@@ -37,30 +38,69 @@ import java.util.function.Predicate;
 public class ExtUtils
 {
 	final private Client client;
-	private Keyboard keyboard = null;
+	private Keyboard keyboard;
+	private ChatMessageManager chatMessageManager;
+
+	public ExtUtils(Client client)
+	{
+		initializeAdonaiClient(client);
+		this.client = client;
+	}
 
 	ExtUtils(Client client, Keyboard keyboard)
 	{
+		initializeAdonaiClient(client);
 		this.client = client;
 		this.keyboard = keyboard;
 	}
 
-	public ExtUtils(Client client)
+	public ExtUtils(Client client, ChatMessageManager manager)
 	{
+		initializeAdonaiClient(client);
+		initializeAdonaiChatManager(manager);
 		this.client = client;
+		this.chatMessageManager = manager;
+	}
+
+	public void initializeAdonaiClient(Client client)
+	{
+		if (!Adonai.isClientInitialized())
+		{
+			Adonai.initializeClient(client);
+		}
+	}
+
+	public void initializeAdonaiChatManager(ChatMessageManager manager)
+	{
+		if (!Adonai.isChatManagerInitialized())
+		{
+			Adonai.initializeChatMessageManager(manager);
+		}
+	}
+
+
+	public void setChatMessageManager(ChatMessageManager manager)
+	{
+		this.chatMessageManager = manager;
+	}
+
+	public void setKeyboardManager(Keyboard keyboard)
+	{
+		this.keyboard = keyboard;
 	}
 
 	public static int[] stringToIntArray(String string)
 	{
-		return Arrays.stream(string.split(",")).map(String::trim).mapToInt(Integer::parseInt).toArray();
+		return Arrays.stream(string.split(","))
+				.map(String::trim)
+				.mapToInt(Integer::parseInt)
+				.toArray();
 	}
 
 
 	/*
 		Bank Items
 	 */
-
-
 
 	public int getTabHotkey(Tab tab)
 	{
@@ -87,7 +127,7 @@ public class ExtUtils
 			case 13:
 				return 27;
 			default:
-				return - 1;
+				return -1;
 		}
 	}
 
@@ -123,7 +163,7 @@ public class ExtUtils
 	 */
 	public void typeString(String string)
 	{
-		assert ! client.isClientThread();
+		assert !client.isClientThread();
 
 		try
 		{
@@ -143,7 +183,8 @@ public class ExtUtils
 				0, KeyEvent.VK_UNDEFINED, key
 		);
 
-		client.getCanvas().dispatchEvent(e);
+		client.getCanvas()
+				.dispatchEvent(e);
 	}
 
 	/**
@@ -154,14 +195,14 @@ public class ExtUtils
 	 */
 	public void click(Rectangle rectangle)
 	{
-		assert ! client.isClientThread();
+		assert !client.isClientThread();
 		Point point = getClickPoint(rectangle);
 		click(point);
 	}
 
 	public void click(Point p)
 	{
-		assert ! client.isClientThread();
+		assert !client.isClientThread();
 
 		if (client.isStretchedEnabled())
 		{
@@ -182,8 +223,14 @@ public class ExtUtils
 
 	public Point getClickPoint(@NotNull Rectangle rect)
 	{
-		final int x = (int) (rect.getX() + getRandomIntBetweenRange((int) rect.getWidth() / 6 * - 1, (int) rect.getWidth() / 6) + rect.getWidth() / 2);
-		final int y = (int) (rect.getY() + getRandomIntBetweenRange((int) rect.getHeight() / 6 * - 1, (int) rect.getHeight() / 6) + rect.getHeight() / 2);
+		final int x = (int) (rect.getX() + getRandomIntBetweenRange(
+				(int) rect.getWidth() / 6 * -1,
+				(int) rect.getWidth() / 6
+		) + rect.getWidth() / 2);
+		final int y = (int) (rect.getY() + getRandomIntBetweenRange(
+				(int) rect.getHeight() / 6 * -1,
+				(int) rect.getHeight() / 6
+		) + rect.getHeight() / 2);
 
 		return new Point(x, y);
 	}
@@ -202,7 +249,8 @@ public class ExtUtils
 				1, false, 1
 		);
 
-		client.getCanvas().dispatchEvent(e);
+		client.getCanvas()
+				.dispatchEvent(e);
 	}
 
 
@@ -210,7 +258,8 @@ public class ExtUtils
 	{
 		RenderOverview ro = client.getRenderOverview();
 
-		if (!ro.getWorldMapData().surfaceContainsPosition(worldPoint.getX(), worldPoint.getY()))
+		if (!ro.getWorldMapData()
+				.surfaceContainsPosition(worldPoint.getX(), worldPoint.getY()))
 		{
 			return null;
 		}
@@ -249,7 +298,8 @@ public class ExtUtils
 	}
 
 
-	private void robotClick() throws AWTException
+	private void robotClick()
+			throws AWTException
 	{
 		Robot bot = new Robot();
 		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
@@ -271,12 +321,14 @@ public class ExtUtils
 
 	public static int random(int min, int max)
 	{
-		return ThreadLocalRandom.current().nextInt(min, max);
+		return ThreadLocalRandom.current()
+				.nextInt(min, max);
 	}
 
 	public boolean isTabOpen(WidgetInfo info)
 	{
-		return Objects.requireNonNull(client.getWidget(info)).isHidden();
+		return Objects.requireNonNull(client.getWidget(info))
+				.isHidden();
 	}
 
 	enum ToolbarTabs
@@ -343,7 +395,8 @@ public class ExtUtils
 				{
 					for (Widget child : children)
 					{
-						if (child.getName().contains(name))
+						if (child.getName()
+								.contains(name))
 						{
 							return true;
 						}
@@ -366,7 +419,8 @@ public class ExtUtils
 				assert children != null;
 				for (Widget child : children)
 				{
-					if (child.getName().contains(name))
+					if (child.getName()
+							.contains(name))
 					{
 						widgets.add(child);
 					}
@@ -387,7 +441,8 @@ public class ExtUtils
 				assert children != null;
 				for (Widget child : children)
 				{
-					if (child.getName().contains(name))
+					if (child.getName()
+							.contains(name))
 					{
 						return child;
 					}
@@ -400,7 +455,9 @@ public class ExtUtils
 	WidgetItem getFirstInventorySlotContains(String name)
 	{
 		return new InventoryWidgetItemQuery()
-				.filter(item -> item.getWidget().getName().contains(name))
+				.filter(item -> item.getWidget()
+						.getName()
+						.contains(name))
 				.result(client)
 				.first();
 	}
@@ -408,7 +465,9 @@ public class ExtUtils
 	WidgetItem getRandomInventorySlotContains(String name)
 	{
 		List<WidgetItem> list = new InventoryWidgetItemQuery()
-				.filter(item -> item.getWidget().getName().contains(name))
+				.filter(item -> item.getWidget()
+						.getName()
+						.contains(name))
 				.result(client)
 				.list;
 		return list.get(new Random().nextInt(list.size()));
@@ -417,7 +476,9 @@ public class ExtUtils
 	List<WidgetItem> getInventorySlotsContains(String name)
 	{
 		return new InventoryWidgetItemQuery()
-				.filter(item -> item.getWidget().getName().contains(name))
+				.filter(item -> item.getWidget()
+						.getName()
+						.contains(name))
 				.result(client)
 				.list;
 	}
@@ -445,6 +506,47 @@ public class ExtUtils
 				.idEquals(ids)
 				.result(client)
 				.first();
+	}
+
+	public void sendChatMessage(String pattern, Object... arguments)
+	{
+		sendChatMessage(MessageFormat.format(pattern, arguments));
+	}
+
+	private String messageArgs(String pattern, Object... arguments)
+	{
+		return MessageFormat.format(pattern, arguments);
+	}
+
+	private QueuedMessage toChatMessage(String pattern, Object... arguments)
+	{
+		return QueuedMessage.builder()
+				.type(ChatMessageType.CONSOLE)
+				.runeLiteFormattedMessage(MessageFormat.format(pattern, arguments))
+				.build();
+	}
+
+	public void sendChatMessage(QueuedMessage message)
+	{
+		assert chatMessageManager != null;
+
+		chatMessageManager.queue(message);
+	}
+
+	public void sendChatMessage(String chatMessage)
+	{
+		assert chatMessageManager != null;
+
+		final String message = new ChatMessageBuilder()
+				.append(ChatColorType.HIGHLIGHT)
+				.append(chatMessage)
+				.build();
+
+		chatMessageManager.queue(
+				QueuedMessage.builder()
+						.type(ChatMessageType.CONSOLE)
+						.runeLiteFormattedMessage(message)
+						.build());
 	}
 
 }

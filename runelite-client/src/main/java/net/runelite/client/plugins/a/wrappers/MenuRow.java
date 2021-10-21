@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.a.wrappers;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.client.plugins.a.Adonai;
