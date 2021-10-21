@@ -5,6 +5,7 @@ import net.runelite.api.queries.DecorativeObjectQuery;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.GroundObjectQuery;
 import net.runelite.api.queries.WallObjectQuery;
+import net.runelite.api.widgets.Menu.MenuTileObject;
 import net.runelite.client.plugins.a.Adonai;
 
 import javax.annotation.Nullable;
@@ -469,6 +470,10 @@ public  class Objects
 	}
 
 
+	public static TileObject findTileObject(MenuTileObject tileObject)
+	{
+		return findTileObject(tileObject.getX(), tileObject.getY(), tileObject.getId());
+	}
 
 	public static TileObject findTileObject(int x, int y, int id)
 	{
@@ -504,5 +509,15 @@ public  class Objects
 			}
 		}
 		return null;
+	}
+
+	public static NPC findNpc(int id)
+	{
+		return Adonai.client.getCachedNPCs()[id];
+	}
+
+	public static Player findPlayer(int id)
+	{
+		return Adonai.client.getCachedPlayers()[id];
 	}
 }
