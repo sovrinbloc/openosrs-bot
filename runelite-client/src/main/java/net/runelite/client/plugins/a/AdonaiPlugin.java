@@ -1,6 +1,5 @@
 package net.runelite.client.plugins.a;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -8,8 +7,7 @@ import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.*;
-import net.runelite.api.widgets.Menu.ContextMenu;
-import net.runelite.api.widgets.Menu.MenuRow;
+import net.runelite.api.widgets.menu.MenuRow;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -19,23 +17,18 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.a.objects.Objects;
 import net.runelite.client.plugins.a.screen.Screen;
-import net.runelite.client.plugins.a.toolbox.ScreenMath;
+import net.runelite.client.plugins.a.toolbox.Calculations;
 import net.runelite.client.plugins.a.utils.ChatMessages;
-import net.runelite.client.plugins.a.wrappers.Menu;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static net.runelite.api.MenuAction.MENU_ACTION_DEPRIORITIZE_OFFSET;
 
 @PluginDescriptor(
 		name = "Adonai Core",
@@ -83,11 +76,15 @@ public class AdonaiPlugin extends Plugin
 
 	private boolean moveCamera = true;
 
-	private ContextMenu ctxMenu;
-
 	private List<String> lastMenuItems = new ArrayList<>();
 
 	private MenuRow lastHovered = null;
+
+	private int gameTicks = 0;
+
+	private int clientTicks = 0;
+
+	private MenuExample adonaiMenu;
 
 	@Provides
 	AdonaiConfig getConfig(ConfigManager configManager)
@@ -98,24 +95,38 @@ public class AdonaiPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		Adonai.client = this.client;
-		Adonai.chatManager = this.chatMessageManager;
-		ChatMessages.initialize(chatMessageManager);
-		ChatMessages.sendChatMessage("Adonai ChatMessages Initialized.");
-
-		executor = Executors.newFixedThreadPool(1);
+		if (Adonai.isNullInitializeClient(client))
+		{
+			log.info("Initialized Adonai Client.");
+		}
+		if (Adonai.isNullInitializeChatMessageManager(this.chatMessageManager))
+		{
+			if (client.getGameState() == GameState.LOGGED_IN)
+			{
+				ChatMessages.sendChatMessage("Adonai ChatMessages Initialized.");
+			}
+		}
 
 		try
 		{
-			this.utils = new ExtUtils(client, new Keyboard());
-			this.utils.setChatMessageManager(chatMessageManager);
+			if (Adonai.isNullInitializeKeyboard(new Keyboard()))
+			{
+				log.info("Initialized Adonai Client.");
+			}
 		}
 		catch (AWTException e)
 		{
 			e.printStackTrace();
 		}
 
+
+		executor = Executors.newFixedThreadPool(1);
+
+		this.utils = new ExtUtils(client, Adonai.keyboard);
+		this.utils.setChatMessageManager(chatMessageManager);
+
 		overlayManager.add(aOverlay);
+		adonaiMenu = new MenuExample(client);
 	}
 
 	@Subscribe
@@ -131,7 +142,7 @@ public class AdonaiPlugin extends Plugin
 
 		if (config.trackPlayerMovement())
 		{
-			if (isPlayerLocationChanged())
+			if (onPlayerLocationChanged())
 			{
 				ChatMessages.sendChatMessage("Your character has moved.");
 			}
@@ -172,143 +183,31 @@ public class AdonaiPlugin extends Plugin
 	}
 
 	/**
-	 * gets the location of the menu items
+	 * Gets a copy of the menu every single time the client ticks.
 	 *
-	 * @param event
+	 * @param tick carries the information of the tick
+	 */
+	@Subscribe
+	public void onClientTick(ClientTick tick)
+	{
+		adonaiMenu.getUpdatedMenu();
+	}
+
+	/**
+	 * Gets the location of the menu items
+	 *
+	 * @param event holds the event information
 	 */
 	@Subscribe
 	public void onMenuOpened(MenuOpened event)
 	{
-
 		menuOpened = true;
-
-		ctxMenu = client.getAdonaiMenu();
-		Menu menu = new Menu(client.getAdonaiMenu(), event);
-
-		//		// not working:
-		//		log.info(
-		//				"Finding: {}",
-		//				menu.findExactCanvasLocation("Walk")
-		//						.toString()
-		//		);
-		//
-		//		// not working:
-		//		log.info(
-		//				"Cancel: {}",
-		//				menu.findExactCanvasLocation("Cancel")
-		//						.toString()
-		//		);
-
-		MenuRow activeMenu = this.ctxMenu.getHovering(ScreenMath.convertToPoint(client.getMouseCanvasPosition()));
-		for (MenuRow row : this.ctxMenu.getAllMenuRows())
-		{
-			log.info("row: {}, target: {}", row.getOption(), row.getTarget());
-		}
+		adonaiMenu.printNewMenuItems(event);
 	}
 
 	@Subscribe
 	public void onMenuEntryAdded(MenuEntryAdded event)
 	{
-		int type = event.getType();
-
-		if (type >= MENU_ACTION_DEPRIORITIZE_OFFSET)
-		{
-			type -= MENU_ACTION_DEPRIORITIZE_OFFSET;
-		}
-
-		final MenuAction menuAction = MenuAction.of(type);
-
-		NPC npc = client.getCachedNPCs()[event.getIdentifier()];
-	}
-
-	private int gameTicks = 0;
-
-
-	@Subscribe
-	public void onClientTick(ClientTick tick)
-	{
-		ctxMenu = client.getAdonaiMenu();
-		MenuRow hNew = getHovering();
-
-		if (hNew != null)
-		{
-			logOnTick(hNew.getOption(), 500);
-		}
-
-		List<String> menuList = getMenuList();
-		if (lastMenuItems != null && lastHovered != null && lastMenuItems.equals(menuList) || hNew.equals(
-				lastHovered))
-		{
-			return;
-		}
-
-		// getting menu objects?
-		List<TileObject> menuObjects = getMenuObjects();
-		for (TileObject o : menuObjects)
-		{
-			log.info("MenuObject: {}", o.getName());
-		}
-
-		refreshMenuOpened();
-
-		lastMenuItems = menuList;
-		lastHovered = hNew;
-		log.info(
-				"Menu Items {}",
-				ctxMenu.getMenuItems()
-						.size()
-		);
-
-		log.info(
-				"menu items... {}",
-				menuList
-		);
-	}
-
-	/**
-	 * Gets the current context-menu option the mouse is hovered over
-	 */
-	private MenuRow getHovering()
-	{
-		return ctxMenu.getHovering(client.getMouseCanvasPosition());
-	}
-
-	private List<TileObject> getMenuObjects()
-	{
-		List<TileObject> tileObjects = new ArrayList<>();
-
-		log.info("Getting the menu rows for the entire context menu...");
-		for (MenuRow r : ctxMenu.getAllMenuRows())
-		{
-			log.info("Menu data (needed to get the TileObject from the context menu): {}", r.getObjectData());
-			log.info("Menu entry from the previous menu row: {}", r.getEntry());
-
-			TileObject obj = Objects.findTileObject(r.getObjectData());
-			if (obj != null)
-			{
-				if (!java.util.Objects.equals(obj.getName(), ""))
-				{
-					log.info(
-							"obj.getName(): {}\n" +
-							"obj.getCanvasLocation(): {}\n" +
-							"obj.getLocalLocation(): {}\n" +
-							"obj.getMinimapLocation(): {}\n" +
-							"obj.getWorldLocation(): {}\n" +
-							"obj.getClickbox(): {}\n" +
-							"obj.getCanvasTilePoly(): {}\n",
-							obj.getName(),
-							obj.getCanvasLocation(),
-							obj.getLocalLocation(),
-							obj.getMinimapLocation(),
-							obj.getWorldLocation(),
-							obj.getClickbox(),
-							obj.getCanvasTilePoly()
-					);
-				}
-				tileObjects.add(obj);
-			}
-		}
-		return tileObjects;
 	}
 
 	@Subscribe
@@ -332,22 +231,15 @@ public class AdonaiPlugin extends Plugin
 		}
 	}
 
-
-	private void refreshMenuOpened()
-	{
-		ctxMenu = client.getAdonaiMenu();
-
-		for (MenuRow row : ctxMenu.getAllMenuRows())
-		{
-			log.info("refreshed option: {}", row.getOption());
-		}
-	}
-
+	/**
+	 * Stores an updated copy of the menu before it the menu is loaded.
+	 *
+	 * @param event carries the information of the tick
+	 */
 	@Subscribe
 	public void onBeforeMenuRender(BeforeMenuRender event)
 	{
-		client.drawAdonaiMenu(200);
-		ctxMenu = client.getAdonaiMenu();
+		adonaiMenu.renderAdonaiMenu();
 		event.consume();
 	}
 
@@ -359,35 +251,14 @@ public class AdonaiPlugin extends Plugin
 				.isHidden();
 	}
 
-	NPC findNpc(int id)
-	{
-		return client.getCachedNPCs()[id];
-	}
-
-	Player findPlayer(int id)
-	{
-		return client.getCachedPlayers()[id];
-	}
-
-	private static final Set<MenuAction> NPC_MENU_ACTIONS = ImmutableSet.of(
-			MenuAction.NPC_FIRST_OPTION,
-			MenuAction.NPC_SECOND_OPTION,
-			MenuAction.NPC_THIRD_OPTION,
-			MenuAction.NPC_FOURTH_OPTION,
-			MenuAction.NPC_FIFTH_OPTION,
-			MenuAction.SPELL_CAST_ON_NPC,
-			MenuAction.ITEM_USE_ON_NPC
-	);
-
-
 	private void randomCameraEvent()
 	{
 		char cameraMovement;
-		if (ExtUtils.random(1, 100) > 85)
+		if (Calculations.random(1, 100) > 85)
 		{
 			StringBuilder outcome = new StringBuilder();
 			int numberPressed = ExtUtils.random(5, 20);
-			switch (ExtUtils.random(1, 5))
+			switch (Calculations.random(1, 5))
 			{
 				case 1:
 					cameraMovement = Keyboard.LEFT_ARROW_KEY;
@@ -415,7 +286,7 @@ public class AdonaiPlugin extends Plugin
 		}
 	}
 
-	private boolean isPlayerLocationChanged()
+	private boolean onPlayerLocationChanged()
 	{
 		if (player == null)
 		{
@@ -444,29 +315,5 @@ public class AdonaiPlugin extends Plugin
 	{
 		executor.shutdown();
 		overlayManager.remove(aOverlay);
-	}
-
-	private static float milliToSeconds(int ms)
-	{
-		return ((float) ms) / 1000.0f;
-	}
-
-	private static float secondsToMillis(int s)
-	{
-		return ((float) s) * 1000.0f;
-	}
-
-	private List<String> getMenuList()
-	{
-		String list = "";
-		List<String> menuList = new ArrayList<String>();
-		new ArrayList<MenuEntry>(
-				java.util.List.of(
-						client.getMenuEntries()
-				)
-		).forEach(
-				e -> menuList.add(e.getOption())
-		);
-		return menuList;
 	}
 }

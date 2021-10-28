@@ -1,8 +1,7 @@
 package net.runelite.client.plugins.a.wrappers;
 
-import net.runelite.api.TileObject;
-import net.runelite.api.widgets.Menu.ContextMenu;
-import net.runelite.api.widgets.Menu.MenuRow;
+import net.runelite.api.widgets.menu.ContextMenu;
+import net.runelite.api.widgets.menu.MenuRow;
 import net.runelite.client.plugins.a.Adonai;
 
 public class MenuEvents
@@ -17,6 +16,6 @@ public class MenuEvents
 
 	public static MenuRow getHoveredMenuRow(ContextMenu ctxMenu)
 	{
-		return ctxMenu.getHovering(Adonai.client.getMouseCanvasPosition());
+		return ctxMenu.getRowHovering(Adonai.client.getMouseCanvasPosition());
 	}
 }

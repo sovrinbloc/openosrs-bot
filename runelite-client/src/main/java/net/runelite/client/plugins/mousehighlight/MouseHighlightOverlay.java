@@ -94,6 +94,12 @@ class MouseHighlightOverlay extends Overlay
 	{
 		if (client.isMenuOpen())
 		{
+			client.getAdonaiMenu();
+			// todo: copy this entire plugin and add it as a configuration for the Adonai Plugin (for context and menu help)
+			// just add the row here, accessed by ContextMenu.getRowAt
+			// net.runelite.api.widgets.menu.ContextMenu.getRowAt
+			// or add the canvas information here
+//			tooltipManager.addFront(new Tooltip("Menu Options" + (Strings.isNullOrEmpty(target) ? "" : " " + target + " [" + client.getMouseCanvasPosition().getX() + ", " +client.getMouseCanvasPosition().getY() + " ]")));
 			return null;
 		}
 
@@ -171,7 +177,8 @@ class MouseHighlightOverlay extends Overlay
 			return null;
 		}
 
-		tooltipManager.addFront(new Tooltip(option + (Strings.isNullOrEmpty(target) ? "" : " " + target)));
+		// todo: move this over to the new plugin (this entire thing) plus this is the correct canvas info.
+		tooltipManager.addFront(new Tooltip(option + (Strings.isNullOrEmpty(target) ? "" : " " + target + " [" + client.getMouseCanvasPosition().getX() + ", " +client.getMouseCanvasPosition().getY() + " ]")));
 		return null;
 	}
 }

@@ -9,18 +9,18 @@ import net.runelite.client.plugins.a.toolbox.ScreenMath;
 @Slf4j
 public class MenuRow
 {
-	net.runelite.api.widgets.Menu.MenuRow row;
+	net.runelite.api.widgets.menu.MenuRow row;
 
 	MenuOpened menu;
 
 	public Point mousePosition;
-	public MenuRow(net.runelite.api.widgets.Menu.MenuRow row, MenuOpened menu)
+	public MenuRow(net.runelite.api.widgets.menu.MenuRow row, MenuOpened menu)
 	{
 		this.row = row;
 		this.menu = menu;
 	}
 
-	public net.runelite.api.widgets.Menu.MenuRow getRow()
+	public net.runelite.api.widgets.menu.MenuRow getRow()
 	{
 		return row;
 	}

@@ -42,7 +42,7 @@ import net.runelite.api.events.PlayerChanged;
 import net.runelite.api.hooks.Callbacks;
 import net.runelite.api.hooks.DrawCallbacks;
 import net.runelite.api.vars.AccountType;
-import net.runelite.api.widgets.Menu.ContextMenu;
+import net.runelite.api.widgets.menu.ContextMenu;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import org.slf4j.Logger;

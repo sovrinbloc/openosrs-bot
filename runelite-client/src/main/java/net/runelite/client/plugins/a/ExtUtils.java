@@ -311,7 +311,7 @@ public class ExtUtils
 	{
 		try
 		{
-			this.keyboard.type(something);
+			Adonai.keyboard.type(something);
 		}
 		catch (InterruptedException e)
 		{

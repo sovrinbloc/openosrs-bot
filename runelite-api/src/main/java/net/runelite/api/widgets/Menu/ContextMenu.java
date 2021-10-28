@@ -1,4 +1,4 @@
-package net.runelite.api.widgets.Menu;
+package net.runelite.api.widgets.menu;
 
 import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
@@ -25,6 +25,18 @@ public class ContextMenu
 	private Map<String, ArrayList<MenuRow>> menuMap = new HashMap<>();
 	private Map<String, ArrayList<String>> menuTargetOptions = new HashMap<>();
 
+	// todo: see if this works.
+	public MenuRow getRowAt(Point point)
+	{
+		for(MenuRow row : menuRows)
+		{
+			if (row.getHitBox().contains(new Rectangle(point.getX(), point.getY(), 1, 1)))
+			{
+				return row;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * The constructor which sets all the dimensions and location of the menu.
@@ -505,7 +517,7 @@ public class ContextMenu
 	 *
 	 * @param mouse position of the mouse
 	 */
-	public MenuRow getHovering(Point mouse)
+	public MenuRow getRowHovering(Point mouse)
 	{
 		return getHovering(new java.awt.Point(mouse.getX(), mouse.getY()));
 	}

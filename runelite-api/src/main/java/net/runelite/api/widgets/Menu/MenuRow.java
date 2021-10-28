@@ -1,4 +1,4 @@
-package net.runelite.api.widgets.Menu;
+package net.runelite.api.widgets.menu;
 
 import lombok.Getter;
 import net.runelite.api.MenuAction;
@@ -139,8 +139,8 @@ public class MenuRow
 	/**
 	 * Get the object data to be used to find the actual physical NPC or Object on the map.
 	 */
-	public MenuTileObject getObjectData()
+	public MenuTargetIdentifier getMenuTargetIdentifiers()
 	{
-		return new MenuTileObject(entry);
+		return new MenuTargetIdentifier(entry);
 	}
 }
