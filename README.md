@@ -13,7 +13,7 @@
 			// or add the canvas information here
 //			tooltipManager.addFront(new Tooltip("Menu Options" + (Strings.isNullOrEmpty(target) ? "" : " " + target + " [" + client.getMouseCanvasPosition().getX() + ", " +client.getMouseCanvasPosition().getY() + " ]")));```
 3. Inside plugin itself: gotta fix.. Give me the OBJECT that the mouse is over...
-   1. net.runelite.client.plugins.a.MenuExample.getAllTargetTileObjects
+   1. net.runelite.client.plugins.adonaicore.MenuSession.getAllTargetTileObjects
 
 
 

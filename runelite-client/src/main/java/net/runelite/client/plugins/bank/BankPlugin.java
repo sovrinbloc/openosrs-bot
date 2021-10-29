@@ -31,7 +31,6 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.inject.Provides;
 
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -62,7 +61,6 @@ import net.runelite.client.input.KeyListener;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.a.toolbox.ScreenMath;
 import net.runelite.client.util.QuantityFormatter;
 
 @PluginDescriptor(

@@ -22,14 +22,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.mousehighlight;
+package net.runelite.client.plugins.adonaicore;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.util.Set;
-import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
@@ -42,7 +39,12 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.tooltip.Tooltip;
 import net.runelite.client.ui.overlay.tooltip.TooltipManager;
 
-class MouseHighlightOverlay extends Overlay
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.Set;
+
+@Slf4j
+class AdonaiTooltipOverlay extends Overlay
 {
 	/**
 	 * Menu types which are on widgets.
@@ -75,31 +77,31 @@ class MouseHighlightOverlay extends Overlay
 
 	private final TooltipManager tooltipManager;
 	private final Client client;
-	private final MouseHighlightConfig config;
+	private final AdonaiConfig config;
+	private final AdonaiPlugin plugin;
 
 	@Inject
-	MouseHighlightOverlay(Client client, TooltipManager tooltipManager, MouseHighlightConfig config)
+	AdonaiTooltipOverlay(Client client, AdonaiPlugin plugin, TooltipManager tooltipManager, AdonaiConfig config)
 	{
-		setPosition(OverlayPosition.DYNAMIC);
-		setLayer(OverlayLayer.ABOVE_WIDGETS);
-		// additionally allow tooltips above the full screen world map and welcome screen
-		drawAfterInterface(WidgetID.FULLSCREEN_CONTAINER_TLI);
 		this.client = client;
+		this.plugin = plugin;
 		this.tooltipManager = tooltipManager;
 		this.config = config;
+		log.info("Loading the injection");
+		setPosition(OverlayPosition.DYNAMIC);
+		setLayer(OverlayLayer.ABOVE_WIDGETS);
+
+		// additionally allow tooltips above the full screen world map and welcome screen
+		drawAfterInterface(WidgetID.FULLSCREEN_CONTAINER_TLI);
 	}
 
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
+		log.info("Inside render");
 		if (client.isMenuOpen())
 		{
 			client.getAdonaiMenu();
-			// todo: copy this entire plugin and add it as a configuration for the Adonai Plugin (for context and menu help)
-			// just add the row here, accessed by ContextMenu.getRowAt
-			// net.runelite.api.widgets.menu.ContextMenu.getRowAt
-			// or add the canvas information here
-//			tooltipManager.addFront(new Tooltip("Menu Options" + (Strings.isNullOrEmpty(target) ? "" : " " + target + " [" + client.getMouseCanvasPosition().getX() + ", " +client.getMouseCanvasPosition().getY() + " ]")));
 			renderLocation();
 			return null;
 		}
@@ -153,23 +155,7 @@ class MouseHighlightOverlay extends Overlay
 			final int widgetId = menuEntry.getParam1();
 			final int groupId = WidgetInfo.TO_GROUP(widgetId);
 
-			if (!config.uiTooltip())
-			{
-				renderLocation();
-				return null;
-			}
-
-			if (!config.chatboxTooltip() && groupId == WidgetInfo.CHATBOX.getGroupId())
-			{
-				renderLocation();
-				return null;
-			}
-
-			if (config.disableSpellbooktooltip() && groupId == WidgetID.SPELLBOOK_GROUP_ID)
-			{
-				renderLocation();
-				return null;
-			}
+			renderLocation();
 		}
 
 		// If this varc is set, a tooltip will be displayed soon
@@ -195,6 +181,7 @@ class MouseHighlightOverlay extends Overlay
 
 	public void renderLocation()
 	{
+		log.info("Rendering");
 		tooltipManager.addFront(new Tooltip("[" + client.getMouseCanvasPosition().getX() + ", " +client.getMouseCanvasPosition().getY() + "]"));
 	}
 }

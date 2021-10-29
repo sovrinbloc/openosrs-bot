@@ -15,7 +15,7 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.external.PrayerMap;
 import net.runelite.client.external.Spells;
 import net.runelite.client.external.Tab;
-import net.runelite.client.plugins.a.Adonai;
+import net.runelite.client.plugins.adonaicore.Adonai;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -812,8 +812,8 @@ public class ExtUtils<operator, T2>
 
 		if (client.isStretchedEnabled())
 		{
-			final Dimension stretched = net.runelite.client.plugins.a.Adonai.client.getStretchedDimensions();
-			final Dimension realDimensions = net.runelite.client.plugins.a.Adonai.client.getRealDimensions();
+			final Dimension stretched = net.runelite.client.plugins.adonaicore.Adonai.client.getStretchedDimensions();
+			final Dimension realDimensions = net.runelite.client.plugins.adonaicore.Adonai.client.getRealDimensions();
 			final double width = (stretched.width / realDimensions.getWidth());
 			final double height = (stretched.height / realDimensions.getHeight());
 			final Point point = new Point((int) (p.getX() * width), (int) (p.getY() * height));
