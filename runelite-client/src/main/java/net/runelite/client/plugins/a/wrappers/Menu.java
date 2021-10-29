@@ -4,13 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
 import net.runelite.api.events.MenuOpened;
-import net.runelite.api.widgets.Menu.ContextMenu;
-import net.runelite.api.widgets.Menu.MenuRow;
+import net.runelite.api.widgets.menu.ContextMenu;
+import net.runelite.api.widgets.menu.MenuRow;
 import net.runelite.client.plugins.a.Adonai;
 import net.runelite.client.plugins.a.toolbox.ScreenMath;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 @Slf4j
 public class Menu

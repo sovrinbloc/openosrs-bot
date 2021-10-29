@@ -1,3 +1,22 @@
+#Bot Development
+## Menu & Right Click (October 28, 2021)
+1. Working on getting the menu row where the mouse is located.
+   - net/runelite/api/widgets/menu/ContextMenu.java:28
+   - net.runelite.api.widgets.menu.ContextMenu.getRowAt
+2. Modifying Plugin to display canvas location, and easier debugging access to information (mouseover) on 
+   - net.runelite.client.plugins.mousehighlight.MouseHighlightOverlay.tooltipManager
+   - net/runelite/client/plugins/mousehighlight/MouseHighlightOverlay.java:180 (works)
+   - ```
+     // todo: copy this entire plugin and add it as a configuration for the Adonai Plugin (for context and menu help)
+			// just add the row here, accessed by ContextMenu.getRowAt
+			// net.runelite.api.widgets.menu.ContextMenu.getRowAt
+			// or add the canvas information here
+//			tooltipManager.addFront(new Tooltip("Menu Options" + (Strings.isNullOrEmpty(target) ? "" : " " + target + " [" + client.getMouseCanvasPosition().getX() + ", " +client.getMouseCanvasPosition().getY() + " ]")));```
+3. Inside plugin itself: gotta fix.. Give me the OBJECT that the mouse is over...
+   1. net.runelite.client.plugins.a.MenuExample.getAllTargetTileObjects
+
+
+
 ![](https://i.imgur.com/0D5106S.png)
 
 

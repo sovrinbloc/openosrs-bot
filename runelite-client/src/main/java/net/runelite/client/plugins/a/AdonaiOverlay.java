@@ -1,13 +1,18 @@
 package net.runelite.client.plugins.a;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.client.plugins.a.objects.Objects;
-import net.runelite.client.ui.overlay.*;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.OverlayPriority;
 import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 
 import javax.inject.Inject;
 import java.awt.*;
 
+@Slf4j
 public class AdonaiOverlay extends Overlay
 {
 
@@ -15,13 +20,15 @@ public class AdonaiOverlay extends Overlay
 	private final AdonaiPlugin plugin;
 	private final AdonaiConfig config;
 	private final ModelOutlineRenderer modelOutlineRenderer;
+	private final MenuExample menuExample;
 
 	@Inject
-	private AdonaiOverlay(Client client, AdonaiPlugin plugin, AdonaiConfig config, ModelOutlineRenderer modelOutlineRenderer)
+	private AdonaiOverlay(Client client, AdonaiPlugin plugin, AdonaiConfig config, MenuExample menuExample, ModelOutlineRenderer modelOutlineRenderer)
 	{
 		this.client = client;
 		this.config = config;
 		this.plugin = plugin;
+		this.menuExample = menuExample;
 		this.modelOutlineRenderer = modelOutlineRenderer;
 
 		setPosition(OverlayPosition.DYNAMIC);
@@ -91,8 +98,8 @@ public class AdonaiOverlay extends Overlay
 			case NPC_FIFTH_OPTION:
 			{
 				int id = top.getIdentifier();
-				NPC npc = plugin.findNpc(id);
-				if (npc != null )
+				NPC npc = menuExample.findNpc(id);
+				if (npc != null)
 				{
 					Color highlightColor = menuAction == MenuAction.NPC_SECOND_OPTION || menuAction == MenuAction.SPELL_CAST_ON_NPC
 							? config.objectHoverHighlightColor() : new Color(0x9000FFFF);
@@ -100,18 +107,22 @@ public class AdonaiOverlay extends Overlay
 				}
 				break;
 			}
+			case ITEM_USE_ON_PLAYER:
+			case SPELL_CAST_ON_PLAYER:
 			case PLAYER_FIRST_OPTION:
 			case PLAYER_SECOND_OPTION:
 			case PLAYER_THIRD_OPTION:
 			case PLAYER_FOURTH_OPTION:
 			case PLAYER_FIFTH_OPTION:
+			case PLAYER_SIXTH_OPTION:
+			case PLAYER_SEVENTH_OPTION:
+			case PLAYER_EIGTH_OPTION:
 			{
 				int id = top.getIdentifier();
-				Player player = plugin.findPlayer(id);
-				if (player != null )
+				Player player = menuExample.findPlayer(id);
+				if (player != null)
 				{
-					Color highlightColor = menuAction == MenuAction.PLAYER_SECOND_OPTION || menuAction == MenuAction.SPELL_CAST_ON_PLAYER
-							? config.playerHoverHighlightColor() : new Color(0x900FFF);
+					Color highlightColor = config.playerHoverHighlightColor();
 					modelOutlineRenderer.drawOutline(player, config.playerBorderWidth(), highlightColor, config.outlineFeather());
 				}
 				break;
@@ -152,8 +163,8 @@ public class AdonaiOverlay extends Overlay
 			case NPC_FIFTH_OPTION:
 			{
 				int id = top.getIdentifier();
-				NPC npc = plugin.findNpc(id);
-				if (npc != null )
+				NPC npc = menuExample.findNpc(id);
+				if (npc != null)
 				{
 					Color highlightColor = menuAction == MenuAction.NPC_SECOND_OPTION || menuAction == MenuAction.SPELL_CAST_ON_NPC
 							? config.objectHoverHighlightColor() : new Color(0x9000FFFF);

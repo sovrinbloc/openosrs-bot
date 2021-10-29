@@ -7,15 +7,51 @@ public class Adonai
 {
 	public static Client client;
 	public static ChatMessageManager chatManager;
+	public static Keyboard keyboard;
 
 	public static void initializeClient(Client client)
 	{
 		Adonai.client = client;
 	}
 
+	public static boolean isNullInitializeClient(Client client)
+	{
+		if (Adonai.client == null)
+		{
+			Adonai.client = client;
+			return true;
+		}
+		return false;
+	}
+
 	public static void initializeChatMessageManager(ChatMessageManager chatMessageManager)
 	{
 		Adonai.chatManager = chatMessageManager;
+	}
+
+	public static boolean isNullInitializeChatMessageManager(ChatMessageManager chatMessageManager)
+	{
+		if (Adonai.chatManager == null)
+		{
+			initializeChatMessageManager(chatMessageManager);
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean isNullInitializeKeyboard(Keyboard keyboard)
+	{
+		if (Adonai.keyboard == null)
+		{
+			initializeKeyboard(keyboard);
+			return true;
+		}
+		return false;
+	}
+
+	public static void initializeKeyboard(Keyboard keyboard)
+	{
+		Adonai.keyboard = keyboard;
 	}
 
 	/**
@@ -32,5 +68,9 @@ public class Adonai
 	public static boolean isChatManagerInitialized()
 	{
 		return chatManager != null;
+	}
+	public static boolean isKeyboardManagerInitialized()
+	{
+		return keyboard != null;
 	}
 }

@@ -1,11 +1,11 @@
-package net.runelite.api.widgets.Menu;
+package net.runelite.api.widgets.menu;
 
 import lombok.Getter;
 import net.runelite.api.*;
 
 import java.text.MessageFormat;
 
-public class MenuTileObject
+public class MenuTargetIdentifier
 {
 
 	@Getter
@@ -20,7 +20,7 @@ public class MenuTileObject
 	@Getter
 	MenuAction menuAction;
 
-	public MenuTileObject(MenuEntry entry)
+	public MenuTargetIdentifier(MenuEntry entry)
 	{
 		this.x = entry.getParam0();
 		this.y = entry.getParam1();
