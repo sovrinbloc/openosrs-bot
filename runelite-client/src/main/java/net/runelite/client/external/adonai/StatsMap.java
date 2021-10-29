@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.external.adonai.widgets.WidgetInfo;
-import net.runelite.client.plugins.a.Adonai;
+import net.runelite.client.plugins.adonaicore.Adonai;
 
 import javax.annotation.Nullable;
 import java.util.Map;
