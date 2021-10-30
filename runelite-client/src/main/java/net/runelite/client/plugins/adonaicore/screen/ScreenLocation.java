@@ -2,7 +2,7 @@ package net.runelite.client.plugins.adonaicore.screen;
 
 import lombok.Value;
 import net.runelite.api.Point;
-import net.runelite.client.plugins.adonaicore.toolbox.ScreenMath;
+import net.runelite.client.plugins.adonaicore.toolbox.Calculations;
 
 @Value
 public class ScreenLocation
@@ -15,6 +15,6 @@ public class ScreenLocation
 	 */
 	public static Point fromCanvasScreenPosition(Point point)
 	{
-		return ScreenMath.add(point, ScreenMath.convertToPoint(Screen.getAbsoluteScreenLocationX0Y0()));
+		return Calculations.add(point, Calculations.convertToPoint(Screen.getAbsoluteScreenLocationX0Y0()));
 	}
 }

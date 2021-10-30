@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.client.plugins.adonaicore.Adonai;
-import net.runelite.client.plugins.adonaicore.toolbox.ScreenMath;
+import net.runelite.client.plugins.adonaicore.toolbox.Calculations;
 
 @Slf4j
 public class MenuRow
@@ -32,7 +32,7 @@ public class MenuRow
 
 	public java.awt.Point getAbsolutePosition()
 	{
-		return ScreenMath.add(this.row.getPosition(), ScreenMath.convertToPoint(Adonai.client.getMouseCanvasPosition()));
+		return Calculations.add(this.row.getPosition(), Calculations.convertToPoint(Adonai.client.getMouseCanvasPosition()));
 	}
 
 }

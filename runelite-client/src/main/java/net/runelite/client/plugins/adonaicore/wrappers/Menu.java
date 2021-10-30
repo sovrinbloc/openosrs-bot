@@ -7,7 +7,7 @@ import net.runelite.api.events.MenuOpened;
 import net.runelite.api.widgets.menu.ContextMenu;
 import net.runelite.api.widgets.menu.MenuRow;
 import net.runelite.client.plugins.adonaicore.Adonai;
-import net.runelite.client.plugins.adonaicore.toolbox.ScreenMath;
+import net.runelite.client.plugins.adonaicore.toolbox.Calculations;
 
 import java.awt.*;
 
@@ -68,6 +68,6 @@ public class Menu
 		{
 			return null;
 		}
-		return ScreenMath.add(ScreenMath.convertToPoint(op.getPosition()), Adonai.client.getMouseCanvasPosition());
+		return Calculations.add(Calculations.convertToPoint(op.getPosition()), Adonai.client.getMouseCanvasPosition());
 	}
 }

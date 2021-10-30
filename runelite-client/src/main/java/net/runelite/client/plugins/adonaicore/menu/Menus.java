@@ -1,9 +1,21 @@
 package net.runelite.client.plugins.adonaicore.menu;
 
 import net.runelite.api.*;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class Menus
 {
+	public enum TileType
+	{
+		WALL_OBJECT_TYPE,
+		DECORATIVE_OBJECT_TYPE,
+		GROUND_OBJECT_TYPE,
+		GAME_OBJECT_TYPE,
+		TILE_ITEM_TYPE
+	}
+
 	public static boolean objectIdEquals(Client client, TileObject tileObject, int id)
 	{
 		if (tileObject == null)
@@ -34,8 +46,35 @@ public class Menus
 		return false;
 	}
 
+	public static boolean groundItemIdEquals(Client client, TileItem tileObject, int id)
+	{
+		if (tileObject == null)
+		{
+			return false;
+		}
 
+		if (tileObject.getId() == id)
+		{
+			return true;
+		}
 
+		// Menu action EXAMINE_OBJECT sends the transformed object id, not the base id, unlike
+		// all of the GAME_OBJECT_OPTION actions, so check the id against the impostor ids
+		final ObjectComposition comp = client.getObjectDefinition(tileObject.getId());
+
+		if (comp.getImpostorIds() != null)
+		{
+			for (int impostorId : comp.getImpostorIds())
+			{
+				if (impostorId == id)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 
 	public static TileObject findTileObject(Client client, Tile tile, int id)
 	{
@@ -69,6 +108,79 @@ public class Menus
 			if (objectIdEquals(client, object, id))
 			{
 				return object;
+			}
+		}
+
+		return null;
+	}
+
+	public static TileItem findTileItem(Client client, Tile tile, int id)
+	{
+		if (tile == null)
+		{
+			return null;
+		}
+
+		final List<TileItem> tileGroundItems = tile.getGroundItems();
+
+		for (TileItem object : tileGroundItems)
+		{
+			if (groundItemIdEquals(client, object, id))
+			{
+				return object;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get the type of the item
+	 * @param client the game client
+	 * @param tile the tile which contains the alleged object
+	 * @param id the id of the menu
+	 */
+	public static TileType getTileObjectType(Client client, Tile tile, int id)
+	{
+		if (tile == null)
+		{
+			return null;
+		}
+
+		final GameObject[] tileGameObjects = tile.getGameObjects();
+		final DecorativeObject tileDecorativeObject = tile.getDecorativeObject();
+		final WallObject tileWallObject = tile.getWallObject();
+		final GroundObject groundObject = tile.getGroundObject();
+		final List<TileItem> tileGroundItems = tile.getGroundItems();
+
+		if (objectIdEquals(client, tileWallObject, id))
+		{
+			return TileType.WALL_OBJECT_TYPE;
+		}
+
+		if (objectIdEquals(client, tileDecorativeObject, id))
+		{
+			return TileType.DECORATIVE_OBJECT_TYPE;
+		}
+
+		if (objectIdEquals(client, groundObject, id))
+		{
+			return TileType.GROUND_OBJECT_TYPE;
+		}
+
+		for (GameObject object : tileGameObjects)
+		{
+			if (objectIdEquals(client, object, id))
+			{
+				return TileType.GAME_OBJECT_TYPE;
+			}
+		}
+
+		for (TileItem item : tileGroundItems)
+		{
+			if (groundItemIdEquals(client, item, id))
+			{
+				return TileType.TILE_ITEM_TYPE;
 			}
 		}
 

@@ -8,7 +8,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.plugins.adonaicore.Adonai;
-import net.runelite.client.plugins.adonaicore.toolbox.ScreenMath;
+import net.runelite.client.plugins.adonaicore.toolbox.Calculations;
 
 import java.awt.*;
 
@@ -220,7 +220,7 @@ public class Screen
 	 */
 	public static Point toAbsoluteScreenPosition(Point point)
 	{
-		return ScreenMath.add(point, ScreenMath.convertToPoint(getAbsoluteScreenLocationX0Y0()));
+		return Calculations.add(point, Calculations.convertToPoint(getAbsoluteScreenLocationX0Y0()));
 	}
 
 	/**
@@ -231,7 +231,7 @@ public class Screen
 	 */
 	public static java.awt.Point toAbsoluteScreenPosition(java.awt.Point point)
 	{
-		return ScreenMath.add(point, getAbsoluteScreenLocationX0Y0());
+		return Calculations.add(point, getAbsoluteScreenLocationX0Y0());
 	}
 
 	public static Tile getTileLocation(LocalPoint point)
