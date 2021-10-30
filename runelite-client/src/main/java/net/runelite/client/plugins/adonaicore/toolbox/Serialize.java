@@ -75,8 +75,6 @@ public class Serialize
 	}
 
 
-
-
 	private Object object;
 	private Serializable serializable;
 	private String hash;
@@ -108,7 +106,7 @@ public class Serialize
 	public void setNew(Object newObject)
 	{
 		this.object = newObject;
-		this.serializable = (Serializable)newObject;
+		this.serializable = (Serializable) newObject;
 		this.hash = createHash(newObject);
 	}
 

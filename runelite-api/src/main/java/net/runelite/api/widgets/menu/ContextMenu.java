@@ -28,9 +28,10 @@ public class ContextMenu
 	// todo: see if this works.
 	public MenuRow getRowAt(Point point)
 	{
-		for(MenuRow row : menuRows)
+		for (MenuRow row : menuRows)
 		{
-			if (row.getHitBox().contains(new Rectangle(point.getX(), point.getY(), 1, 1)))
+			if (row.getHitBox()
+					.contains(new Rectangle(point.getX(), point.getY(), 1, 1)))
 			{
 				return row;
 			}
@@ -112,6 +113,14 @@ public class ContextMenu
 	public java.awt.Rectangle getDimensions()
 	{
 		return new java.awt.Rectangle(x, y, width, height);
+	}
+
+	/**
+	 * Alias for getDimensions(), returns the hitbox (width, height, x, and y position of menu)
+	 */
+	public java.awt.Rectangle getHitBox()
+	{
+		return getDimensions();
 	}
 
 	/**

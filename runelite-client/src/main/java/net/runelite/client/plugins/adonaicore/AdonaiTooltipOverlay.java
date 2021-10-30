@@ -98,7 +98,6 @@ class AdonaiTooltipOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		log.info("Inside render");
 		if (client.isMenuOpen())
 		{
 			client.getAdonaiMenu();
@@ -181,7 +180,6 @@ class AdonaiTooltipOverlay extends Overlay
 
 	public void renderLocation()
 	{
-		log.info("Rendering");
 		tooltipManager.addFront(new Tooltip("[" + client.getMouseCanvasPosition().getX() + ", " +client.getMouseCanvasPosition().getY() + "]"));
 	}
 }
