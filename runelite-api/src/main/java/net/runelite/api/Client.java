@@ -1257,9 +1257,26 @@ public interface Client extends GameEngine
 	 *
 	 * @param inventory the inventory type
 	 * @return the item container
+	 * @see InventoryID
 	 */
 	@Nullable
 	ItemContainer getItemContainer(InventoryID inventory);
+
+	/**
+	 * Get an item container by id
+	 *
+	 * @param id the inventory id
+	 * @return the item container
+	 * @see InventoryID
+	 */
+	@Nullable
+	ItemContainer getItemContainer(int id);
+
+	/**
+	 * Get all item containers
+	 * @return
+	 */
+	HashTable<ItemContainer> getItemContainers();
 
 	/**
 	 * Gets the length of the cs2 vm's int stack
@@ -1879,6 +1896,16 @@ public interface Client extends GameEngine
 	int getOculusOrbFocalPointY();
 
 	/**
+	 * Sets local X coord where the camera is pointing when the Oculus orb is active
+	 */
+	void setOculusOrbFocalPointX(int xPos);
+
+	/**
+	 * Sets local Y coord where the camera is pointing when the Oculus orb is active
+	 */
+	void setOculusOrbFocalPointY(int yPos);
+
+	/**
 	 * Opens in-game world hopper interface
 	 */
 	void openWorldHopper();
@@ -2338,4 +2365,6 @@ public interface Client extends GameEngine
 	 */
 	@Nullable
 	ClanSettings getClanSettings(int clanId);
+
+	void setUnlockedFps(boolean unlock);
 }
