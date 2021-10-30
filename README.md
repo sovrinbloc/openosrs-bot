@@ -15,7 +15,23 @@
 3. Inside plugin itself: gotta fix.. Give me the OBJECT that the mouse is over...
    1. net.runelite.client.plugins.adonaicore.MenuSession.getAllTargetTileObjects
 
+# The plugins hot loading...
+1. Clone the plugins repository
+2. Add the plugins configuration
+3. Update the `external.system.substitute.library.dependencies` to checked
+   1. `plugins/gradle.build.kts`
+   2. Modify the `build` configuration:
+      1. `build copyDeps --stacktrace -x test`
+   3. Modify the `client` build configuration:
+      1. `build publishToMavenLocal :runelite-client:publishToMavenLocal :runelite-api:publishToMavenLocal :http-api:publishToMavenLocal -x test -x checkStyleMain -x checkStyleTest`
+   4. Build the client
+   5. Build the plugins
+4. Paste `PLUGIN_DEVELOPMENT_PATH=../OpenOSRSPlugins` into `run` config ENVIRONMENTAL variables
 
+# If the plugins are not compiling, not finding the built client...
+1. We need to change the version of the built files
+2. Change the `buildSrc/src/main/kotlin/Dependencies.kt` version...
+   1. to the current version, listed at `/Users/josephalai/.m2/repository/com/openosrs/runelite-api`
 
 ![](https://i.imgur.com/0D5106S.png)
 

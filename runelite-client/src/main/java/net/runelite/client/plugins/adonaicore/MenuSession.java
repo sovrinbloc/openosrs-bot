@@ -113,17 +113,15 @@ public class MenuSession
 					.getTiles()[Adonai.client.getPlane()][event.getActionParam0()][event.getParam1()];
 			if (tile != null)
 			{
-				log.info("This Menu Row Points to {}", tile);
-				log.info("-------------------------------------------");
-
 				Menus.TileType tileObjectType = Menus.getTileObjectType(client, tile, event.getIdentifier());
+				log.info("TileObject is of type: {}", tileObjectType.toString());
 
 				String[] actions = tile.getItemLayer()
 						.getActions();
+				log.info("The actions are: {}", ((Object) actions).toString());
 
 				TileObject tileObject = null;
 				TileItem   itemTile   = null;
-				log.info("TileObject is of type: {}", tileObjectType);
 				switch (tileObjectType)
 				{
 					case WALL_OBJECT_TYPE:
