@@ -45,6 +45,15 @@ public class MenuRow
 	@Getter
 	private final java.awt.Rectangle hitBox;
 
+	public enum OptionType {
+		ITEM_OP,
+		OBJECT_OP,
+		NPC_OP
+	}
+
+	@Getter
+	private final OptionType optionType;
+
 	/**
 	 * The constructor for the right-click option (row).
 	 *
@@ -86,6 +95,7 @@ public class MenuRow
 		this.menuEntryId = menuEntryId;
 		this.menuAction = menuAction;
 		this.hitBox = new java.awt.Rectangle(x, y, width, height);
+		this.optionType = getOptionType(menuAction);
 	}
 
 	/**
@@ -142,5 +152,42 @@ public class MenuRow
 	public MenuTargetIdentifier getMenuTargetIdentifiers()
 	{
 		return new MenuTargetIdentifier(entry);
+	}
+
+
+	private static OptionType getOptionType(MenuAction menuAction)
+	{
+		if (isItemOp(menuAction))
+		{
+			return OptionType.ITEM_OP;
+		}
+		if (isNPCOp(menuAction))
+		{
+			return OptionType.NPC_OP;
+		}
+		if (isObjectOp(menuAction))
+		{
+			return OptionType.OBJECT_OP;
+		}
+		return null;
+	}
+
+	private static boolean isItemOp(MenuAction menuAction)
+	{
+		final int id = menuAction.getId();
+		return id >= MenuAction.ITEM_FIRST_OPTION.getId() && id <= MenuAction.ITEM_FIFTH_OPTION.getId();
+	}
+
+	private static boolean isNPCOp(MenuAction menuAction)
+	{
+		final int id = menuAction.getId();
+		return id >= MenuAction.NPC_FIRST_OPTION.getId() && id <= MenuAction.NPC_FIFTH_OPTION.getId();
+	}
+
+	private static boolean isObjectOp(MenuAction menuAction)
+	{
+		final int id = menuAction.getId();
+		return (id >= MenuAction.GAME_OBJECT_FIRST_OPTION.getId() && id <= MenuAction.GAME_OBJECT_FOURTH_OPTION.getId())
+				|| id == MenuAction.GAME_OBJECT_FIFTH_OPTION.getId();
 	}
 }

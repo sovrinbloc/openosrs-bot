@@ -89,6 +89,11 @@ class MouseHighlightOverlay extends Overlay
 		this.config = config;
 	}
 
+	/**
+	 * Renders the Mouse Canvas Coordinates onto the screen next to the cursor.
+	 *
+	 * @param graphics inputs the rendering graphics parameter
+	 */
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{

@@ -1,8 +1,12 @@
 package net.runelite.client.plugins.adonaicore;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.client.plugins.adonaicore.objects.Objects;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.external.adonaicore.objects.Objects;
+import net.runelite.client.external.adonaicore.item.GroundItem;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -20,7 +24,9 @@ public class AdonaiOverlay extends Overlay
 	private final AdonaiPlugin plugin;
 	private final AdonaiConfig config;
 	private final ModelOutlineRenderer modelOutlineRenderer;
-	private final MenuSession menuSession;
+	private final MenuSession menuPlugin;
+	private int rowCount = 0;
+	private int menuCounter = 0;
 
 	@Inject
 	private AdonaiOverlay(Client client, AdonaiPlugin plugin, AdonaiConfig config, MenuSession menuSession, ModelOutlineRenderer modelOutlineRenderer)
@@ -28,7 +34,7 @@ public class AdonaiOverlay extends Overlay
 		this.client = client;
 		this.config = config;
 		this.plugin = plugin;
-		this.menuSession = menuSession;
+		this.menuPlugin = menuSession;
 		this.modelOutlineRenderer = modelOutlineRenderer;
 
 		setPosition(OverlayPosition.DYNAMIC);
@@ -47,6 +53,8 @@ public class AdonaiOverlay extends Overlay
 	private void renderMenuObjects()
 	{
 		MenuEntry[] menuEntries = client.getMenuEntries();
+		this.rowCount = menuEntries.length;
+
 		if (menuEntries.length == 0)
 		{
 			return;
@@ -54,6 +62,73 @@ public class AdonaiOverlay extends Overlay
 		for (MenuEntry e : menuEntries)
 		{
 			renderTileObjectOutline(e);
+			this.menuCounter = this.menuCounter < 5 ? this.menuCounter + 1 : 0;
+		}
+	}
+
+	private final Table<WorldPoint, Integer, GroundItem> collectedGroundItems = HashBasedTable.create();
+	/**
+	 * Render the outline around the object.
+	 */
+	private void renderTileObjectOutline(MenuEntry entry)
+	{
+		MenuAction menuAction = MenuAction.of(entry.getType());
+
+		switch (menuAction)
+		{
+			case ITEM_USE_ON_GAME_OBJECT:
+			case SPELL_CAST_ON_GAME_OBJECT:
+			case GAME_OBJECT_FIRST_OPTION:
+			case GAME_OBJECT_SECOND_OPTION:
+			case GAME_OBJECT_THIRD_OPTION:
+			case GAME_OBJECT_FOURTH_OPTION:
+			case GAME_OBJECT_FIFTH_OPTION:
+			{
+				int x = entry.getParam0();
+				int y = entry.getParam1();
+				int id = entry.getIdentifier();
+				TileObject tileObject = Objects.findTileObject(x, y, id);
+				if (tileObject != null)
+				{
+//					log.info("This should be rendering around the target");
+					modelOutlineRenderer.drawOutline(tileObject, config.borderWidth(), config.objectHoverHighlightColor(), config.outlineFeather());
+				}
+				break;
+			}
+			case ITEM_USE_ON_NPC:
+			case SPELL_CAST_ON_NPC:
+
+			// what: this is any of the npc options. when hovered over, the npc is highlighted.
+			case NPC_FIRST_OPTION:
+			case NPC_SECOND_OPTION:
+			case NPC_THIRD_OPTION:
+			case NPC_FOURTH_OPTION:
+			case NPC_FIFTH_OPTION:
+			{
+				int id = entry.getIdentifier();
+				NPC npc = menuPlugin.findNpc(id);
+				if (npc != null)
+				{
+					Color outline = new Color(0x9000FFFF);
+					Color highlightColor = menuAction == MenuAction.NPC_SECOND_OPTION || menuAction == MenuAction.SPELL_CAST_ON_NPC
+							? config.objectHoverHighlightColor() : outline;
+					modelOutlineRenderer.drawOutline(npc, config.borderWidth(), highlightColor, config.outlineFeather());
+				}
+				break;
+			}
+			case ITEM_USE_ON_GROUND_ITEM:
+			case SPELL_CAST_ON_GROUND_ITEM:
+			case GROUND_ITEM_FIRST_OPTION:
+			case GROUND_ITEM_SECOND_OPTION:
+			case GROUND_ITEM_THIRD_OPTION:
+			case GROUND_ITEM_FOURTH_OPTION:
+			case GROUND_ITEM_FIFTH_OPTION:
+				final int itemId = entry.getIdentifier();
+				final int sceneX = entry.getActionParam0();
+				final int sceneY = entry.getParam1();
+				final WorldPoint worldPoint = WorldPoint.fromScene(client, sceneX, sceneY, client.getPlane());
+				GroundItem groundItem = collectedGroundItems.get(worldPoint, itemId);
+
 		}
 	}
 
@@ -98,7 +173,7 @@ public class AdonaiOverlay extends Overlay
 			case NPC_FIFTH_OPTION:
 			{
 				int id = top.getIdentifier();
-				NPC npc = menuSession.findNpc(id);
+				NPC npc = menuPlugin.findNpc(id);
 				if (npc != null)
 				{
 					Color highlightColor = menuAction == MenuAction.NPC_SECOND_OPTION || menuAction == MenuAction.SPELL_CAST_ON_NPC
@@ -119,57 +194,15 @@ public class AdonaiOverlay extends Overlay
 			case PLAYER_EIGTH_OPTION:
 			{
 				int id = top.getIdentifier();
-				Player player = menuSession.findPlayer(id);
+				Player player = menuPlugin.findPlayer(id);
 				if (player != null)
 				{
 					Color highlightColor = config.playerHoverHighlightColor();
 					modelOutlineRenderer.drawOutline(player, config.playerBorderWidth(), highlightColor, config.outlineFeather());
 				}
-				break;
-			}
-		}
-	}
-
-	private void renderTileObjectOutline(MenuEntry top)
-	{
-		MenuAction menuAction = MenuAction.of(top.getType());
-
-		switch (menuAction)
-		{
-			case ITEM_USE_ON_GAME_OBJECT:
-			case SPELL_CAST_ON_GAME_OBJECT:
-			case GAME_OBJECT_FIRST_OPTION:
-			case GAME_OBJECT_SECOND_OPTION:
-			case GAME_OBJECT_THIRD_OPTION:
-			case GAME_OBJECT_FOURTH_OPTION:
-			case GAME_OBJECT_FIFTH_OPTION:
-			{
 				int x = top.getParam0();
 				int y = top.getParam1();
-				int id = top.getIdentifier();
 				TileObject tileObject = Objects.findTileObject(x, y, id);
-				if (tileObject != null)
-				{
-					modelOutlineRenderer.drawOutline(tileObject, config.borderWidth(), config.objectHoverHighlightColor(), config.outlineFeather());
-				}
-				break;
-			}
-			case ITEM_USE_ON_NPC:
-			case SPELL_CAST_ON_NPC:
-			case NPC_FIRST_OPTION:
-			case NPC_SECOND_OPTION:
-			case NPC_THIRD_OPTION:
-			case NPC_FOURTH_OPTION:
-			case NPC_FIFTH_OPTION:
-			{
-				int id = top.getIdentifier();
-				NPC npc = menuSession.findNpc(id);
-				if (npc != null)
-				{
-					Color highlightColor = menuAction == MenuAction.NPC_SECOND_OPTION || menuAction == MenuAction.SPELL_CAST_ON_NPC
-							? config.objectHoverHighlightColor() : new Color(0x9000FFFF);
-					modelOutlineRenderer.drawOutline(npc, config.borderWidth(), highlightColor, config.outlineFeather());
-				}
 				break;
 			}
 		}

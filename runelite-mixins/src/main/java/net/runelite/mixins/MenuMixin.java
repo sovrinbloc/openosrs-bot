@@ -36,6 +36,8 @@ import net.runelite.rs.api.RSClient;
 import net.runelite.rs.api.RSFont;
 import net.runelite.rs.api.RSMenuAction;
 
+import java.text.MessageFormat;
+
 @Mixin(RSClient.class)
 public abstract class MenuMixin implements RSClient
 {
@@ -216,6 +218,13 @@ public abstract class MenuMixin implements RSClient
 		}
 	}
 
+	/**
+	 * getAdonaiMenu executes the same style of command to draw the menu itself, except it does
+	 * not have the drawing. That means it gets all the data as to where the menu rows are
+	 * referring to. menuEntry contains that information that connects the menu to the objects.
+	 *
+	 * ActionParam0 & Param1 both point to the x-y elements in the Scene Tile Array to get the object
+	 */
 	@Inject
 	@Override
 	public ContextMenu getAdonaiMenu()
@@ -246,7 +255,13 @@ public abstract class MenuMixin implements RSClient
 				s += " " + targets[i];
 			}
 
+			// menuEntry holds all the required things in the click menu to get the
+			// tile, and the object.
 			MenuEntry menuEntry = menuEntries[i];
+			if (menuEntry.getOption().contains("Walk here") || menuEntry.getOption().contains("Walk Cancel"))
+			{
+				// set argument0, action1 = blank
+			}
 			contextMenu.addMenuRowToTarget(options[i], new MenuRow(
 					x + 3,
 					rowY - 12,
@@ -266,6 +281,7 @@ public abstract class MenuMixin implements RSClient
 					menuEntry.getId(),
 					menuEntry.getMenuAction()
 			));
+			System.out.println("Id: " + menuEntry.getId() + ", Menu information: actionParam0 " + menuEntry.getActionParam0() + " param1 + " + menuEntry.getParam1());
 		}
 		return contextMenu;
 	}

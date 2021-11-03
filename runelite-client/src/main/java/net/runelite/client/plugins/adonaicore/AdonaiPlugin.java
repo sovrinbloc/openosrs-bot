@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.adonaicore;
 
 import com.google.inject.Provides;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
@@ -15,10 +16,10 @@ import net.runelite.client.external.adonai.TabMap;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.adonaicore.objects.Objects;
-import net.runelite.client.plugins.adonaicore.screen.Screen;
-import net.runelite.client.plugins.adonaicore.toolbox.Calculations;
-import net.runelite.client.plugins.adonaicore.utils.ChatMessages;
+import net.runelite.client.external.adonaicore.objects.Objects;
+import net.runelite.client.external.adonaicore.screen.Screen;
+import net.runelite.client.external.adonaicore.toolbox.Calculations;
+import net.runelite.client.external.adonaicore.utils.ChatMessages;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -31,14 +32,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @PluginDescriptor(
-		name = "Adonai Core",
-		description = "Adonai Bot Core"
+		name = "Adonai Corelito Plugin",
+		description = "Adonai Bot Corelito"
 )
 @Slf4j
 @SuppressWarnings("unused")
 public class AdonaiPlugin extends Plugin
 {
-	static final String CONFIG_GROUP = "adonai";
+	static final String CONFIG_GROUP = "adonaicore";
 
 	@Inject
 	private Client client;
@@ -89,12 +90,19 @@ public class AdonaiPlugin extends Plugin
 
 	private MenuSession adonaiMenu;
 
+	// the CURRENT interacted object, when clicked or walked to, etc... between player and object
+	@Getter(AccessLevel.PACKAGE)
+	private TileObject interactedObject;
+
 	@Provides
 	AdonaiConfig getConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(AdonaiConfig.class);
 	}
 
+	/**
+	 * Initialize the adonai client -- including plugging in the tooltip interface
+	 */
 	@Override
 	protected void startUp()
 	{
@@ -143,6 +151,27 @@ public class AdonaiPlugin extends Plugin
 		adonaiMenu = new MenuSession(client);
 	}
 
+	/**
+	 *  Count 1 begin
+	 *  desc is the description
+	 *  Count 1 end desc
+	 *
+	 * // desc: description explanation
+	 * Gets a copy of the menu every single time the client ticks.
+	 *
+	 * @param tick carries the information of the tick
+	 */
+	@Subscribe
+	public void onClientTick(ClientTick tick)
+	{
+		adonaiMenu.getUpdatedMenu();
+	}
+
+	/**
+	 * Allows you to grab information and execute commands on every game tick
+	 *
+	 * @param event is the information carried in each tick
+	 */
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
@@ -197,14 +226,15 @@ public class AdonaiPlugin extends Plugin
 	}
 
 	/**
-	 * Gets a copy of the menu every single time the client ticks.
+	 * Stores an updated copy of the menu before it the menu is loaded.
 	 *
-	 * @param tick carries the information of the tick
+	 * @param event carries the information of the tick
 	 */
 	@Subscribe
-	public void onClientTick(ClientTick tick)
+	public void onBeforeMenuRender(BeforeMenuRender event)
 	{
-		adonaiMenu.getUpdatedMenu();
+		adonaiMenu.renderAdonaiMenu();
+		event.consume();
 	}
 
 	/**
@@ -216,7 +246,7 @@ public class AdonaiPlugin extends Plugin
 	public void onMenuOpened(MenuOpened event)
 	{
 		menuOpened = true;
-		adonaiMenu.printNewMenuItems(event);
+//		adonaiMenu.printNewMenuItems(event);
 	}
 
 	@Subscribe
@@ -243,18 +273,6 @@ public class AdonaiPlugin extends Plugin
 			log.info("Logging the HOVERED one on tick");
 			log.info(info);
 		}
-	}
-
-	/**
-	 * Stores an updated copy of the menu before it the menu is loaded.
-	 *
-	 * @param event carries the information of the tick
-	 */
-	@Subscribe
-	public void onBeforeMenuRender(BeforeMenuRender event)
-	{
-		adonaiMenu.renderAdonaiMenu();
-		event.consume();
 	}
 
 	private void getTabInterface()
