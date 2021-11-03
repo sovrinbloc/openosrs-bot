@@ -812,8 +812,8 @@ public class ExtUtils<operator, T2>
 
 		if (client.isStretchedEnabled())
 		{
-			final Dimension stretched = net.runelite.client.plugins.adonaicore.Adonai.client.getStretchedDimensions();
-			final Dimension realDimensions = net.runelite.client.plugins.adonaicore.Adonai.client.getRealDimensions();
+			final Dimension stretched = Adonai.client.getStretchedDimensions();
+			final Dimension realDimensions = Adonai.client.getRealDimensions();
 			final double width = (stretched.width / realDimensions.getWidth());
 			final double height = (stretched.height / realDimensions.getHeight());
 			final Point point = new Point((int) (p.getX() * width), (int) (p.getY() * height));

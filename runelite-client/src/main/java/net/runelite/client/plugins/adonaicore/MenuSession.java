@@ -3,18 +3,20 @@ package net.runelite.client.plugins.adonaicore;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.Point;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.api.widgets.menu.ContextMenu;
 import net.runelite.api.widgets.menu.MenuRow;
-import net.runelite.client.plugins.adonaicore.menu.Menus;
-import net.runelite.client.plugins.adonaicore.objects.Objects;
-import net.runelite.client.plugins.adonaicore.toolbox.Calculations;
-import net.runelite.client.plugins.adonaicore.toolbox.Serialize;
-import net.runelite.client.plugins.adonaicore.wrappers.Menu;
+import net.runelite.client.external.adonaicore.menu.Menus;
+import net.runelite.client.external.adonaicore.objects.Objects;
+import net.runelite.client.external.adonaicore.screen.Screen;
+import net.runelite.client.external.adonaicore.toolbox.Calculations;
+import net.runelite.client.external.adonaicore.wrappers.Menu;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.text.MessageFormat;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,18 +27,21 @@ public class MenuSession
 
 	private ContextMenu ctxMenu;
 
-	private List<String> lastMenuItems = new ArrayList<>();
-
-	private MenuRow lastHovered = null;
-
 	private ExtUtils utils = null;
 
 	private int gameTicks = 0;
 
+	/**
+	 * Initializes the Menu segment of the plugin
+	 * @param client
+	 */
 	@Inject
 	public MenuSession(Client client)
 	{
 		assert client != null;
+
+		// initialize client.
+		this.client = client;
 
 		if (Adonai.isNullInitializeClient(client))
 		{
@@ -44,28 +49,29 @@ public class MenuSession
 		}
 
 		ctxMenu = client.getAdonaiMenu();
+		log.info("Client.getAdonaiMenu initialized: entry information... \n\t{}", ctxMenu.getMenuEntries().toString());
 
 		utils = new ExtUtils(client);
 	}
 
+	byte[] oldContextMenu = null;
+	private List<MenuRow> currentMenuRows = new ArrayList<>();
+
+	/**
+	 * Count 2 begin (before, comes Course 1)
+	 * Gets a copy of the menu
+	 * Count 2 end (next, comes Course 3)
+	 */
 	public void getUpdatedMenu()
 	{
-		ctxMenu = Adonai.client.getAdonaiMenu();
+		refreshMenuOpened();
+
 		MenuRow hNew = ctxMenu.getRowHovering(Adonai.client.getMouseCanvasPosition());
 
 		if (hNew != null)
 		{
 			// this works
-			logOnTick(hNew.getOption(), 20);
-		}
-
-		List<String> menuList = getMenuList();
-		if (lastMenuItems != null && lastHovered != null && lastMenuItems.equals(menuList) || java.util.Objects.equals(
-				hNew,
-				lastHovered
-		))
-		{
-			return;
+			logOnTick(50, "Hovering Over: (Menu Option) {} => (Menu Target) {}", hNew.getOption(), hNew.getTarget());
 		}
 
 		getAllTargetTileObjects();
@@ -77,15 +83,6 @@ public class MenuSession
 			log.info("MenuObject: {}", o.getName());
 		}
 
-		refreshMenuOpened();
-
-		lastMenuItems = menuList;
-		lastHovered = hNew;
-
-		log.info(
-				"menu items... {}",
-				menuList
-		);
 	}
 
 	void printNewMenuItems(MenuOpened event)
@@ -99,31 +96,63 @@ public class MenuSession
 		}
 	}
 
-	private List<MenuRow> currentMenuRows = new ArrayList<>();
-
 	// todo: get the row location of each individual
 	private void getAllTargetTileObjects()
 	{
 		List<TileObject> tileObjects = new ArrayList<>();
 
-		for (MenuRow r : ctxMenu.getAllMenuRows())
+		List<MenuRow> allMenuRows = ctxMenu.getAllMenuRows();
+		logOnTick(50, "ctxMenu.getAllMenuRows(): SIZE: {} ", allMenuRows.size());
+		int i = 0;
+		for (MenuRow r : allMenuRows)
+		{
+			MenuEntry entry = r.getEntry();
+			logOnTick(50, "{}: Entry information (for tile): ({}, {}): [{}, {}]", i, entry.getOption(), entry.getTarget(),  entry.getActionParam0(), entry.getParam1());
+			i++;
+		}
+
+		for (MenuRow r : allMenuRows)
 		{
 			MenuEntry event = r.getEntry();
+
+			/**
+			 * start: this does not work but it's supposed to get the tile location of the menu hovered
+			 * todo: figure out how to get the tile object of the menu item
+			 */
+
+			// if the ID is zero, there will be no object or item in this world so return
+			if (event.getId() == 0)
+			{
+				log.info("ID is 0");
+				return;
+			}
+
 			final Tile tile = Adonai.client.getScene()
 					.getTiles()[Adonai.client.getPlane()][event.getActionParam0()][event.getParam1()];
+
+
+			/**
+			 * This is the test tile...
+			 * start try to get the tile location of this menu item and post the location
+			 * finish try to post the world point and local point and canvas point too
+			 */
+			final int itemId = event.getIdentifier();
+			final int sceneX = event.getActionParam0();
+			final int sceneY = event.getParam1();
+			final WorldPoint worldPoint = WorldPoint.fromScene(client, sceneX, sceneY, client.getPlane());
+//			log.info("ItemID: {}, sceneX: {}, sceneY: {}, worldPoint: {}, {}", itemId, sceneX, sceneY, worldPoint.getX(), worldPoint.getY());
+			Screen.getTileLocation(worldPoint);
 			if (tile != null)
 			{
-				log.info("This Menu Row Points to {}", tile);
-				log.info("-------------------------------------------");
-
-				Menus.TileType tileObjectType = Menus.getTileObjectType(client, tile, event.getIdentifier());
+				Menus.TileType tileObjectType = Menus.getTileObjectType(Adonai.client, tile, event.getIdentifier());
+				log.info("TileObject is of type: {}", tileObjectType.toString());
 
 				String[] actions = tile.getItemLayer()
 						.getActions();
+				log.info("The actions are: {}", ((Object) actions).toString());
 
 				TileObject tileObject = null;
 				TileItem   itemTile   = null;
-				log.info("TileObject is of type: {}", tileObjectType);
 				switch (tileObjectType)
 				{
 					case WALL_OBJECT_TYPE:
@@ -158,24 +187,6 @@ public class MenuSession
 									.getY(),
 							tile.getPlane()
 					);
-					//					Renderable middle = tile.getItemLayer()
-					//							.getMiddle();
-					//					Renderable top = tile.getItemLayer()
-					//							.getTop();
-					//					Renderable bottom = tile.getItemLayer()
-					//							.getBottom();
-					//					Point canvasLocation = tile.getItemLayer()
-					//							.getCanvasLocation();
-					//					int plane = tile.getPlane();
-					//					SceneTileModel sceneTileModel = tile.getSceneTileModel();
-					//					ItemLayer itemLayer = tile.getItemLayer();
-					//					Point canvasLoc = itemLayer.getCanvasLocation();
-					//					Polygon canvasTilePoly = itemLayer.getCanvasTilePoly();
-					//					Model   modelBottom    = itemLayer.getModelBottom();
-					//					Model   modelMiddle    = itemLayer.getModelMiddle();
-					//					Model   modelTop       = itemLayer.getModelTop();
-					//					String[] actions       = itemLayer.getActions();
-					//					Shape clickbox = itemLayer.getClickbox();
 					log.info(
 							"tile object information {}: bounds: ({}), obj({}) pos: {}",
 							itemTile.getTile()
@@ -192,48 +203,28 @@ public class MenuSession
 									.getCanvasLocation()
 					);
 					tileObjects.add(tileObject);
-
 				}
 			}
 		}
 	}
-
-	private String actionsToString(Tile tile)
-	{
-		return String.join(
-				", ",
-				tile.getItemLayer()
-						.getActions()
-		);
-	}
-
 
 	private void refreshMenuOpened()
 	{
 		ctxMenu = Adonai.client.getAdonaiMenu();
 	}
 
-	private void logOnTick(String info, int ticks)
+	private ContextMenu getAdonaiMenu()
+	{
+		return ctxMenu;
+	}
+
+	private void logOnTick(int ticks, String info, Object ... arguments)
 	{
 		gameTicks++;
 		if (gameTicks % ticks == 0)
 		{
-			log.info("This is the MenuRow which the mouse is hovering: {}", info);
+			log.info(info, arguments);
 		}
-	}
-
-	private List<String> getMenuList()
-	{
-		String       list     = "";
-		List<String> menuList = new ArrayList<String>();
-		new ArrayList<>(
-				java.util.List.of(
-						Adonai.client.getMenuEntries()
-				)
-		).forEach(
-				e -> menuList.add(e.getOption())
-		);
-		return menuList;
 	}
 
 	private List<TileObject> getMenuObjects()
@@ -242,30 +233,50 @@ public class MenuSession
 
 		for (MenuRow r : ctxMenu.getAllMenuRows())
 		{
-			logOnTick(net.runelite.client.plugins.adonaicore.utils.ChatMessages.messageArgs(
+			logOnTick(50,
 					"Menu data (needed to get the TileObject from the context menu): {}",
-					r.getMenuTargetIdentifiers()
-			), 50);
-			logOnTick(MessageFormat.format("Menu entry from the previous menu row: {}", r.getEntry()), 50);
+					r.getMenuTargetIdentifiers());
+			logOnTick(50, "Menu entry from the previous menu row: {}", r.getEntry());
 
 			TileObject obj = Objects.findTileObject(r.getMenuTargetIdentifiers());
 			if (obj != null)
 			{
 				if (!java.util.Objects.equals(obj.getName(), ""))
 				{
+					Shape clickBox = obj.getClickbox();
+					Point canvasLocation = obj.getCanvasLocation();
+					LocalPoint localLocation = obj.getLocalLocation();
+					Point minimapLocation = obj.getMinimapLocation();
+					WorldPoint worldLocation = obj.getWorldLocation();
+					Polygon canvasTilePoly = obj.getCanvasTilePoly();
+					Rectangle2D bounds2D = canvasTilePoly
+							.getBounds2D();
+					Rectangle bounds = clickBox.getBounds();
+					if (bounds == null)
+					{
+						bounds = new Rectangle(0, 0);
+					}
+					String name = obj.getName();
 					log.info(
-							"menuObjects: name(): {}\n canvasLocation(): {}\n localLocation(): {}\n minimapLocation(): {}\n worldLocation(): {}\n clickbox(): {}\n canvasTilePoly(): {}\n",
-							obj.getName(),
-							obj.getCanvasLocation(),
-							obj.getLocalLocation(),
-							obj.getMinimapLocation(),
-							obj.getWorldLocation(),
-							java.util.Objects.requireNonNull(obj.getClickbox())
-									.getBounds2D()
-									.toString(),
-							obj.getCanvasTilePoly()
-									.getBounds2D()
-									.toString()
+							"TileObject Attributes: \n" +
+									"\tmenuObjects: name(): {}\n" +
+									"\t canvasLocation(): {}\n" +
+									"\t localLocation(): {}\n" +
+									"\t minimapLocation(): {}\n" +
+									"\t worldLocation(): {}\n" +
+									"\t clickbox(): {}\n" +
+									"\t canvasTilePoly(): {}\n" +
+									"\t bounds(): {}\n" +
+									"\tbounds2d(): {}",
+							name,
+							canvasLocation,
+							localLocation,
+							minimapLocation,
+							worldLocation,
+							clickBox,
+							canvasTilePoly,
+							bounds,
+							bounds2D.toString()
 					);
 				}
 				tileObjects.add(obj);
@@ -290,31 +301,11 @@ public class MenuSession
 	}
 
 	/**
-	 * Gets the current context-menu option the mouse is hovered over
+	 * Gets the menu and all it's options & targets, and related information and stores it.
 	 */
-	private MenuRow getHovering()
-	{
-		return ctxMenu.getRowHovering(Adonai.client.getMouseCanvasPosition());
-	}
-
 	void renderAdonaiMenu()
 	{
 		Adonai.client.drawAdonaiMenu(200);
 		ctxMenu = Adonai.client.getAdonaiMenu();
-	}
-
-	MenuRow getMenuRow(Point point)
-	{
-		for (MenuRow row : currentMenuRows)
-		{
-			Rectangle hitBox = row.getHitBox();
-			log.info("Row HitBox: {}", hitBox);
-			if (hitBox.contains(Calculations.convertToPoint(point)))
-			{
-				log.info("Row {} -> {} Contains the Mouse", row.getOption(), row.getTarget());
-				return row;
-			}
-		}
-		return null;
 	}
 }
