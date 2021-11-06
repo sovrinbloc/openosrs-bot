@@ -36,8 +36,6 @@ import net.runelite.rs.api.RSClient;
 import net.runelite.rs.api.RSFont;
 import net.runelite.rs.api.RSMenuAction;
 
-import java.text.MessageFormat;
-
 @Mixin(RSClient.class)
 public abstract class MenuMixin implements RSClient
 {
@@ -281,7 +279,9 @@ public abstract class MenuMixin implements RSClient
 					menuEntry.getId(),
 					menuEntry.getMenuAction()
 			));
-			System.out.println("Id: " + menuEntry.getId() + ", Menu information: actionParam0 " + menuEntry.getActionParam0() + " param1 + " + menuEntry.getParam1());
+			// todo: remove this -- for debugging only
+			if (menuEntry.getId() != 0)
+				System.out.println("Id: " + menuEntry.getId() + ", Menu information: actionParam0 " + menuEntry.getActionParam0() + " param1 + " + menuEntry.getParam1());
 		}
 		return contextMenu;
 	}

@@ -608,10 +608,7 @@ public class ExtUtils<operator, T2>
 
 	}
 
-
 	// widget items
-
-
 	static class AdonaiEquippedItems
 	{
 		public static Client client;

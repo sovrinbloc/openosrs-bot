@@ -1,8 +1,8 @@
 package net.runelite.client.plugins.adonaicore;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
 import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.MenuOpened;
@@ -33,6 +33,7 @@ public class MenuSession
 
 	/**
 	 * Initializes the Menu segment of the plugin
+	 *
 	 * @param client
 	 */
 	@Inject
@@ -68,7 +69,7 @@ public class MenuSession
 
 		MenuRow hNew = ctxMenu.getRowHovering(Adonai.client.getMouseCanvasPosition());
 
-		if (hNew != null)
+		if (hNew != null && client.isMenuOpen())
 		{
 			// this works
 			logOnTick(50, "Hovering Over: (Menu Option) {} => (Menu Target) {}", hNew.getOption(), hNew.getTarget());
@@ -88,7 +89,7 @@ public class MenuSession
 	void printNewMenuItems(MenuOpened event)
 	{
 		ctxMenu = Adonai.client.getAdonaiMenu();
-		Menu    menu       = new Menu(Adonai.client.getAdonaiMenu(), event);
+		Menu menu = new Menu(Adonai.client.getAdonaiMenu(), event);
 		MenuRow activeMenu = this.ctxMenu.getHovering(Calculations.convertToPoint(Adonai.client.getMouseCanvasPosition()));
 		for (MenuRow row : this.ctxMenu.getAllMenuRows())
 		{
@@ -102,12 +103,11 @@ public class MenuSession
 		List<TileObject> tileObjects = new ArrayList<>();
 
 		List<MenuRow> allMenuRows = ctxMenu.getAllMenuRows();
-		logOnTick(50, "ctxMenu.getAllMenuRows(): SIZE: {} ", allMenuRows.size());
 		int i = 0;
 		for (MenuRow r : allMenuRows)
 		{
 			MenuEntry entry = r.getEntry();
-			logOnTick(50, "{}: Entry information (for tile): ({}, {}): [{}, {}]", i, entry.getOption(), entry.getTarget(),  entry.getActionParam0(), entry.getParam1());
+			logOnTick(50, "{}: Entry information (for tile): ({}, {}): [{}, {}]", i, entry.getOption(), entry.getTarget(), entry.getActionParam0(), entry.getParam1());
 			i++;
 		}
 
@@ -123,13 +123,14 @@ public class MenuSession
 			// if the ID is zero, there will be no object or item in this world so return
 			if (event.getId() == 0)
 			{
-				log.info("ID is 0");
-				return;
+				continue;
 			}
+			log.info("target: {}, option: {}, actionParam0: {}, actionParam1: {}, getParam0: {}, getParam1: {}, getId: {}, getIdentifier: {}",
+					event.getTarget(), event.getOption(), event.getActionParam0(), event.getActionParam1(), event.getParam0(), event.getParam1(), event.getId(), event.getIdentifier());
 
-			final Tile tile = Adonai.client.getScene()
+			Tile tile = Adonai.client.getScene()
 					.getTiles()[Adonai.client.getPlane()][event.getActionParam0()][event.getParam1()];
-
+			log.info("Tile: {}", tile);
 
 			/**
 			 * This is the test tile...
@@ -147,12 +148,8 @@ public class MenuSession
 				Menus.TileType tileObjectType = Menus.getTileObjectType(Adonai.client, tile, event.getIdentifier());
 				log.info("TileObject is of type: {}", tileObjectType.toString());
 
-				String[] actions = tile.getItemLayer()
-						.getActions();
-				log.info("The actions are: {}", ((Object) actions).toString());
-
 				TileObject tileObject = null;
-				TileItem   itemTile   = null;
+				TileItem itemTile = null;
 				switch (tileObjectType)
 				{
 					case WALL_OBJECT_TYPE:
@@ -187,8 +184,9 @@ public class MenuSession
 									.getY(),
 							tile.getPlane()
 					);
+					String[] actions = tile.getItemLayer().getActions();
 					log.info(
-							"tile object information {}: bounds: ({}), obj({}) pos: {}",
+							"tile object information {}: bounds: ({}), obj({}) pos: {}\nThe actions are: {}",
 							itemTile.getTile()
 									.getItemLayer()
 									.getName(),
@@ -200,7 +198,8 @@ public class MenuSession
 									.getItemLayer(),
 							itemTile.getTile()
 									.getItemLayer()
-									.getCanvasLocation()
+									.getCanvasLocation(),
+							((Object) actions).toString()
 					);
 					tileObjects.add(tileObject);
 				}
@@ -218,7 +217,7 @@ public class MenuSession
 		return ctxMenu;
 	}
 
-	private void logOnTick(int ticks, String info, Object ... arguments)
+	private void logOnTick(int ticks, String info, Object... arguments)
 	{
 		gameTicks++;
 		if (gameTicks % ticks == 0)
@@ -230,19 +229,28 @@ public class MenuSession
 	private List<TileObject> getMenuObjects()
 	{
 		List<TileObject> tileObjects = new ArrayList<>();
-
-		for (MenuRow r : ctxMenu.getAllMenuRows())
+		if (!client.isMenuOpen())
+		{
+			return null;
+		}
+		for (MenuRow event : ctxMenu.getAllMenuRows())
 		{
 			logOnTick(50,
 					"Menu data (needed to get the TileObject from the context menu): {}",
-					r.getMenuTargetIdentifiers());
-			logOnTick(50, "Menu entry from the previous menu row: {}", r.getEntry());
+					event.getMenuTargetIdentifiers());
+			logOnTick(50, "Menu entry from the previous menu row: {}", event.getEntry());
 
-			TileObject obj = Objects.findTileObject(r.getMenuTargetIdentifiers());
+			TileObject obj = Objects.getTileObject(event.getMenuTargetIdentifiers());
+
+			final int sceneX = event.getEntry().getActionParam0();
+			final int sceneY = event.getEntry().getParam1();
+
 			if (obj != null)
 			{
+				log.info("Object is not null");
 				if (!java.util.Objects.equals(obj.getName(), ""))
 				{
+					log.info("Object has a name");
 					Shape clickBox = obj.getClickbox();
 					Point canvasLocation = obj.getCanvasLocation();
 					LocalPoint localLocation = obj.getLocalLocation();
@@ -280,6 +288,18 @@ public class MenuSession
 					);
 				}
 				tileObjects.add(obj);
+			}
+			else
+			{
+				List<TileItem> groundItem = Objects.getGroundItem(sceneX, sceneY);
+				if (groundItem != null)
+				{
+					for (TileItem item :
+							groundItem)
+					{
+						log.info("Ground Item (else): {}, {}", item.getId(), item.getQuantity());
+					}
+				}
 			}
 		}
 		return tileObjects;

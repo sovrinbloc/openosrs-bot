@@ -87,7 +87,7 @@ public class AdonaiOverlay extends Overlay
 				int x = entry.getParam0();
 				int y = entry.getParam1();
 				int id = entry.getIdentifier();
-				TileObject tileObject = Objects.findTileObject(x, y, id);
+				TileObject tileObject = Objects.getTileObject(x, y, id);
 				if (tileObject != null)
 				{
 //					log.info("This should be rendering around the target");
@@ -157,7 +157,7 @@ public class AdonaiOverlay extends Overlay
 				int x = top.getParam0();
 				int y = top.getParam1();
 				int id = top.getIdentifier();
-				TileObject tileObject = Objects.findTileObject(x, y, id);
+				TileObject tileObject = Objects.getTileObject(x, y, id);
 				if (tileObject != null)
 				{
 					modelOutlineRenderer.drawOutline(tileObject, config.borderWidth(), config.objectHoverHighlightColor(), config.outlineFeather());
@@ -202,7 +202,7 @@ public class AdonaiOverlay extends Overlay
 				}
 				int x = top.getParam0();
 				int y = top.getParam1();
-				TileObject tileObject = Objects.findTileObject(x, y, id);
+				TileObject tileObject = Objects.getTileObject(x, y, id);
 				break;
 			}
 		}
