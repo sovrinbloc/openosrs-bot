@@ -78,8 +78,6 @@ public class AdonaiPlugin extends Plugin
 
 	private boolean menuOpened = false;
 
-	private boolean moveCamera = true;
-
 	private List<String> lastMenuItems = new ArrayList<>();
 
 	private MenuRow lastHovered = null;
@@ -257,21 +255,9 @@ public class AdonaiPlugin extends Plugin
 	@Subscribe
 	public void onFocusChanged(FocusChanged event)
 	{
-		if (event.isFocused())
+		if (event.isFocused() && config.randomCameraMovement())
 		{
-			moveCamera = true;
-			return;
-		}
-		moveCamera = false;
-	}
-
-	private void logOnTick(String info, int ticks)
-	{
-		gameTicks++;
-		if (gameTicks % ticks == 0)
-		{
-			log.info("Logging the HOVERED one on tick");
-			log.info(info);
+			randomCameraEvent();
 		}
 	}
 
@@ -285,42 +271,17 @@ public class AdonaiPlugin extends Plugin
 
 	private void randomCameraEvent()
 	{
-		char cameraMovement;
-		if (Calculations.random(1, 100) > 85)
+		if (Calculations.roll(85))
 		{
-			StringBuilder outcome       = new StringBuilder();
-			int           numberPressed = ExtUtils.random(5, 20);
-			switch (Calculations.random(1, 5))
-			{
-				case 1:
-					cameraMovement = Keyboard.LEFT_ARROW_KEY;
-					break;
-				case 2:
-					cameraMovement = Keyboard.RIGHT_ARROW_KEY;
-					break;
-				case 3:
-					cameraMovement = Keyboard.UP_ARROW_KEY;
-					break;
-				default:
-					cameraMovement = Keyboard.DOWN_ARROW_KEY;
-					break;
-			}
-			for (int i = 0; i < numberPressed; i++)
-			{
-				outcome.append(cameraMovement);
-			}
-			Runnable typeWords = () ->
-			{
-
-				utils.robotType(outcome.toString());
-			};
-			executor.execute(typeWords);
+			return;
 		}
+		executor.execute(() -> utils.robotType(Randoms.moveCamera().toString()));
+
 	}
 
 	private boolean onPlayerLocationChanged()
 	{
-		if (player == null)
+		if (client.getGameState().getState() != GameState.LOGGED_IN.getState())
 		{
 			return false;
 		}
@@ -348,6 +309,15 @@ public class AdonaiPlugin extends Plugin
 		executor.shutdown();
 		overlayManager.remove(aOverlay);
 		overlayManager.remove(tooltipOverlay);
+	}
 
+	private void logOnTick(String info, int ticks)
+	{
+		gameTicks++;
+		if (gameTicks % ticks == 0)
+		{
+			log.info("Logging the HOVERED one on tick");
+			log.info(info);
+		}
 	}
 }

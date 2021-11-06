@@ -8,6 +8,28 @@ public class Calculations
 	{
 		return (int) ((Math.random() * ((max - min) + 1)) + min);
 	}
+
+	/**
+	 * Calculates a random number between 1 and 100 (percent), preferable used to determine
+	 * if the following action will be performed.
+	 * Entering a percentage of success, a random number is calculated between 1 and 100, and
+	 * we compare that resulting number against (100 - chancePercentage).
+	 * If result >= (100 - chancePercentage)
+	 * returns true
+	 * If results < (100 - chancePercentage)
+	 * returns false
+	 * Example:
+	 * chancePercentage = 30
+	 * Means that there is a 30 percent chance of the result being true.
+	 *
+	 * @param chancePercentage is the percentage chance of receiving a TRUE return
+	 * @return random(1, 100) >= (100 - chancePercentage);
+	 */
+	public static boolean roll(int chancePercentage)
+	{
+		return Calculations.random(1, 100) >= (100 - chancePercentage);
+	}
+
 	public static int random(double min, double max)
 	{
 		return (int) ((Math.random() * ((max - min) + 1)) + min);

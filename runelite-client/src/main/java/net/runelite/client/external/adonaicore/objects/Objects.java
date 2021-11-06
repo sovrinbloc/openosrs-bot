@@ -1,6 +1,8 @@
 package net.runelite.client.external.adonaicore.objects;
 
 import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.queries.DecorativeObjectQuery;
 import net.runelite.api.queries.GameObjectQuery;
 import net.runelite.api.queries.GroundObjectQuery;
@@ -10,10 +12,11 @@ import net.runelite.client.plugins.adonaicore.Adonai;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 
-public  class Objects
+public class Objects
 {
 
 	public static List<GameObject> getGameObjects(int... ids)
@@ -470,12 +473,119 @@ public  class Objects
 	}
 
 
-	public static TileObject findTileObject(MenuTargetIdentifier tileObject)
+	public static TileObject getTileObject(MenuTargetIdentifier tileObject)
 	{
-		return findTileObject(tileObject.getX(), tileObject.getY(), tileObject.getId());
+		return getTileObject(tileObject.getX(), tileObject.getY(), tileObject.getId());
 	}
 
-	public static TileObject findTileObject(int x, int y, int id)
+	public static List<TileItem> getGroundItem(int sceneX, int sceneY)
+	{
+		assert Adonai.client.isClientThread();
+
+		final WorldPoint worldPoint = WorldPoint.fromScene(Adonai.client, sceneX, sceneY, Adonai.client.getPlane());
+		Scene scene = Adonai.client.getScene();
+		Tile[][][] tiles = scene.getTiles();
+		Tile tile = tiles[Adonai.client.getPlane()][sceneX][sceneY];
+		return tile.getGroundItems();
+	}
+
+	public static List<TileItem> getAllGroundItems()
+	{
+		assert Adonai.client.isClientThread();
+
+		List<TileItem> items = new ArrayList<>();
+
+		Scene scene = Adonai.client.getScene();
+		Tile[][][] tiles = scene.getTiles();
+		int z = Adonai.client.getPlane();
+		for (int x = 0; x < Constants.SCENE_SIZE; ++x)
+		{
+			for (int y = 0; y < Constants.SCENE_SIZE; ++y)
+			{
+				Tile tile = tiles[z][x][y];
+				if (tile == null)
+				{
+					continue;
+				}
+				List<TileItem> groundItems = tile.getGroundItems();
+				if (groundItems.size() > 0)
+				{
+					items.addAll(groundItems);
+				}
+			}
+		}
+
+		return items;
+	}
+
+	public static TileItem findNearestGroundItems()
+	{
+		assert Adonai.client.isClientThread();
+
+		LocalPoint localLocation = Adonai.client.getLocalPlayer().getLocalLocation();
+
+		List<TileItem> allGroundItems = getAllGroundItems();
+		return allGroundItems.stream()
+				.min(
+						Comparator.comparing(
+								entityType -> entityType.getTile().getLocalLocation().distanceTo(
+										Adonai.client.getLocalPlayer().getLocalLocation())))
+				.orElse(null);
+	}
+
+	public static TileItem findNearestGroundItems(int... ids)
+	{
+		assert Adonai.client.isClientThread();
+
+		List<TileItem> allGroundItems = getAllGroundItems();
+		TileItem tileItem = null;
+		int distance = 2147483647;
+
+		for (TileItem item : allGroundItems)
+		{
+			for(int id : ids)
+			{
+				if (item.getId() == id)
+				{
+					int tmpDistance = item.getTile().getLocalLocation().distanceTo(Adonai.client.getLocalPlayer().getLocalLocation());
+					if (tileItem == null ||
+							tmpDistance < distance
+					)
+					tileItem = item;
+					distance = tmpDistance;
+				}
+			}
+		}
+
+		return tileItem;
+	}
+
+	public static List<TileItem> getGroundItem()
+	{
+		assert Adonai.client.isClientThread();
+
+		Player player = Adonai.client.getLocalPlayer();
+		if (player == null)
+		{
+			return null;
+		}
+
+		LocalPoint localPoint = player.getLocalLocation();
+		Scene scene = Adonai.client.getScene();
+
+		Tile[][][] tiles = scene.getTiles();
+		Tile tile = tiles[Adonai.client.getPlane()][localPoint.getSceneX()][localPoint.getSceneY()];
+		return tile.getGroundItems();
+	}
+
+	public static List<TileItem> getGroundItem(MenuEntry entry)
+	{
+		assert Adonai.client.isClientThread();
+
+		return getGroundItem(entry.getActionParam0(), entry.getParam1());
+	}
+
+	public static TileObject getTileObject(int x, int y, int id)
 	{
 		Scene scene = Adonai.client.getScene();
 		Tile[][][] tiles = scene.getTiles();
