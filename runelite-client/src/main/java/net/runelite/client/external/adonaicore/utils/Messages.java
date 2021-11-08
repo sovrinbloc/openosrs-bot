@@ -8,13 +8,13 @@ import net.runelite.client.chat.QueuedMessage;
 
 import java.text.MessageFormat;
 
-public class ChatMessages
+public class Messages
 {
 	public static ChatMessageManager chatMessageManager;
 
 	public static void initialize(ChatMessageManager chatMessageManager)
 	{
-		ChatMessages.chatMessageManager = chatMessageManager;
+		Messages.chatMessageManager = chatMessageManager;
 	}
 
 	public static void sendChatMessage(String pattern, Object... arguments)
@@ -22,8 +22,14 @@ public class ChatMessages
 		sendChatMessage(MessageFormat.format(pattern, arguments));
 	}
 
-	public static String messageArgs(String pattern, Object... arguments)
+	public static String format(String pattern, Object... arguments)
 	{
+		int i = 0;
+		while (pattern.contains("{}"))
+		{
+			pattern = pattern.replaceFirst("\\{\\}", "{" + i + "}");
+			i++;
+		}
 		return MessageFormat.format(pattern, arguments);
 	}
 

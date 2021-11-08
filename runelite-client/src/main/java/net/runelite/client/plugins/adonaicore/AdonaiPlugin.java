@@ -8,32 +8,31 @@ import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.*;
-import net.runelite.api.widgets.menu.MenuRow;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.external.adonai.TabMap;
-import net.runelite.client.game.ItemManager;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.external.adonaicore.objects.Objects;
 import net.runelite.client.external.adonaicore.screen.Screen;
 import net.runelite.client.external.adonaicore.toolbox.Calculations;
-import net.runelite.client.external.adonaicore.utils.ChatMessages;
+import net.runelite.client.external.adonaicore.utils.Messages;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @PluginDescriptor(
-		name = "Adonai Corelito Plugin",
-		description = "Adonai Bot Corelito"
+		name = "Adonai Core Plugin",
+		description = "Adonai Bot Core"
 )
 @Slf4j
 @SuppressWarnings("unused")
@@ -76,15 +75,7 @@ public class AdonaiPlugin extends Plugin
 
 	private ExecutorService executor;
 
-	private boolean menuOpened = false;
-
-	private List<String> lastMenuItems = new ArrayList<>();
-
-	private MenuRow lastHovered = null;
-
 	private int gameTicks = 0;
-
-	private int clientTicks = 0;
 
 	private MenuSession adonaiMenu;
 
@@ -123,7 +114,7 @@ public class AdonaiPlugin extends Plugin
 		{
 			if (client.getGameState() == GameState.LOGGED_IN)
 			{
-				ChatMessages.sendChatMessage("Adonai ChatMessages Initialized.");
+				Messages.sendChatMessage("Adonai Messages Initialized.");
 			}
 		}
 
@@ -140,7 +131,7 @@ public class AdonaiPlugin extends Plugin
 		}
 
 
-		executor = Executors.newFixedThreadPool(1);
+		executor = Executors.newFixedThreadPool(2);
 
 		this.utils = new ExtUtils(client, Adonai.keyboard);
 		this.utils.setChatMessageManager(chatMessageManager);
@@ -150,10 +141,10 @@ public class AdonaiPlugin extends Plugin
 	}
 
 	/**
-	 *  Count 1 begin
-	 *  desc is the description
-	 *  Count 1 end desc
-	 *
+	 * Count 1 begin
+	 * desc is the description
+	 * Count 1 end desc
+	 * <p>
 	 * // desc: description explanation
 	 * Gets a copy of the menu every single time the client ticks.
 	 *
@@ -185,7 +176,7 @@ public class AdonaiPlugin extends Plugin
 		{
 			if (onPlayerLocationChanged())
 			{
-				ChatMessages.sendChatMessage("Your character has moved.");
+				Messages.sendChatMessage("Your character has moved.");
 			}
 		}
 
@@ -200,8 +191,8 @@ public class AdonaiPlugin extends Plugin
 			minimapLocation = object.getMinimapLocation();
 			if (minimapLocation != null)
 			{
-				ChatMessages.sendChatMessage("nearest game object minimap information: " + minimapLocation);
-				ChatMessages.sendChatMessage("This is the distance on minimap of " + player.getMinimapLocation()
+				Messages.sendChatMessage("nearest game object minimap information: " + minimapLocation);
+				Messages.sendChatMessage("This is the distance on minimap of " + player.getMinimapLocation()
 						.distanceTo(minimapLocation));
 				object.getCanvasTilePoly()
 						.getBounds();
@@ -209,17 +200,17 @@ public class AdonaiPlugin extends Plugin
 
 			LocalPoint localDestinationLocation = client.getLocalDestinationLocation();
 
-			ChatMessages.sendChatMessage("nearest game object information: " + object.getCanvasLocation());
+			Messages.sendChatMessage("nearest game object information: " + object.getCanvasLocation());
 			LocalPoint localLocation = object.getLocalLocation();
-			String[]   actions       = object.getActions();
+			String[] actions = object.getActions();
 			for (String action :
 					actions)
 			{
-				ChatMessages.sendChatMessage("Options for:" + object.getName());
+				Messages.sendChatMessage("Options for:" + object.getName());
 			}
-			ChatMessages.sendChatMessage("This is the distance of " + player.getLocalLocation()
+			Messages.sendChatMessage("This is the distance of " + player.getLocalLocation()
 					.distanceTo(localLocation));
-			ChatMessages.sendChatMessage("Is it on the screen?: " + Screen.isOnScreen(object));
+			Messages.sendChatMessage("Is it on the screen?: " + Screen.isOnScreen(object));
 		}
 	}
 
@@ -243,13 +234,32 @@ public class AdonaiPlugin extends Plugin
 	@Subscribe
 	public void onMenuOpened(MenuOpened event)
 	{
-		menuOpened = true;
-//		adonaiMenu.printNewMenuItems(event);
 	}
 
-	@Subscribe
-	public void onMenuEntryAdded(MenuEntryAdded event)
+	private void removeOptionsExcept(int objectId, String exceptOption)
 	{
+		if (client.getGameState().getState() == GameState.LOGGED_IN.getState())
+		{
+			MenuEntry[] clientMenuEntries = client.getMenuEntries();
+			MenuEntry[] entries = new MenuEntry[clientMenuEntries.length];
+			int added = 0;
+			for (MenuEntry e : clientMenuEntries)
+			{
+				if (e.getId() != objectId)
+				{
+					entries[added] = e;
+					added++;
+					continue;
+				}
+				if (e.getOption().toLowerCase().contains(exceptOption))
+				{
+					entries[added] = e;
+					added++;
+				}
+			}
+			MenuEntry[] finalEntries = new MenuEntry[added];
+			client.setMenuEntries(Arrays.stream(entries).filter(java.util.Objects::nonNull).collect(Collectors.toList()).toArray(finalEntries));
+		}
 	}
 
 	@Subscribe
@@ -263,10 +273,7 @@ public class AdonaiPlugin extends Plugin
 
 	private void getTabInterface()
 	{
-		client.getWidget(TabMap.getWidget("Root Interface Container"))
-				.isHidden();
-		client.getWidget(TabMap.getWidget(""))
-				.isHidden();
+		client.getWidget(TabMap.getWidget("Root Interface Container")).isHidden();
 	}
 
 	private void randomCameraEvent()
@@ -319,5 +326,11 @@ public class AdonaiPlugin extends Plugin
 			log.info("Logging the HOVERED one on tick");
 			log.info(info);
 		}
+	}
+
+	@Subscribe
+	public void onAnimationChanged(AnimationChanged event)
+	{
+
 	}
 }

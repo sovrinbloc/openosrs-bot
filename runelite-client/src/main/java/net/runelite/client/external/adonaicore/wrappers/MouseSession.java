@@ -1,7 +1,7 @@
 package net.runelite.client.external.adonaicore.wrappers;
 
 import net.runelite.api.Point;
-import net.runelite.client.external.adonaicore.utils.ChatMessages;
+import net.runelite.client.external.adonaicore.utils.Messages;
 
 public class MouseSession
 {
@@ -19,6 +19,6 @@ public class MouseSession
 	private static Point mouseCanvasPosition = new Point(0, 0);
 	public static String toBracketString()
 	{
-		return ChatMessages.messageArgs("[{}, {}]", mouseCanvasPosition.getX(), mouseCanvasPosition.getY());
+		return Messages.format("[{}, {}]", mouseCanvasPosition.getX(), mouseCanvasPosition.getY());
 	}
 }
