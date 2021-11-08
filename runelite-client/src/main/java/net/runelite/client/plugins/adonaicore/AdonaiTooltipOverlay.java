@@ -27,12 +27,12 @@ package net.runelite.client.plugins.adonaicore;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.MenuAction;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.VarClientInt;
+import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.external.adonaicore.utils.Colors;
+import net.runelite.client.external.adonaicore.utils.Messages;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -50,29 +50,29 @@ class AdonaiTooltipOverlay extends Overlay
 	 * Menu types which are on widgets.
 	 */
 	private static final Set<MenuAction> WIDGET_MENU_ACTIONS = ImmutableSet.of(
-		MenuAction.WIDGET_TYPE_1,
-		MenuAction.WIDGET_TYPE_2,
-		MenuAction.WIDGET_TYPE_3,
-		MenuAction.WIDGET_TYPE_4,
-		MenuAction.WIDGET_TYPE_5,
-		MenuAction.WIDGET_TYPE_6,
-		MenuAction.ITEM_USE_ON_WIDGET_ITEM,
-		MenuAction.ITEM_USE_ON_WIDGET,
-		MenuAction.ITEM_FIRST_OPTION,
-		MenuAction.ITEM_SECOND_OPTION,
-		MenuAction.ITEM_THIRD_OPTION,
-		MenuAction.ITEM_FOURTH_OPTION,
-		MenuAction.ITEM_FIFTH_OPTION,
-		MenuAction.ITEM_USE,
-		MenuAction.WIDGET_FIRST_OPTION,
-		MenuAction.WIDGET_SECOND_OPTION,
-		MenuAction.WIDGET_THIRD_OPTION,
-		MenuAction.WIDGET_FOURTH_OPTION,
-		MenuAction.WIDGET_FIFTH_OPTION,
-		MenuAction.EXAMINE_ITEM,
-		MenuAction.SPELL_CAST_ON_WIDGET,
-		MenuAction.CC_OP_LOW_PRIORITY,
-		MenuAction.CC_OP
+			MenuAction.WIDGET_TYPE_1,
+			MenuAction.WIDGET_TYPE_2,
+			MenuAction.WIDGET_TYPE_3,
+			MenuAction.WIDGET_TYPE_4,
+			MenuAction.WIDGET_TYPE_5,
+			MenuAction.WIDGET_TYPE_6,
+			MenuAction.ITEM_USE_ON_WIDGET_ITEM,
+			MenuAction.ITEM_USE_ON_WIDGET,
+			MenuAction.ITEM_FIRST_OPTION,
+			MenuAction.ITEM_SECOND_OPTION,
+			MenuAction.ITEM_THIRD_OPTION,
+			MenuAction.ITEM_FOURTH_OPTION,
+			MenuAction.ITEM_FIFTH_OPTION,
+			MenuAction.ITEM_USE,
+			MenuAction.WIDGET_FIRST_OPTION,
+			MenuAction.WIDGET_SECOND_OPTION,
+			MenuAction.WIDGET_THIRD_OPTION,
+			MenuAction.WIDGET_FOURTH_OPTION,
+			MenuAction.WIDGET_FIFTH_OPTION,
+			MenuAction.EXAMINE_ITEM,
+			MenuAction.SPELL_CAST_ON_WIDGET,
+			MenuAction.CC_OP_LOW_PRIORITY,
+			MenuAction.CC_OP
 	);
 
 	private final TooltipManager tooltipManager;
@@ -98,37 +98,40 @@ class AdonaiTooltipOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (client.isMenuOpen())
-		{
-			client.getAdonaiMenu();
-			renderLocation();
-			return null;
-		}
-
 		MenuEntry[] menuEntries = client.getMenuEntries();
 		int last = menuEntries.length - 1;
-
-		if (last < 0)
-		{
-			renderLocation();
-			return null;
-		}
-
 		MenuEntry menuEntry = menuEntries[last];
 		String target = menuEntry.getTarget();
 		String option = menuEntry.getOption();
+		int objectId = menuEntry.getId();
+
 		MenuAction type = MenuAction.of(menuEntry.getType());
+
+		if (client.isMenuOpen())
+		{
+			client.getAdonaiMenu();
+			renderLocation(option, target, objectId);
+			return null;
+		}
+
+		if (last < 0)
+		{
+			renderLocation("No Entries", "", -1);
+			return null;
+		}
+
+
 
 		if (type == MenuAction.RUNELITE_OVERLAY || type == MenuAction.CC_OP_LOW_PRIORITY)
 		{
 			// These are always right click only
-			renderLocation();
+			renderLocation(option, target, objectId);
 			return null;
 		}
 
 		if (Strings.isNullOrEmpty(option))
 		{
-			renderLocation();
+			renderLocation(option, target, objectId);
 			return null;
 		}
 
@@ -138,13 +141,13 @@ class AdonaiTooltipOverlay extends Overlay
 			case "Walk here":
 			case "Cancel":
 			case "Continue":
-				renderLocation();
+				renderLocation(option, target, objectId);
 				return null;
 			case "Move":
 				// Hide overlay on sliding puzzle boxes
 				if (target.contains("Sliding piece"))
 				{
-					renderLocation();
+					renderLocation(option, target, objectId);
 					return null;
 				}
 		}
@@ -154,14 +157,14 @@ class AdonaiTooltipOverlay extends Overlay
 			final int widgetId = menuEntry.getParam1();
 			final int groupId = WidgetInfo.TO_GROUP(widgetId);
 
-			renderLocation();
+			renderLocation(option, target, objectId);
 		}
 
 		// If this varc is set, a tooltip will be displayed soon
 		int tooltipTimeout = client.getVar(VarClientInt.TOOLTIP_TIMEOUT);
 		if (tooltipTimeout > client.getGameCycle())
 		{
-			renderLocation();
+			renderLocation(option, target, objectId);
 			return null;
 		}
 
@@ -169,17 +172,38 @@ class AdonaiTooltipOverlay extends Overlay
 		int tooltipDisplayed = client.getVar(VarClientInt.TOOLTIP_VISIBLE);
 		if (tooltipDisplayed == 1)
 		{
-			renderLocation();
+			renderLocation(option, target, objectId);
 			return null;
 		}
 
-		// todo: move this over to the new plugin (this entire thing) plus this is the correct canvas info.
-		tooltipManager.addFront(new Tooltip(option + (Strings.isNullOrEmpty(target) ? "" : " " + target + " [" + client.getMouseCanvasPosition().getX() + ", " +client.getMouseCanvasPosition().getY() + "]")));
+		renderLocation(option, target, objectId);
+
+//		String tooltipString = "";
+//		String fOption = option;
+//		if (!target.isBlank())
+//		{
+//			fOption = Messages.format("{} {}", fOption, target);
+//		}
+//		Point mp = client.getMouseCanvasPosition();
+//		tooltipString = Messages.format("{}(ID: {}) [{}, {}]", fOption, objectId, mp.getX(), mp.getY());
+//
+//		tooltipManager.addFront(new Tooltip(tooltipString));
+
 		return null;
 	}
 
-	public void renderLocation()
+	public void renderLocation(String option, String target, int objectId)
 	{
-		tooltipManager.addFront(new Tooltip("[" + client.getMouseCanvasPosition().getX() + ", " +client.getMouseCanvasPosition().getY() + "]"));
+		String fOption = option;
+		if (!target.isBlank())
+		{
+			fOption = Messages.format("{} {}", fOption, target);
+		}
+		if (objectId != -1 && objectId != 0)
+		{
+			fOption = Messages.format("{} ({})", fOption, Colors.addColorTag(objectId, Colors.Crimson));
+		}
+		Point mp = client.getMouseCanvasPosition();
+		tooltipManager.addFront(new Tooltip(Messages.format("{} [{}, {}]", fOption, mp.getX(), mp.getY())));
 	}
 }

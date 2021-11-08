@@ -716,6 +716,13 @@ public interface Client extends GameEngine
 	void setCameraYawTarget(int cameraYawTarget);
 
 	/**
+	 * Set the target camera pitch
+	 *
+	 * @param cameraPitchTarget
+	 */
+	void setCameraPitchTarget(int cameraPitchTarget);
+
+	/**
 	 * Checks whether the client window is currently resized.
 	 *
 	 * @return true if resized, false otherwise
