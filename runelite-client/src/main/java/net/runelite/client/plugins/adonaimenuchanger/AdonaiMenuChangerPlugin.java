@@ -41,6 +41,7 @@ public class AdonaiMenuChangerPlugin extends Plugin
 	private AdonaiMenuChangerConfig config;
 
 	final private Map<Integer, List<String>> objectOptions = new HashMap<>();
+	final private Map<Integer, List<String>> npcOptions = new HashMap<>();
 	final private List<String> removeOptions = new ArrayList<>();
 
 	final public static String MENU_OPTION_SEARCH_FOR_TRAPS = "search for traps";
@@ -50,7 +51,7 @@ public class AdonaiMenuChangerPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		onlyShowOnMenu(OBJECT_ID_NATURE_CHEST, MENU_OPTION_SEARCH_FOR_TRAPS);
+		modifyObjectMenu(OBJECT_ID_NATURE_CHEST, MENU_OPTION_SEARCH_FOR_TRAPS);
 		removeFromAllMenus(MENU_OPTION_EXAMINE);
 	}
 
@@ -63,12 +64,19 @@ public class AdonaiMenuChangerPlugin extends Plugin
 			if (config.resetOptions())
 			{
 				objectOptions.clear();
+				npcOptions.clear();
 				return;
 			}
 
 			if (config.commitAddOption())
 			{
-				onlyShowOnMenu(config.objectId(), config.objectOption());
+				modifyObjectMenu(config.objectId(), config.objectOption());
+				return;
+			}
+
+			if (config.commitAddNpcOption())
+			{
+				modifyNPCMenu(config.objectId(), config.objectOption());
 				return;
 			}
 
@@ -87,7 +95,18 @@ public class AdonaiMenuChangerPlugin extends Plugin
 		}
 	}
 
-	public void onlyShowOnMenu(int objectId, String menuOption)
+	public void modifyObjectMenu(int objectId, String menuOption)
+	{
+		onlyShowOnMenu(objectOptions, objectId, menuOption);
+	}
+
+
+	public void modifyNPCMenu(int objectId, String menuOption)
+	{
+		onlyShowOnMenu(npcOptions, objectId, menuOption);
+	}
+
+	public void onlyShowOnMenu(Map<Integer, List<String>> objectOptions, int objectId, String menuOption)
 	{
 		String lwrMenuOption = menuOption.toLowerCase();
 		if (objectOptions.containsKey(objectId))
@@ -144,7 +163,7 @@ public class AdonaiMenuChangerPlugin extends Plugin
 			case ITEM_USE_ON_NPC:
 			case SPELL_CAST_ON_NPC:
 
-				// what: this is any of the npc options. when hovered over, the npc is highlighted.
+			// what: this is any of the npc options. when hovered over, the npc is highlighted.
 			case NPC_FIRST_OPTION:
 			case NPC_SECOND_OPTION:
 			case NPC_THIRD_OPTION:
@@ -182,8 +201,6 @@ public class AdonaiMenuChangerPlugin extends Plugin
 
 			for (MenuEntry entry : clientMenuEntries)
 			{
-//				Boolean doHideOption = hideOption(entry);
-
 				boolean addedEntry = false;
 
 				if (!objectOptions.containsKey(entry.getId()))
@@ -211,18 +228,6 @@ public class AdonaiMenuChangerPlugin extends Plugin
 	private Boolean hideOption(MenuEntry entry)
 	{
 		return new ArrayList<>(removeOptions).removeIf(opt -> entry.getOption().toLowerCase().contains(opt.toLowerCase()));
-//		AtomicBoolean hide = new AtomicBoolean(false);
-//		List<String> tmpOpts = new ArrayList<>(removeOptions);
-//		removeOptions.removeIf(o -> o.toLowerCase().contains(entry.getOption()));
-//		removeOptions.stream().takeWhile(val -> !hide.get()).forEach(option ->
-//		{
-//			if (entry.getOption().toLowerCase().contains(option.toLowerCase()))
-//			{
-//				log.info("The current menu does contain the item: \"{}\"", option.toLowerCase());
-//				hide.set(true);
-//			}
-//		});
-//		return hide.get();
 	}
 
 }
