@@ -3,20 +3,18 @@ import net.runelite.mapping.Implements;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("iq")
+@ObfuscatedName("jv")
 @Implements("Varps")
 public class Varps {
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@Export("Varps_masks")
 	static int[] Varps_masks;
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@Export("Varps_temp")
 	public static int[] Varps_temp;
 	@ObfuscatedName("s")
 	@Export("Varps_main")
 	public static int[] Varps_main;
-	@ObfuscatedName("x")
-	public static short[] field3013;
 
 	static {
 		Varps_masks = new int[32]; // L: 6
@@ -31,47 +29,34 @@ public class Varps {
 		Varps_main = new int[4000]; // L: 17
 	}
 
-	@ObfuscatedName("s")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
-		descriptor = "(II)Z",
-		garbageValue = "-1911470841"
+		descriptor = "([BIIII[Lgi;I)V",
+		garbageValue = "-1249872319"
 	)
-	public static boolean method5007(int var0) {
-		return var0 >= 0 && var0 < 112 ? KeyHandler.field118[var0] : false; // L: 219 220
-	}
-
-	@ObfuscatedName("j")
-	@ObfuscatedSignature(
-		descriptor = "(Ljf;I[B[BS)V",
-		garbageValue = "20257"
-	)
-	@Export("Widget_setKey")
-	static final void Widget_setKey(Widget var0, int var1, byte[] var2, byte[] var3) {
-		if (var0.field3180 == null) { // L: 975
-			if (var2 == null) { // L: 976
-				return; // L: 982
-			}
-
-			var0.field3180 = new byte[11][]; // L: 977
-			var0.field3105 = new byte[11][]; // L: 978
-			var0.field3128 = new int[11]; // L: 979
-			var0.field3129 = new int[11]; // L: 980
-		}
-
-		var0.field3180[var1] = var2; // L: 984
-		if (var2 != null) {
-			var0.field3125 = true; // L: 985
-		} else {
-			var0.field3125 = false; // L: 987
-
-			for (int var4 = 0; var4 < var0.field3180.length; ++var4) { // L: 988
-				if (var0.field3180[var4] != null) { // L: 989
-					var0.field3125 = true; // L: 990
-					break;
+	static final void method5333(byte[] var0, int var1, int var2, int var3, int var4, CollisionMap[] var5) {
+		int var7;
+		int var8;
+		for (int var6 = 0; var6 < 4; ++var6) { // L: 93
+			for (var7 = 0; var7 < 64; ++var7) { // L: 94
+				for (var8 = 0; var8 < 64; ++var8) { // L: 95
+					if (var7 + var1 > 0 && var7 + var1 < 103 && var8 + var2 > 0 && var8 + var2 < 103) { // L: 96
+						int[] var10000 = var5[var6].flags[var7 + var1];
+						var10000[var2 + var8] &= -16777217;
+					}
 				}
 			}
 		}
 
-		var0.field3105[var1] = var3; // L: 995
-	} // L: 996
+		Buffer var10 = new Buffer(var0); // L: 100
+
+		for (var7 = 0; var7 < 4; ++var7) { // L: 101
+			for (var8 = 0; var8 < 64; ++var8) { // L: 102
+				for (int var9 = 0; var9 < 64; ++var9) { // L: 103
+					UserComparator9.loadTerrain(var10, var7, var8 + var1, var9 + var2, var3, var4, 0); // L: 104
+				}
+			}
+		}
+
+	} // L: 108
 }

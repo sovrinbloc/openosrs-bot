@@ -4,30 +4,37 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("ho")
+@ObfuscatedName("gu")
 @Implements("Frames")
 public class Frames extends DualNode {
-	@ObfuscatedName("u")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "Ljf;"
+		descriptor = "Lkq;"
 	)
-	@Export("scriptActiveWidget")
-	static Widget scriptActiveWidget;
-	@ObfuscatedName("mx")
+	public static AbstractArchive field2379;
+	@ObfuscatedName("y")
 	@ObfuscatedGetter(
-		intValue = -1716567897
+		intValue = 1948507169
 	)
-	@Export("menuY")
-	static int menuY;
-	@ObfuscatedName("i")
+	static int field2377;
+	@ObfuscatedName("av")
+	@Export("fontHelvetica13")
+	static java.awt.Font fontHelvetica13;
+	@ObfuscatedName("il")
 	@ObfuscatedSignature(
-		descriptor = "[Lhe;"
+		descriptor = "[Lpg;"
+	)
+	@Export("modIconSprites")
+	static IndexedSprite[] modIconSprites;
+	@ObfuscatedName("c")
+	@ObfuscatedSignature(
+		descriptor = "[Lge;"
 	)
 	@Export("frames")
 	Animation[] frames;
 
 	@ObfuscatedSignature(
-		descriptor = "(Lko;Lko;IZ)V",
+		descriptor = "(Lkq;Lkq;IZ)V",
 		garbageValue = "0"
 	)
 	public Frames(AbstractArchive var1, AbstractArchive var2, int var3, boolean var4) {
@@ -59,26 +66,35 @@ public class Frames extends DualNode {
 
 	} // L: 36
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
 		descriptor = "(II)Z",
-		garbageValue = "1499014717"
+		garbageValue = "-1224868018"
 	)
 	@Export("hasAlphaTransform")
 	public boolean hasAlphaTransform(int var1) {
 		return this.frames[var1].hasAlphaTransform; // L: 39
 	}
 
-	@ObfuscatedName("gb")
+	@ObfuscatedName("lu")
 	@ObfuscatedSignature(
-		descriptor = "(B)V",
-		garbageValue = "1"
+		descriptor = "(Lpi;II)V",
+		garbageValue = "-1045407302"
 	)
-	static void method4481() {
-		PacketBufferNode var0 = AbstractWorldMapData.getPacketBufferNode(ClientPacket.field2745, Client.packetWriter.isaacCipher); // L: 4570
-		var0.packetBuffer.writeByte(class134.getWindowedMode()); // L: 4571
-		var0.packetBuffer.writeShort(GameEngine.canvasWidth); // L: 4572
-		var0.packetBuffer.writeShort(KeyHandler.canvasHeight); // L: 4573
-		Client.packetWriter.addNode(var0); // L: 4574
-	} // L: 4575
+	static void method4098(Buffer var0, int var1) {
+		byte[] var2 = var0.array; // L: 12072
+		if (Client.randomDatData == null) { // L: 12074
+			Client.randomDatData = new byte[24];
+		}
+
+		class338.writeRandomDat(var2, var1, Client.randomDatData, 0, 24); // L: 12075
+		if (JagexCache.JagexCache_randomDat != null) { // L: 12078
+			try {
+				JagexCache.JagexCache_randomDat.seek(0L); // L: 12080
+				JagexCache.JagexCache_randomDat.write(var0.array, var1, 24); // L: 12081
+			} catch (Exception var4) { // L: 12083
+			}
+		}
+
+	} // L: 12086
 }

@@ -3,7 +3,7 @@ import net.runelite.mapping.Implements;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("la")
+@ObfuscatedName("my")
 @Implements("User")
 public class User implements Comparable {
 	@ObfuscatedName("s")
@@ -12,7 +12,7 @@ public class User implements Comparable {
 	)
 	@Export("username")
 	Username username;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
 		descriptor = "Lpb;"
 	)
@@ -22,50 +22,50 @@ public class User implements Comparable {
 	User() {
 	} // L: 9
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "(Lla;I)I",
-		garbageValue = "-1073614160"
+		descriptor = "(Lmy;I)I",
+		garbageValue = "-1446218206"
 	)
 	@Export("compareTo_user")
 	public int compareTo_user(User var1) {
 		return this.username.compareToTyped(var1.username); // L: 32
 	}
 
-	@ObfuscatedName("ae")
+	@ObfuscatedName("ak")
 	@ObfuscatedSignature(
-		descriptor = "(I)Lpb;",
-		garbageValue = "-1294008122"
+		descriptor = "(B)Lpb;",
+		garbageValue = "1"
 	)
 	@Export("getUsername")
 	public Username getUsername() {
 		return this.username; // L: 12
 	}
 
-	@ObfuscatedName("aq")
+	@ObfuscatedName("av")
 	@ObfuscatedSignature(
 		descriptor = "(I)Ljava/lang/String;",
-		garbageValue = "598510100"
+		garbageValue = "1174948960"
 	)
 	@Export("getName")
 	public String getName() {
 		return this.username == null ? "" : this.username.getName(); // L: 16 17
 	}
 
-	@ObfuscatedName("al")
+	@ObfuscatedName("ar")
 	@ObfuscatedSignature(
-		descriptor = "(B)Ljava/lang/String;",
-		garbageValue = "56"
+		descriptor = "(I)Ljava/lang/String;",
+		garbageValue = "1772854194"
 	)
 	@Export("getPreviousName")
 	public String getPreviousName() {
 		return this.previousUsername == null ? "" : this.previousUsername.getName(); // L: 21 22
 	}
 
-	@ObfuscatedName("am")
+	@ObfuscatedName("al")
 	@ObfuscatedSignature(
-		descriptor = "(Lpb;Lpb;I)V",
-		garbageValue = "1723391677"
+		descriptor = "(Lpb;Lpb;B)V",
+		garbageValue = "1"
 	)
 	@Export("set")
 	void set(Username var1, Username var2) {

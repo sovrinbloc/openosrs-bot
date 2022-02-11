@@ -1,40 +1,37 @@
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import net.runelite.mapping.Export;
 import net.runelite.mapping.Implements;
 import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
-import net.runelite.rs.Reflection;
 
-@ObfuscatedName("fq")
+@ObfuscatedName("gi")
 @Implements("CollisionMap")
 public class CollisionMap {
-	@ObfuscatedName("as")
+	@ObfuscatedName("ao")
 	@ObfuscatedGetter(
-		intValue = 391726433
+		intValue = 655302433
 	)
 	@Export("xInset")
 	public int xInset;
-	@ObfuscatedName("at")
+	@ObfuscatedName("aq")
 	@ObfuscatedGetter(
-		intValue = -2116687229
+		intValue = -1220938779
 	)
 	@Export("yInset")
 	public int yInset;
-	@ObfuscatedName("az")
+	@ObfuscatedName("ay")
 	@ObfuscatedGetter(
-		intValue = 1517170261
+		intValue = -1760314827
 	)
 	@Export("xSize")
 	int xSize;
 	@ObfuscatedName("ac")
 	@ObfuscatedGetter(
-		intValue = 1280119157
+		intValue = -1723006743
 	)
 	@Export("ySize")
 	int ySize;
-	@ObfuscatedName("ak")
+	@ObfuscatedName("ab")
 	@Export("flags")
 	public int[][] flags;
 
@@ -47,10 +44,10 @@ public class CollisionMap {
 		this.clear(); // L: 49
 	} // L: 50
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
 		descriptor = "(I)V",
-		garbageValue = "981190902"
+		garbageValue = "1665588354"
 	)
 	@Export("clear")
 	public void clear() {
@@ -66,12 +63,12 @@ public class CollisionMap {
 
 	} // L: 59
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
 		descriptor = "(IIIIZI)V",
-		garbageValue = "-696909470"
+		garbageValue = "2049533735"
 	)
-	public void method3465(int var1, int var2, int var3, int var4, boolean var5) {
+	public void method3651(int var1, int var2, int var3, int var4, boolean var5) {
 		var1 -= this.xInset; // L: 62
 		var2 -= this.yInset; // L: 63
 		if (var3 == 0) { // L: 64
@@ -126,7 +123,7 @@ public class CollisionMap {
 			}
 
 			if (var4 == 1) { // L: 106
-				this.setFlag(var1, var2, 10); // L: 107
+				this.setFlag(var1, var2, 10);
 				this.setFlag(var1, var2 + 1, 32); // L: 108
 				this.setFlag(var1 + 1, var2, 128); // L: 109
 			}
@@ -151,82 +148,82 @@ public class CollisionMap {
 					this.setFlag(var1 - 1, var2, 4096); // L: 126
 				}
 
-				if (var4 == 1) {
-					this.setFlag(var1, var2, 1024);
-					this.setFlag(var1, var2 + 1, 16384);
+				if (var4 == 1) { // L: 128
+					this.setFlag(var1, var2, 1024); // L: 129
+					this.setFlag(var1, var2 + 1, 16384); // L: 130
 				}
 
-				if (var4 == 2) {
-					this.setFlag(var1, var2, 4096);
-					this.setFlag(var1 + 1, var2, 65536);
+				if (var4 == 2) { // L: 132
+					this.setFlag(var1, var2, 4096); // L: 133
+					this.setFlag(var1 + 1, var2, 65536); // L: 134
 				}
 
-				if (var4 == 3) {
+				if (var4 == 3) { // L: 136
 					this.setFlag(var1, var2, 16384); // L: 137
-					this.setFlag(var1, var2 - 1, 1024);
+					this.setFlag(var1, var2 - 1, 1024); // L: 138
 				}
 			}
 
-			if (var3 == 1 || var3 == 3) {
-				if (var4 == 0) {
-					this.setFlag(var1, var2, 512);
-					this.setFlag(var1 - 1, var2 + 1, 8192);
+			if (var3 == 1 || var3 == 3) { // L: 141
+				if (var4 == 0) { // L: 142
+					this.setFlag(var1, var2, 512); // L: 143
+					this.setFlag(var1 - 1, var2 + 1, 8192); // L: 144
 				}
 
-				if (var4 == 1) {
-					this.setFlag(var1, var2, 2048);
+				if (var4 == 1) { // L: 146
+					this.setFlag(var1, var2, 2048); // L: 147
 					this.setFlag(var1 + 1, var2 + 1, 32768); // L: 148
 				}
 
-				if (var4 == 2) {
-					this.setFlag(var1, var2, 8192);
-					this.setFlag(var1 + 1, var2 - 1, 512);
+				if (var4 == 2) { // L: 150
+					this.setFlag(var1, var2, 8192); // L: 151
+					this.setFlag(var1 + 1, var2 - 1, 512); // L: 152
 				}
 
-				if (var4 == 3) {
-					this.setFlag(var1, var2, 32768);
-					this.setFlag(var1 - 1, var2 - 1, 2048);
+				if (var4 == 3) { // L: 154
+					this.setFlag(var1, var2, 32768); // L: 155
+					this.setFlag(var1 - 1, var2 - 1, 2048); // L: 156
 				}
 			}
 
-			if (var3 == 2) {
-				if (var4 == 0) {
-					this.setFlag(var1, var2, 66560);
+			if (var3 == 2) { // L: 159
+				if (var4 == 0) { // L: 160
+					this.setFlag(var1, var2, 66560); // L: 161
 					this.setFlag(var1 - 1, var2, 4096); // L: 162
 					this.setFlag(var1, var2 + 1, 16384); // L: 163
 				}
 
-				if (var4 == 1) {
-					this.setFlag(var1, var2, 5120);
-					this.setFlag(var1, var2 + 1, 16384);
-					this.setFlag(var1 + 1, var2, 65536);
+				if (var4 == 1) { // L: 165
+					this.setFlag(var1, var2, 5120); // L: 166
+					this.setFlag(var1, var2 + 1, 16384); // L: 167
+					this.setFlag(var1 + 1, var2, 65536); // L: 168
 				}
 
 				if (var4 == 2) { // L: 170
-					this.setFlag(var1, var2, 20480);
-					this.setFlag(var1 + 1, var2, 65536);
-					this.setFlag(var1, var2 - 1, 1024);
+					this.setFlag(var1, var2, 20480); // L: 171
+					this.setFlag(var1 + 1, var2, 65536); // L: 172
+					this.setFlag(var1, var2 - 1, 1024); // L: 173
 				}
 
-				if (var4 == 3) {
-					this.setFlag(var1, var2, 81920);
-					this.setFlag(var1, var2 - 1, 1024);
-					this.setFlag(var1 - 1, var2, 4096);
+				if (var4 == 3) { // L: 175
+					this.setFlag(var1, var2, 81920); // L: 176
+					this.setFlag(var1, var2 - 1, 1024); // L: 177
+					this.setFlag(var1 - 1, var2, 4096); // L: 178
 				}
 			}
 		}
 
-	}
+	} // L: 182
 
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
 		descriptor = "(IIIIZI)V",
-		garbageValue = "-507434937"
+		garbageValue = "-429830438"
 	)
 	@Export("addGameObject")
 	public void addGameObject(int var1, int var2, int var3, int var4, boolean var5) {
-		int var6 = 256;
-		if (var5) {
+		int var6 = 256; // L: 185
+		if (var5) { // L: 186
 			var6 += 131072;
 		}
 
@@ -243,51 +240,51 @@ public class CollisionMap {
 			}
 		}
 
-	}
+	} // L: 196
 
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
-		descriptor = "(III)V",
-		garbageValue = "-1882493146"
+		descriptor = "(IIB)V",
+		garbageValue = "-55"
 	)
 	@Export("setBlockedByFloor")
 	public void setBlockedByFloor(int var1, int var2) {
-		var1 -= this.xInset;
-		var2 -= this.yInset;
+		var1 -= this.xInset; // L: 199
+		var2 -= this.yInset; // L: 200
 		int[] var10000 = this.flags[var1]; // L: 201
 		var10000[var2] |= 2097152;
-	}
+	} // L: 202
 
-	@ObfuscatedName("o")
+	@ObfuscatedName("r")
 	@ObfuscatedSignature(
-		descriptor = "(IIB)V",
-		garbageValue = "71"
+		descriptor = "(III)V",
+		garbageValue = "2074310404"
 	)
 	@Export("setBlockedByFloorDec")
 	public void setBlockedByFloorDec(int var1, int var2) {
-		var1 -= this.xInset;
-		var2 -= this.yInset;
+		var1 -= this.xInset; // L: 205
+		var2 -= this.yInset; // L: 206
 		int[] var10000 = this.flags[var1]; // L: 207
 		var10000[var2] |= 262144;
-	}
+	} // L: 208
 
-	@ObfuscatedName("g")
+	@ObfuscatedName("o")
 	@ObfuscatedSignature(
-		descriptor = "(IIII)V",
-		garbageValue = "-1002118940"
+		descriptor = "(IIIS)V",
+		garbageValue = "9111"
 	)
 	@Export("setFlag")
 	void setFlag(int var1, int var2, int var3) {
 		int[] var10000 = this.flags[var1]; // L: 211
 		var10000[var2] |= var3;
-	}
+	} // L: 212
 
-	@ObfuscatedName("e")
+	@ObfuscatedName("i")
 	@ObfuscatedSignature(
 		descriptor = "(IIIIZI)V",
-		garbageValue = "569667708"
+		garbageValue = "-1578864959"
 	)
-	public void method3470(int var1, int var2, int var3, int var4, boolean var5) {
+	public void method3653(int var1, int var2, int var3, int var4, boolean var5) {
 		var1 -= this.xInset; // L: 215
 		var2 -= this.yInset; // L: 216
 		if (var3 == 0) { // L: 217
@@ -434,10 +431,10 @@ public class CollisionMap {
 
 	} // L: 335
 
-	@ObfuscatedName("p")
+	@ObfuscatedName("w")
 	@ObfuscatedSignature(
-		descriptor = "(IIIIIZI)V",
-		garbageValue = "230890481"
+		descriptor = "(IIIIIZB)V",
+		garbageValue = "84"
 	)
 	@Export("setFlagOffNonSquare")
 	public void setFlagOffNonSquare(int var1, int var2, int var3, int var4, int var5, boolean var6) {
@@ -467,10 +464,10 @@ public class CollisionMap {
 
 	} // L: 354
 
-	@ObfuscatedName("j")
+	@ObfuscatedName("v")
 	@ObfuscatedSignature(
-		descriptor = "(IIII)V",
-		garbageValue = "265042064"
+		descriptor = "(IIIB)V",
+		garbageValue = "46"
 	)
 	@Export("setFlagOff")
 	void setFlagOff(int var1, int var2, int var3) {
@@ -478,161 +475,25 @@ public class CollisionMap {
 		var10000[var2] &= ~var3;
 	} // L: 358
 
-	@ObfuscatedName("b")
+	@ObfuscatedName("a")
 	@ObfuscatedSignature(
 		descriptor = "(III)V",
-		garbageValue = "1834026790"
+		garbageValue = "626666517"
 	)
-	public void method3479(int var1, int var2) {
+	public void method3656(int var1, int var2) {
 		var1 -= this.xInset; // L: 361
 		var2 -= this.yInset; // L: 362
 		int[] var10000 = this.flags[var1]; // L: 363
 		var10000[var2] &= -262145;
 	} // L: 364
 
-	@ObfuscatedName("s")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(Lop;II)V",
-		garbageValue = "696499017"
+		descriptor = "(I)[Liq;",
+		garbageValue = "1958044668"
 	)
-	@Export("readReflectionCheck")
-	public static void readReflectionCheck(Buffer var0, int var1) {
-		ReflectionCheck var2 = new ReflectionCheck(); // L: 127
-		var2.size = var0.readUnsignedByte(); // L: 128
-		var2.id = var0.readInt(); // L: 129
-		var2.operations = new int[var2.size]; // L: 130
-		var2.creationErrors = new int[var2.size]; // L: 131
-		var2.fields = new Field[var2.size]; // L: 132
-		var2.intReplaceValues = new int[var2.size]; // L: 133
-		var2.methods = new Method[var2.size]; // L: 134
-		var2.arguments = new byte[var2.size][][]; // L: 135
-
-		for (int var3 = 0; var3 < var2.size; ++var3) { // L: 136
-			try {
-				int var4 = var0.readUnsignedByte(); // L: 138
-				String var5;
-				String var6;
-				int var7;
-				if (var4 != 0 && var4 != 1 && var4 != 2) { // L: 139
-					if (var4 == 3 || var4 == 4) { // L: 149
-						var5 = var0.readStringCp1252NullTerminated(); // L: 150
-						var6 = var0.readStringCp1252NullTerminated(); // L: 151
-						var7 = var0.readUnsignedByte(); // L: 152
-						String[] var8 = new String[var7]; // L: 153
-
-						for (int var9 = 0; var9 < var7; ++var9) { // L: 154
-							var8[var9] = var0.readStringCp1252NullTerminated();
-						}
-
-						String var20 = var0.readStringCp1252NullTerminated(); // L: 155
-						byte[][] var10 = new byte[var7][]; // L: 156
-						int var12;
-						if (var4 == 3) { // L: 157
-							for (int var11 = 0; var11 < var7; ++var11) { // L: 158
-								var12 = var0.readInt(); // L: 159
-								var10[var11] = new byte[var12]; // L: 160
-								var0.readBytes(var10[var11], 0, var12); // L: 161
-							}
-						}
-
-						var2.operations[var3] = var4; // L: 164
-						Class[] var21 = new Class[var7]; // L: 165
-
-						for (var12 = 0; var12 < var7; ++var12) { // L: 166
-							var21[var12] = WorldMapLabelSize.loadClassFromDescriptor(var8[var12]);
-						}
-
-						Class var22 = WorldMapLabelSize.loadClassFromDescriptor(var20); // L: 167
-						if (WorldMapLabelSize.loadClassFromDescriptor(var5).getClassLoader() == null) { // L: 168
-							throw new SecurityException();
-						}
-
-						Method[] var13 = WorldMapLabelSize.loadClassFromDescriptor(var5).getDeclaredMethods(); // L: 169
-						Method[] var14 = var13; // L: 171
-
-						for (int var15 = 0; var15 < var14.length; ++var15) { // L: 172
-							Method var16 = var14[var15]; // L: 173
-							if (Reflection.getMethodName(var16).equals(var6)) { // L: 175
-								Class[] var17 = Reflection.getParameterTypes(var16); // L: 176
-								if (var17.length == var21.length) { // L: 177
-									boolean var18 = true; // L: 178
-
-									for (int var19 = 0; var19 < var21.length; ++var19) { // L: 179
-										if (var21[var19] != var17[var19]) { // L: 180
-											var18 = false; // L: 181
-											break; // L: 182
-										}
-									}
-
-									if (var18 && var22 == var16.getReturnType()) { // L: 185
-										var2.methods[var3] = var16; // L: 186
-									}
-								}
-							}
-						}
-
-						var2.arguments[var3] = var10; // L: 193
-					}
-				} else {
-					var5 = var0.readStringCp1252NullTerminated(); // L: 140
-					var6 = var0.readStringCp1252NullTerminated(); // L: 141
-					var7 = 0; // L: 142
-					if (var4 == 1) { // L: 143
-						var7 = var0.readInt();
-					}
-
-					var2.operations[var3] = var4; // L: 144
-					var2.intReplaceValues[var3] = var7; // L: 145
-					if (WorldMapLabelSize.loadClassFromDescriptor(var5).getClassLoader() == null) { // L: 146
-						throw new SecurityException();
-					}
-
-					var2.fields[var3] = Reflection.findField(WorldMapLabelSize.loadClassFromDescriptor(var5), var6); // L: 147
-				}
-			} catch (ClassNotFoundException var24) { // L: 196
-				var2.creationErrors[var3] = -1; // L: 197
-			} catch (SecurityException var25) { // L: 199
-				var2.creationErrors[var3] = -2; // L: 200
-			} catch (NullPointerException var26) { // L: 202
-				var2.creationErrors[var3] = -3; // L: 203
-			} catch (Exception var27) { // L: 205
-				var2.creationErrors[var3] = -4; // L: 206
-			} catch (Throwable var28) { // L: 208
-				var2.creationErrors[var3] = -5; // L: 209
-			}
-		}
-
-		class54.reflectionChecks.addFirst(var2); // L: 212
-	} // L: 213
-
-	@ObfuscatedName("q")
-	@ObfuscatedSignature(
-		descriptor = "(B)V",
-		garbageValue = "-67"
-	)
-	public static void method3492() {
-		ItemComposition.ItemDefinition_cached.clear(); // L: 548
-		ItemComposition.ItemDefinition_cachedModels.clear(); // L: 549
-		ItemComposition.ItemDefinition_cachedSprites.clear(); // L: 550
-	} // L: 551
-
-	@ObfuscatedName("ff")
-	@ObfuscatedSignature(
-		descriptor = "(IB)V",
-		garbageValue = "121"
-	)
-	@Export("forceDisconnect")
-	static final void forceDisconnect(int var0) {
-		SequenceDefinition.logOut(); // L: 3194
-		switch(var0) { // L: 3195
-		case 1:
-			class275.method5201(24); // L: 3199
-			class1.setLoginResponseString("", "You were disconnected from the server.", ""); // L: 3200
-			break;
-		case 2:
-			class275.method5201(24); // L: 3207
-			class1.setLoginResponseString("The game servers are currently being updated.", "Please wait a few minutes and try again.", ""); // L: 3208
-		}
-
-	} // L: 3213
+	@Export("ServerPacket_values")
+	public static ServerPacket[] ServerPacket_values() {
+		return new ServerPacket[]{ServerPacket.field3012, ServerPacket.field2963, ServerPacket.field2970, ServerPacket.field2965, ServerPacket.field3001, ServerPacket.field3029, ServerPacket.field2968, ServerPacket.field2969, ServerPacket.field3055, ServerPacket.field2971, ServerPacket.field2972, ServerPacket.field2973, ServerPacket.field2974, ServerPacket.field2975, ServerPacket.field2976, ServerPacket.field2977, ServerPacket.field3011, ServerPacket.field2979, ServerPacket.field2980, ServerPacket.field2981, ServerPacket.field3047, ServerPacket.field2983, ServerPacket.field2984, ServerPacket.field2985, ServerPacket.field3019, ServerPacket.field2987, ServerPacket.field2988, ServerPacket.field2989, ServerPacket.field2990, ServerPacket.field2966, ServerPacket.field2992, ServerPacket.field2993, ServerPacket.field2982, ServerPacket.field2986, ServerPacket.field3007, ServerPacket.field3052, ServerPacket.field2998, ServerPacket.field2999, ServerPacket.field3000, ServerPacket.field2962, ServerPacket.field3002, ServerPacket.field3003, ServerPacket.field3004, ServerPacket.field3010, ServerPacket.field2964, ServerPacket.field3051, ServerPacket.field3008, ServerPacket.field3009, ServerPacket.field3053, ServerPacket.field3060, ServerPacket.field3054, ServerPacket.field2978, ServerPacket.field3014, ServerPacket.field3015, ServerPacket.field3016, ServerPacket.field3017, ServerPacket.field2967, ServerPacket.field2997, ServerPacket.field3020, ServerPacket.field3021, ServerPacket.field2996, ServerPacket.field3023, ServerPacket.field3013, ServerPacket.field3025, ServerPacket.field3026, ServerPacket.field3027, ServerPacket.field3024, ServerPacket.field3005, ServerPacket.field3006, ServerPacket.field3031, ServerPacket.field3058, ServerPacket.field3033, ServerPacket.field3034, ServerPacket.field3035, ServerPacket.field3036, ServerPacket.field3037, ServerPacket.field3038, ServerPacket.field3039, ServerPacket.field3040, ServerPacket.field3041, ServerPacket.field3042, ServerPacket.field3043, ServerPacket.field3044, ServerPacket.field3045, ServerPacket.field3030, ServerPacket.field2991, ServerPacket.field3048, ServerPacket.field3049, ServerPacket.field3050, ServerPacket.field3032, ServerPacket.field3022, ServerPacket.field2994, ServerPacket.field3046, ServerPacket.field2995, ServerPacket.field3056, ServerPacket.field3057, ServerPacket.field3018, ServerPacket.field3059}; // L: 107
+	}
 }

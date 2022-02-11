@@ -1,71 +1,65 @@
-import java.io.IOException;
 import net.runelite.mapping.Export;
 import net.runelite.mapping.Implements;
 import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("bu")
+@ObfuscatedName("bh")
 @Implements("MenuAction")
 public class MenuAction {
-	@ObfuscatedName("gm")
-	@ObfuscatedSignature(
-		descriptor = "Lnu;"
-	)
-	@Export("WorldMapElement_fonts")
-	static Fonts WorldMapElement_fonts;
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedGetter(
-		intValue = -1877540813
+		intValue = 683087729
 	)
 	@Export("param0")
 	int param0;
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedGetter(
-		intValue = -319901543
+		intValue = -1027855045
 	)
 	@Export("param1")
 	int param1;
 	@ObfuscatedName("s")
 	@ObfuscatedGetter(
-		intValue = -2124872737
+		intValue = 791610257
 	)
 	@Export("opcode")
 	int opcode;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedGetter(
-		intValue = -1182228171
+		intValue = 1555115433
 	)
 	@Export("identifier")
 	int identifier;
-	@ObfuscatedName("o")
+	@ObfuscatedName("r")
 	@Export("action")
 	String action;
 
 	MenuAction() {
-	} // L: 12091
+	} // L: 12200
 
-	@ObfuscatedName("hj")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "(ZI)V",
-		garbageValue = "-780302169"
+		descriptor = "(Lkq;IIIZB)V",
+		garbageValue = "-93"
 	)
-	static final void method1912(boolean var0) {
-		class14.playPcmPlayers(); // L: 5878
-		++Client.packetWriter.pendingWrites; // L: 5879
-		if (Client.packetWriter.pendingWrites >= 50 || var0) { // L: 5880
-			Client.packetWriter.pendingWrites = 0; // L: 5881
-			if (!Client.hadNetworkError && Client.packetWriter.getSocket() != null) { // L: 5882
-				PacketBufferNode var1 = AbstractWorldMapData.getPacketBufferNode(ClientPacket.field2726, Client.packetWriter.isaacCipher); // L: 5884
-				Client.packetWriter.addNode(var1); // L: 5885
+	public static void method1894(AbstractArchive var0, int var1, int var2, int var3, boolean var4) {
+		class265.musicPlayerStatus = 1; // L: 34
+		class265.musicTrackArchive = var0; // L: 35
+		class265.musicTrackGroupId = var1; // L: 36
+		class140.musicTrackFileId = var2; // L: 37
+		class167.musicTrackVolume = var3; // L: 38
+		MusicPatch.musicTrackBoolean = var4; // L: 39
+		GrandExchangeOfferNameComparator.pcmSampleLength = 10000; // L: 40
+	} // L: 41
 
-				try {
-					Client.packetWriter.flush(); // L: 5887
-				} catch (IOException var3) { // L: 5889
-					Client.hadNetworkError = true; // L: 5890
-				}
-			}
-
-		}
-	} // L: 5893
+	@ObfuscatedName("lv")
+	@ObfuscatedSignature(
+		descriptor = "(I)V",
+		garbageValue = "-1125693830"
+	)
+	static void method1895() {
+		class424.clientPreferences.field1231 = Client.field699; // L: 12164
+		GameEngine.savePreferences(); // L: 12165
+	} // L: 12166
 }

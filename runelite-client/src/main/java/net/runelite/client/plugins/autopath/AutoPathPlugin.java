@@ -294,18 +294,16 @@ public class AutoPathPlugin extends Plugin
 
 	private void addMenuEntry(MenuEntryAdded event, String option)
 	{
-		List<MenuEntry> entries = new LinkedList<>(Arrays.asList(client.getMenuEntries()));
+		LinkedList<MenuEntry> entries = new LinkedList<>(Arrays.asList(client.getMenuEntries()));
 
 		if (entries.stream().anyMatch(e -> e.getOption().equals(option)))
 		{
 			return;
 		}
 
-		MenuEntry entry = new MenuEntry();
-		entry.setOption(option);
-		entry.setTarget(event.getTarget());
-		entry.setType(MenuAction.RUNELITE.getId());
-		entries.add(0, entry);
+
+		MenuEntryAdded entry = new MenuEntryAdded(option, event.getTarget(), event.getType(), event.getIdentifier(), event.getActionParam0(), event.getActionParam1());
+		entries.add(0, (MenuEntry) entry);
 
 		client.setMenuEntries(entries.toArray(new MenuEntry[0]));
 	}

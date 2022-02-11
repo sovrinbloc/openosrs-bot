@@ -1,50 +1,63 @@
+import java.awt.Image;
 import net.runelite.mapping.Export;
 import net.runelite.mapping.Implements;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("ee")
+@ObfuscatedName("fk")
 @Implements("Clock")
 public abstract class Clock {
-	@ObfuscatedName("t")
+	@ObfuscatedName("aq")
+	static Image field1740;
+	@ObfuscatedName("ef")
 	@ObfuscatedSignature(
-		descriptor = "Lee;"
+		descriptor = "Lkz;"
 	)
-	@Export("clock")
-	protected static Clock clock;
+	@Export("archive17")
+	static Archive archive17;
 
 	Clock() {
 	} // L: 4
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
 		descriptor = "(I)V",
-		garbageValue = "1421350581"
+		garbageValue = "-2049179835"
 	)
 	@Export("mark")
 	public abstract void mark();
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "(III)I",
-		garbageValue = "1121035205"
+		descriptor = "(IIB)I",
+		garbageValue = "-113"
 	)
 	@Export("wait")
 	public abstract int wait(int var1, int var2);
 
-	@ObfuscatedName("fm")
+	@ObfuscatedName("a")
+	@ObfuscatedSignature(
+		descriptor = "([BI)Llv;",
+		garbageValue = "-136888407"
+	)
+	public static Font method3125(byte[] var0) {
+		if (var0 == null) { // L: 138
+			return null;
+		} else {
+			Font var1 = new Font(var0, class434.SpriteBuffer_xOffsets, class434.SpriteBuffer_yOffsets, class434.SpriteBuffer_spriteWidths, Fonts.SpriteBuffer_spriteHeights, HealthBarUpdate.SpriteBuffer_spritePalette, WorldMapLabelSize.SpriteBuffer_pixels); // L: 139
+			Canvas.method365(); // L: 140
+			return var1; // L: 141
+		}
+	}
+
+	@ObfuscatedName("n")
 	@ObfuscatedSignature(
 		descriptor = "(B)V",
-		garbageValue = "2"
+		garbageValue = "91"
 	)
-	static final void method2960() {
-		if (Client.logoutTimer > 0) { // L: 3275
-			SequenceDefinition.logOut(); // L: 3276
-		} else {
-			Client.timer.method5978(); // L: 3279
-			WorldMapData_1.updateGameState(40); // L: 3280
-			Projectile.field915 = Client.packetWriter.getSocket(); // L: 3281
-			Client.packetWriter.removeSocket(); // L: 3282
-		}
-	} // L: 3277 3283
+	public static void method3121() {
+		SequenceDefinition.SequenceDefinition_cached.clear(); // L: 403
+		SequenceDefinition.SequenceDefinition_cachedFrames.clear(); // L: 404
+		SequenceDefinition.SequenceDefinition_cachedModel.clear(); // L: 405
+	} // L: 406
 }

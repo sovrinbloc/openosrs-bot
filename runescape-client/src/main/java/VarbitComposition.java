@@ -1,118 +1,129 @@
+import java.io.File;
+import java.io.IOException;
 import net.runelite.mapping.Export;
 import net.runelite.mapping.Implements;
 import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("fy")
+@ObfuscatedName("fv")
 @Implements("VarbitComposition")
 public class VarbitComposition extends DualNode {
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "Lko;"
+		descriptor = "Lkq;"
 	)
 	@Export("VarbitDefinition_archive")
-	static AbstractArchive VarbitDefinition_archive;
-	@ObfuscatedName("w")
+	public static AbstractArchive VarbitDefinition_archive;
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "Lig;"
+		descriptor = "Lic;"
 	)
 	@Export("VarbitDefinition_cached")
 	public static EvictingDualNodeHashTable VarbitDefinition_cached;
-	@ObfuscatedName("g")
-	static final int[] field1780;
-	@ObfuscatedName("fh")
-	@ObfuscatedGetter(
-		intValue = -71897969
-	)
-	static int field1775;
+	@ObfuscatedName("o")
+	static final int[] field1929;
 	@ObfuscatedName("s")
 	@ObfuscatedGetter(
-		intValue = 207149791
+		intValue = -1004826275
 	)
 	@Export("baseVar")
 	public int baseVar;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedGetter(
-		intValue = 348615607
+		intValue = 593245031
 	)
 	@Export("startBit")
 	public int startBit;
-	@ObfuscatedName("o")
+	@ObfuscatedName("r")
 	@ObfuscatedGetter(
-		intValue = -1999695007
+		intValue = 1032069569
 	)
 	@Export("endBit")
 	public int endBit;
 
 	static {
 		VarbitDefinition_cached = new EvictingDualNodeHashTable(64); // L: 11
-		field1780 = new int[32]; // L: 15
+		field1929 = new int[32]; // L: 15
 		int var0 = 2; // L: 18
 
 		for (int var1 = 0; var1 < 32; ++var1) { // L: 19
-			field1780[var1] = var0 - 1; // L: 20
+			field1929[var1] = var0 - 1; // L: 20
 			var0 += var0; // L: 21
 		}
 
 	} // L: 23
 
-	VarbitComposition() {
-	} // L: 25
-
-	@ObfuscatedName("s")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "(Lop;S)V",
-		garbageValue = "3911"
+		descriptor = "(Lpi;I)V",
+		garbageValue = "2022529608"
 	)
 	@Export("decode")
-	void decode(Buffer var1) {
+	public void decode(Buffer var1) {
 		while (true) {
-			int var2 = var1.readUnsignedByte(); // L: 43
-			if (var2 == 0) { // L: 44
-				return; // L: 47
+			int var2 = var1.readUnsignedByte(); // L: 31
+			if (var2 == 0) { // L: 32
+				return; // L: 35
 			}
 
-			this.decodeNext(var1, var2); // L: 45
+			this.decodeNext(var1, var2); // L: 33
 		}
 	}
 
-	@ObfuscatedName("a")
+	@ObfuscatedName("s")
 	@ObfuscatedSignature(
-		descriptor = "(Lop;II)V",
-		garbageValue = "-1096806966"
+		descriptor = "(Lpi;II)V",
+		garbageValue = "119027723"
 	)
 	@Export("decodeNext")
 	void decodeNext(Buffer var1, int var2) {
-		if (var2 == 1) { // L: 50
-			this.baseVar = var1.readUnsignedShort();
-			this.startBit = var1.readUnsignedByte();
-			this.endBit = var1.readUnsignedByte();
+		if (var2 == 1) { // L: 38
+			this.baseVar = var1.readUnsignedShort(); // L: 39
+			this.startBit = var1.readUnsignedByte(); // L: 40
+			this.endBit = var1.readUnsignedByte(); // L: 41
 		}
 
-	} // L: 56
-
-	@ObfuscatedName("i")
-	@ObfuscatedSignature(
-		descriptor = "(B)[Ljb;",
-		garbageValue = "51"
-	)
-	@Export("PlayerType_values")
-	public static PlayerType[] PlayerType_values() {
-		return new PlayerType[]{PlayerType.field3652, PlayerType.PlayerType_jagexModerator, PlayerType.PlayerType_playerModerator, PlayerType.PlayerType_normal, PlayerType.PlayerType_hardcoreIronman, PlayerType.field3650, PlayerType.PlayerType_ironman, PlayerType.PlayerType_ultimateIronman, PlayerType.field3649}; // L: 22
-	}
+	} // L: 44
 
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
-		descriptor = "(Lnf;ILjava/lang/String;I)Ljava/lang/String;",
-		garbageValue = "1356427947"
+		descriptor = "(Ljava/lang/String;Ljava/lang/String;ZI)Loo;",
+		garbageValue = "-1196339506"
 	)
-	static String method3205(IterableNodeHashTable var0, int var1, String var2) {
-		if (var0 == null) { // L: 51
-			return var2;
-		} else {
-			ObjectNode var3 = (ObjectNode)var0.get((long)var1); // L: 52
-			return var3 == null ? var2 : (String)var3.obj; // L: 53 54
+	@Export("getPreferencesFile")
+	public static AccessFile getPreferencesFile(String var0, String var1, boolean var2) {
+		File var3 = new File(UrlRequest.cacheDir, "preferences" + var0 + ".dat"); // L: 280
+		if (var3.exists()) { // L: 281
+			try {
+				AccessFile var10 = new AccessFile(var3, "rw", 10000L); // L: 283
+				return var10; // L: 284
+			} catch (IOException var9) { // L: 286
+			}
+		}
+
+		String var4 = ""; // L: 288
+		if (WorldMapSectionType.cacheGamebuild == 33) { // L: 289
+			var4 = "_rc";
+		} else if (WorldMapSectionType.cacheGamebuild == 34) { // L: 290
+			var4 = "_wip";
+		}
+
+		File var5 = new File(TileItem.userHomeDirectory, "jagex_" + var1 + "_preferences" + var0 + var4 + ".dat"); // L: 291
+		AccessFile var6;
+		if (!var2 && var5.exists()) { // L: 292
+			try {
+				var6 = new AccessFile(var5, "rw", 10000L); // L: 294
+				return var6; // L: 295
+			} catch (IOException var8) { // L: 297
+			}
+		}
+
+		try {
+			var6 = new AccessFile(var3, "rw", 10000L); // L: 300
+			return var6; // L: 301
+		} catch (IOException var7) { // L: 303
+			throw new RuntimeException(); // L: 304
 		}
 	}
 }

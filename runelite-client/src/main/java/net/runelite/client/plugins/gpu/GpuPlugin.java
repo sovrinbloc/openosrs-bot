@@ -44,9 +44,13 @@ import com.jogamp.opengl.GLFBODrawable;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.math.Matrix4;
 import java.awt.Canvas;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -74,6 +78,7 @@ import net.runelite.api.SceneTilePaint;
 import net.runelite.api.Texture;
 import net.runelite.api.TextureProvider;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.ResizeableChanged;
 import net.runelite.api.hooks.DrawCallbacks;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -293,6 +298,24 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 	private int uniSmoothBanding;
 	private int uniTextureLightMode;
 
+	private int needsReset;
+
+	private final ComponentListener resizeListener = new ComponentAdapter()
+	{
+		@Override
+		public void componentResized(ComponentEvent e)
+		{
+			// forward to the JAWTWindow component listener on the canvas. The JAWTWindow component
+			// listener listens for resizes or movement of the component in order to resize and move
+			// the associated offscreen layer (calayer on macos only)
+			canvas.dispatchEvent(e);
+			// resetSize needs to be run awhile after the resize is completed.
+			// I've tried waiting until all EDT events are completed and even that is too soon.
+			// Not sure why, so we just wait a few frames.
+			needsReset = 5;
+		}
+	};
+
 	@Override
 	protected void startUp()
 	{
@@ -394,9 +417,7 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 
 					this.gl = glContext.getGL().getGL4();
 
-					final boolean unlockFps = this.config.unlockFps();
-					client.setUnlockedFps(unlockFps);
-					gl.setSwapInterval(unlockFps ? -1 : 0);
+					setupSyncMode();
 
 					if (log.isDebugEnabled())
 					{
@@ -449,6 +470,12 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 				{
 					invokeOnMainThread(this::uploadScene);
 				}
+
+				if (OSType.getOSType() == OSType.MacOS)
+				{
+					SwingUtilities.invokeAndWait(() -> ((Component) client).addComponentListener(resizeListener));
+					needsReset = 5; // plugin startup races with ClientUI positioning, so do a reset in a little bit
+				}
 			}
 			catch (Throwable e)
 			{
@@ -476,6 +503,7 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 	@Override
 	protected void shutDown()
 	{
+		((Component) client).removeComponentListener(resizeListener);
 		clientThread.invoke(() ->
 		{
 			client.setGpu(false);
@@ -556,15 +584,40 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 	{
 		if (configChanged.getGroup().equals(GpuPluginConfig.GROUP))
 		{
-			if (configChanged.getKey().equals("unlockFps"))
+			if (configChanged.getKey().equals("unlockFps")
+				|| configChanged.getKey().equals("vsyncMode")
+				|| configChanged.getKey().equals("fpsTarget"))
 			{
-				boolean unlockFps = Boolean.parseBoolean(configChanged.getNewValue());
-				clientThread.invokeLater(() ->
-				{
-					client.setUnlockedFps(unlockFps);
-					invokeOnMainThread(() -> gl.setSwapInterval(unlockFps ? -1 : 0));
-				});
+				log.debug("Rebuilding sync mode");
+				clientThread.invokeLater(() -> invokeOnMainThread(this::setupSyncMode));
 			}
+		}
+	}
+
+	private void setupSyncMode()
+	{
+		final boolean unlockFps = config.unlockFps();
+		client.setUnlockedFps(unlockFps);
+
+		// Without unlocked fps, the client manages sync on its 20ms timer
+		GpuPluginConfig.SyncMode syncMode = unlockFps
+			? this.config.syncMode()
+			: GpuPluginConfig.SyncMode.OFF;
+
+		switch (syncMode)
+		{
+			case ON:
+				gl.setSwapInterval(1);
+				client.setUnlockedFpsTarget(0);
+				break;
+			case OFF:
+				gl.setSwapInterval(0);
+				client.setUnlockedFpsTarget(config.fpsTarget()); // has no effect with unlockFps=false
+				break;
+			case ADAPTIVE:
+				gl.setSwapInterval(-1);
+				client.setUnlockedFpsTarget(0);
+				break;
 		}
 	}
 
@@ -1068,16 +1121,22 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 			gl.glBindTexture(gl.GL_TEXTURE_2D, interfaceTexture);
 			gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, canvasWidth, canvasHeight, 0, gl.GL_BGRA, gl.GL_UNSIGNED_BYTE, null);
 			gl.glBindTexture(gl.GL_TEXTURE_2D, 0);
+		}
 
-			if (OSType.getOSType() == OSType.MacOS && glDrawable instanceof GLFBODrawable)
+		if (needsReset > 0)
+		{
+			assert OSType.getOSType() == OSType.MacOS;
+			if (needsReset == 1 && glDrawable instanceof GLFBODrawable)
 			{
 				// GLDrawables created with createGLDrawable() do not have a resize listener
 				// I don't know why this works with Windows/Linux, but on OSX
 				// it prevents JOGL from resizing its FBOs and underlying GL textures. So,
 				// we manually trigger a resize here.
 				GLFBODrawable glfboDrawable = (GLFBODrawable) glDrawable;
+				log.debug("Resetting GLFBODrawable size");
 				glfboDrawable.resetSize(gl);
 			}
+			needsReset--;
 		}
 
 		final BufferProvider bufferProvider = client.getBufferProvider();
@@ -1477,6 +1536,17 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 		}
 	}
 
+	@Subscribe
+	public void onResizeableChanged(ResizeableChanged resizeableChanged)
+	{
+		if (OSType.getOSType() == OSType.MacOS)
+		{
+			// switching resizable mode adjusts the canvas size, without adjusting
+			// the client size. queue the GLFBODrawable resize for later.
+			needsReset = 5;
+		}
+	}
+
 	private void uploadScene()
 	{
 		vertexBuffer.clear();
@@ -1585,7 +1655,7 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 				modelY = y + client.getCameraY2();
 				modelZ = z + client.getCameraZ2();
 				modelOrientation = orientation;
-				int triangleCount = model.getTrianglesCount();
+				int triangleCount = model.getFaceCount();
 				vertexBuffer.ensureCapacity(12 * triangleCount);
 				uvBuffer.ensureCapacity(12 * triangleCount);
 
@@ -1609,7 +1679,7 @@ public class GpuPlugin extends Plugin implements DrawCallbacks
 			model.calculateExtreme(orientation);
 			client.checkClickbox(model, orientation, pitchSin, pitchCos, yawSin, yawCos, x, y, z, hash);
 
-			int tc = Math.min(MAX_TRIANGLE, model.getTrianglesCount());
+			int tc = Math.min(MAX_TRIANGLE, model.getFaceCount());
 			int uvOffset = model.getUvBufferOffset();
 
 			GpuIntBuffer b = bufferForTriangles(tc);

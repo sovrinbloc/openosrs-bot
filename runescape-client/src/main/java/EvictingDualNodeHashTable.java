@@ -3,35 +3,36 @@ import net.runelite.mapping.Implements;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("ig")
+@ObfuscatedName("ic")
 @Implements("EvictingDualNodeHashTable")
 public final class EvictingDualNodeHashTable {
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "Lnt;"
+		descriptor = "Lnd;"
 	)
-	DualNode field2657;
-	@ObfuscatedName("w")
+	@Export("dualNode")
+	DualNode dualNode;
+	@ObfuscatedName("l")
 	@Export("capacity")
 	int capacity;
 	@ObfuscatedName("s")
 	@Export("remainingCapacity")
 	int remainingCapacity;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
-		descriptor = "Lnf;"
+		descriptor = "Lon;"
 	)
 	@Export("hashTable")
 	IterableNodeHashTable hashTable;
-	@ObfuscatedName("o")
+	@ObfuscatedName("r")
 	@ObfuscatedSignature(
-		descriptor = "Llm;"
+		descriptor = "Lli;"
 	)
 	@Export("deque")
 	IterableDualNodeQueue deque;
 
 	public EvictingDualNodeHashTable(int var1) {
-		this.field2657 = new DualNode(); // L: 8
+		this.dualNode = new DualNode(); // L: 8
 		this.deque = new IterableDualNodeQueue(); // L: 12
 		this.capacity = var1; // L: 15
 		this.remainingCapacity = var1; // L: 16
@@ -43,61 +44,61 @@ public final class EvictingDualNodeHashTable {
 		this.hashTable = new IterableNodeHashTable(var2); // L: 19
 	} // L: 20
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(J)Lnt;"
+		descriptor = "(J)Lnd;"
 	)
 	@Export("get")
 	public DualNode get(long var1) {
-		DualNode var3 = (DualNode)this.hashTable.get(var1); // L: 23
-		if (var3 != null) { // L: 24
-			this.deque.add(var3); // L: 25
+		DualNode var3 = (DualNode)this.hashTable.get(var1); // L: 24
+		if (var3 != null) { // L: 25
+			this.deque.add(var3); // L: 26
 		}
 
-		return var3; // L: 28
+		return var3; // L: 29
 	}
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@Export("remove")
 	public void remove(long var1) {
-		DualNode var3 = (DualNode)this.hashTable.get(var1); // L: 32
-		if (var3 != null) { // L: 33
-			var3.remove(); // L: 34
-			var3.removeDual(); // L: 35
-			++this.remainingCapacity; // L: 36
+		DualNode var3 = (DualNode)this.hashTable.get(var1); // L: 33
+		if (var3 != null) { // L: 34
+			var3.remove(); // L: 35
+			var3.removeDual(); // L: 36
+			++this.remainingCapacity; // L: 37
 		}
 
-	} // L: 38
+	} // L: 39
 
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
-		descriptor = "(Lnt;J)V"
+		descriptor = "(Lnd;J)V"
 	)
 	@Export("put")
 	public void put(DualNode var1, long var2) {
-		if (this.remainingCapacity == 0) { // L: 41
-			DualNode var4 = this.deque.removeLast(); // L: 42
-			var4.remove(); // L: 43
-			var4.removeDual(); // L: 44
-			if (var4 == this.field2657) { // L: 45
-				var4 = this.deque.removeLast(); // L: 46
-				var4.remove(); // L: 47
-				var4.removeDual(); // L: 48
+		if (this.remainingCapacity == 0) { // L: 42
+			DualNode var4 = this.deque.removeLast(); // L: 43
+			var4.remove(); // L: 44
+			var4.removeDual(); // L: 45
+			if (var4 == this.dualNode) { // L: 46
+				var4 = this.deque.removeLast(); // L: 47
+				var4.remove(); // L: 48
+				var4.removeDual(); // L: 49
 			}
 		} else {
-			--this.remainingCapacity; // L: 51
+			--this.remainingCapacity; // L: 52
 		}
 
-		this.hashTable.put(var1, var2); // L: 52
-		this.deque.add(var1); // L: 53
-	} // L: 54
+		this.hashTable.put(var1, var2); // L: 53
+		this.deque.add(var1); // L: 54
+	} // L: 55
 
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@Export("clear")
 	public void clear() {
-		this.deque.clear(); // L: 57
-		this.hashTable.clear(); // L: 58
-		this.field2657 = new DualNode(); // L: 59
-		this.remainingCapacity = this.capacity; // L: 60
-	} // L: 61
+		this.deque.clear(); // L: 58
+		this.hashTable.clear(); // L: 59
+		this.dualNode = new DualNode(); // L: 60
+		this.remainingCapacity = this.capacity; // L: 61
+	} // L: 62
 }

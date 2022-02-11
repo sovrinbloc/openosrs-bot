@@ -25,6 +25,7 @@
 package net.runelite.mixins;
 
 import net.runelite.api.MenuEntry;
+import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.WidgetPressed;
 import net.runelite.api.mixins.FieldHook;
 import net.runelite.api.mixins.Inject;
@@ -35,6 +36,7 @@ import net.runelite.api.widgets.menu.ContextMenu;
 import net.runelite.rs.api.RSClient;
 import net.runelite.rs.api.RSFont;
 import net.runelite.rs.api.RSMenuAction;
+import net.runelite.rs.api.RSRuneLiteMenuEntry;
 
 @Mixin(RSClient.class)
 public abstract class MenuMixin implements RSClient
@@ -276,12 +278,12 @@ public abstract class MenuMixin implements RSClient
 					menuEntry,
 					menuEntry.getMenuAction()
 							.getId(),
-					menuEntry.getId(),
+					menuEntry.getIdentifier(),
 					menuEntry.getMenuAction()
 			));
 			// todo: remove this -- for debugging only
-			if (menuEntry.getId() != 0)
-				System.out.println("Id: " + menuEntry.getId() + ", Menu information: actionParam0 " + menuEntry.getActionParam0() + " param1 + " + menuEntry.getParam1());
+			if (menuEntry.getIdentifier() != 0)
+				System.out.println("Id: " + menuEntry.getIdentifier() + ", Menu information: actionParam0 " + menuEntry.getActionParam0() + " param1 + " + menuEntry.getParam1());
 		}
 		return contextMenu;
 	}
@@ -337,7 +339,7 @@ public abstract class MenuMixin implements RSClient
 					menuEntry,
 					menuEntry.getMenuAction()
 							.getId(),
-					menuEntry.getId(),
+					menuEntry.getIdentifier(),
 					menuEntry.getMenuAction()
 			));
 		}
@@ -436,7 +438,7 @@ public abstract class MenuMixin implements RSClient
 					menuEntry,
 					menuEntry.getMenuAction()
 							.getId(),
-					menuEntry.getId(),
+					menuEntry.getIdentifier(),
 					menuEntry.getMenuAction()
 			));
 		}
@@ -445,10 +447,11 @@ public abstract class MenuMixin implements RSClient
 
 	@Inject
 	@Override
-	public MenuEntry getLeftClickMenuEntry()
+	public MenuEntryAdded getLeftClickMenuEntry()
 	{
 		final int i = getMenuOptionCount() - 1;
-		return new MenuEntry(
+
+		return new MenuEntryAdded(
 				getMenuOptions()[i],
 				getMenuTargets()[i],
 				getMenuIdentifiers()[i],
@@ -461,7 +464,7 @@ public abstract class MenuMixin implements RSClient
 
 	@Inject
 	@Override
-	public void setLeftClickMenuEntry(final MenuEntry entry)
+	public void setLeftClickMenuEntry(final MenuEntryAdded entry)
 	{
 		final int i = getMenuOptionCount() - 1;
 		getMenuOptions()[i] = entry.getOption();
@@ -494,7 +497,7 @@ public abstract class MenuMixin implements RSClient
 		}
 
 		tempMenuAction.setOption(entry.getOption());
-		tempMenuAction.setOpcode(entry.getOpcode());
+		tempMenuAction.setOpcode(entry.getType().getId());
 		tempMenuAction.setIdentifier(entry.getIdentifier());
 		tempMenuAction.setParam0(entry.getParam0());
 		tempMenuAction.setParam1(entry.getParam1());

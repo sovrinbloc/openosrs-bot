@@ -24,8 +24,8 @@ public class MenuTargetIdentifier
 	{
 		this.x = entry.getParam0();
 		this.y = entry.getParam1();
-		this.id = entry.getId();
-		this.menuAction = MenuAction.of(entry.getType());
+		this.id = entry.getIdentifier();
+		this.menuAction = MenuAction.of(entry.getType().getId());
 	}
 
 	public String toString()

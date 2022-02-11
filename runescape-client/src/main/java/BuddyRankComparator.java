@@ -1,27 +1,15 @@
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.util.Iterator;
 import net.runelite.mapping.Export;
 import net.runelite.mapping.Implements;
-import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("dn")
+@ObfuscatedName("dr")
 @Implements("BuddyRankComparator")
 public class BuddyRankComparator extends AbstractUserComparator {
-	@ObfuscatedName("rd")
-	@ObfuscatedSignature(
-		descriptor = "Las;"
-	)
-	@Export("pcmStreamMixer")
-	static PcmStreamMixer pcmStreamMixer;
-	@ObfuscatedName("sn")
-	@ObfuscatedGetter(
-		intValue = 31962043
-	)
-	static int field1333;
-	@ObfuscatedName("p")
-	@Export("ItemDefinition_inMembersWorld")
-	public static boolean ItemDefinition_inMembersWorld;
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@Export("reversed")
 	final boolean reversed;
 
@@ -29,10 +17,10 @@ public class BuddyRankComparator extends AbstractUserComparator {
 		this.reversed = var1; // L: 10
 	} // L: 11
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(Lmt;Lmt;B)I",
-		garbageValue = "1"
+		descriptor = "(Lmd;Lmd;I)I",
+		garbageValue = "-1694287070"
 	)
 	@Export("compareBuddy")
 	int compareBuddy(Buddy var1, Buddy var2) {
@@ -47,58 +35,54 @@ public class BuddyRankComparator extends AbstractUserComparator {
 		return this.compareBuddy((Buddy)var1, (Buddy)var2); // L: 21
 	}
 
-	@ObfuscatedName("y")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(Lko;III)Z",
-		garbageValue = "2134321189"
+		descriptor = "(III)Z",
+		garbageValue = "1750865876"
 	)
-	public static boolean method2502(AbstractArchive var0, int var1, int var2) {
-		byte[] var3 = var0.takeFile(var1, var2); // L: 208
-		if (var3 == null) { // L: 209
-			return false;
-		} else {
-			Script.SpriteBuffer_decode(var3); // L: 210
-			return true; // L: 211
-		}
+	static boolean method2513(int var0, int var1) {
+		return var0 != 4 || var1 < 8; // L: 26
 	}
 
-	@ObfuscatedName("gm")
+	@ObfuscatedName("aq")
 	@ObfuscatedSignature(
-		descriptor = "(S)V",
-		garbageValue = "459"
+		descriptor = "(I)I",
+		garbageValue = "-1109868456"
 	)
-	static void method2500() {
-		int var0 = Players.Players_count; // L: 5051
-		int[] var1 = Players.Players_indices; // L: 5052
+	@Export("getGcDuration")
+	protected static int getGcDuration() {
+		int var0 = 0; // L: 578
+		if (GameEngine.garbageCollector == null || !GameEngine.garbageCollector.isValid()) { // L: 579
+			try {
+				Iterator var1 = ManagementFactory.getGarbageCollectorMXBeans().iterator(); // L: 581
 
-		for (int var2 = 0; var2 < var0; ++var2) { // L: 5053
-			if (var1[var2] != Client.combatTargetPlayerIndex && var1[var2] != Client.localPlayerIndex) { // L: 5054
-				class132.addPlayerToScene(Client.players[var1[var2]], true); // L: 5055
+				while (var1.hasNext()) {
+					GarbageCollectorMXBean var2 = (GarbageCollectorMXBean)var1.next(); // L: 582
+					if (var2.isValid()) { // L: 584
+						GameEngine.garbageCollector = var2; // L: 585
+						GameEngine.garbageCollectorLastCheckTimeMs = -1L; // L: 586
+						GameEngine.garbageCollectorLastCollectionTime = -1L; // L: 587
+					}
+				}
+			} catch (Throwable var11) { // L: 592
 			}
 		}
 
-	} // L: 5057
-
-	@ObfuscatedName("le")
-	@ObfuscatedSignature(
-		descriptor = "(Ljf;I)Ljf;",
-		garbageValue = "1540120138"
-	)
-	static Widget method2501(Widget var0) {
-		int var2 = PendingSpawn.getWidgetFlags(var0); // L: 11886
-		int var1 = var2 >> 17 & 7; // L: 11888
-		int var3 = var1; // L: 11890
-		if (var1 == 0) { // L: 11891
-			return null;
-		} else {
-			for (int var4 = 0; var4 < var3; ++var4) { // L: 11892
-				var0 = UserComparator9.getWidget(var0.parentId); // L: 11893
-				if (var0 == null) { // L: 11894
-					return null;
+		if (GameEngine.garbageCollector != null) { // L: 594
+			long var9 = DirectByteArrayCopier.method5318(); // L: 595
+			long var3 = GameEngine.garbageCollector.getCollectionTime(); // L: 596
+			if (GameEngine.garbageCollectorLastCollectionTime != -1L) { // L: 597
+				long var5 = var3 - GameEngine.garbageCollectorLastCollectionTime; // L: 598
+				long var7 = var9 - GameEngine.garbageCollectorLastCheckTimeMs; // L: 599
+				if (0L != var7) { // L: 600
+					var0 = (int)(100L * var5 / var7);
 				}
 			}
 
-			return var0; // L: 11896
+			GameEngine.garbageCollectorLastCollectionTime = var3; // L: 602
+			GameEngine.garbageCollectorLastCheckTimeMs = var9; // L: 603
 		}
+
+		return var0; // L: 605
 	}
 }

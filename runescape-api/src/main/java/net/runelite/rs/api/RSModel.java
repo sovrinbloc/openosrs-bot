@@ -48,19 +48,19 @@ public interface RSModel extends RSRenderable, Model
 
 	@Import("indicesCount")
 	@Override
-	int getTrianglesCount();
+	int getFaceCount();
 
 	@Import("indices1")
 	@Override
-	int[] getTrianglesX();
+	int[] getFaceIndices1();
 
 	@Import("indices2")
 	@Override
-	int[] getTrianglesY();
+	int[] getFaceIndices2();
 
 	@Import("indices3")
 	@Override
-	int[] getTrianglesZ();
+	int[] getFaceIndices3();
 
 	@Import("faceColors1")
 	@Override
@@ -76,7 +76,7 @@ public interface RSModel extends RSRenderable, Model
 
 	@Import("faceAlphas")
 	@Override
-	byte[] getTriangleTransparencies();
+	byte[] getFaceTransparencies();
 
 	@Import("faceRenderPriorities")
 	@Override
@@ -110,13 +110,19 @@ public interface RSModel extends RSRenderable, Model
 	RSModel toSharedSpotAnimModel(boolean b);
 
 	@Import("rotateY90Ccw")
-	void rotateY90Ccw();
+	void rs$rotateY90Ccw();
 
 	@Import("rotateY180")
-	void rotateY180Ccw();
+	void rs$rotateY180Ccw();
 
 	@Import("rotateY270Ccw")
-	void rotateY270Ccw();
+	void rs$rotateY270Ccw();
+
+	@Import("scale")
+	void rs$scale(int var1, int var2, int var3);
+
+	@Import("offsetBy")
+	void rs$translate(int var1, int var2, int var3);
 
 	@Import("radius")
 	@Override
@@ -184,4 +190,20 @@ public interface RSModel extends RSRenderable, Model
 
 	int[] getVertexNormalsZ();
 	void setVertexNormalsZ(int[] vertexNormalsZ);
+
+	@Import("overrideAmount")
+	@Override
+	byte getOverrideAmount();
+
+	@Import("overrideHue")
+	@Override
+	byte getOverrideHue();
+
+	@Import("overrideSaturation")
+	@Override
+	byte getOverrideSaturation();
+
+	@Import("overrideLuminance")
+	@Override
+	byte getOverrideLuminance();
 }

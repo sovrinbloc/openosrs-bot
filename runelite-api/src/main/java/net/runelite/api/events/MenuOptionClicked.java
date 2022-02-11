@@ -87,12 +87,12 @@ public class MenuOptionClicked
 		this.consumed = true;
 	}
 
-	public void setMenuEntry(MenuEntry entry)
+	public void setMenuEntry(MenuEntryAdded entry)
 	{
 		this.setMenuOption(entry.getOption());
 		this.setMenuTarget(entry.getTarget());
-		this.setId(entry.getId());
-		this.setMenuAction(MenuAction.of(entry.getOpcode()));
+		this.setId(entry.getIdentifier());
+		this.setMenuAction(entry.getMenuAction());
 		this.setParam0(entry.getParam0());
 		this.setParam1(entry.getParam1());
 	}

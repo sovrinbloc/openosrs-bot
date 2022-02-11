@@ -1,4 +1,3 @@
-import java.lang.management.GarbageCollectorMXBean;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
@@ -8,63 +7,60 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("cs")
+@ObfuscatedName("cl")
 @Implements("ClientPreferences")
 public class ClientPreferences {
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedGetter(
-		intValue = 1485573005
+		intValue = 389167517
 	)
 	@Export("ClientPreferences_optionCount")
 	static int ClientPreferences_optionCount;
-	@ObfuscatedName("aj")
-	@Export("garbageCollector")
-	static GarbageCollectorMXBean garbageCollector;
 	@ObfuscatedName("s")
 	@Export("roofsHidden")
 	boolean roofsHidden;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@Export("titleMusicDisabled")
 	boolean titleMusicDisabled;
-	@ObfuscatedName("o")
+	@ObfuscatedName("r")
 	@ObfuscatedGetter(
-		intValue = -884769931
+		intValue = 687015131
 	)
 	@Export("windowMode")
 	int windowMode;
-	@ObfuscatedName("g")
+	@ObfuscatedName("o")
 	@Export("rememberedUsername")
 	String rememberedUsername;
-	@ObfuscatedName("e")
+	@ObfuscatedName("i")
 	@Export("hideUsername")
 	boolean hideUsername;
-	@ObfuscatedName("p")
+	@ObfuscatedName("w")
 	@Export("brightness")
 	double brightness;
-	@ObfuscatedName("j")
+	@ObfuscatedName("v")
 	@ObfuscatedGetter(
-		intValue = -162381111
+		intValue = 497474901
 	)
 	@Export("musicVolume")
 	int musicVolume;
-	@ObfuscatedName("b")
+	@ObfuscatedName("a")
 	@ObfuscatedGetter(
-		intValue = 452159187
+		intValue = 292884651
 	)
 	@Export("soundEffectsVolume")
 	int soundEffectsVolume;
-	@ObfuscatedName("x")
+	@ObfuscatedName("y")
 	@ObfuscatedGetter(
-		intValue = 1910295805
+		intValue = -2024623247
 	)
 	@Export("areaSoundEffectsVolume")
 	int areaSoundEffectsVolume;
-	@ObfuscatedName("y")
+	@ObfuscatedName("u")
 	@ObfuscatedGetter(
-		intValue = 1017713591
+		intValue = 591433569
 	)
-	int field1182;
-	@ObfuscatedName("k")
+	int field1231;
+	@ObfuscatedName("h")
 	@Export("parameters")
 	LinkedHashMap parameters;
 
@@ -80,13 +76,13 @@ public class ClientPreferences {
 		this.musicVolume = 127;
 		this.soundEffectsVolume = 127;
 		this.areaSoundEffectsVolume = 127;
-		this.field1182 = -1;
+		this.field1231 = -1;
 		this.parameters = new LinkedHashMap();
-		this.method2231(true); // L: 26
+		this.method2226(true); // L: 26
 	} // L: 27
 
 	@ObfuscatedSignature(
-		descriptor = "(Lop;)V"
+		descriptor = "(Lpi;)V"
 	)
 	ClientPreferences(Buffer var1) {
 		this.windowMode = 1; // L: 15
@@ -96,12 +92,12 @@ public class ClientPreferences {
 		this.musicVolume = 127; // L: 19
 		this.soundEffectsVolume = 127; // L: 20
 		this.areaSoundEffectsVolume = 127; // L: 21
-		this.field1182 = -1; // L: 22
+		this.field1231 = -1; // L: 22
 		this.parameters = new LinkedHashMap(); // L: 23
 		if (var1 != null && var1.array != null) { // L: 30
 			int var2 = var1.readUnsignedByte(); // L: 34
 			if (var2 >= 0 && var2 <= ClientPreferences_optionCount) { // L: 35
-				if (var1.readUnsignedByte() == 1) { // L: 39
+				if (var1.readUnsignedByte() == 1) {
 					this.roofsHidden = true;
 				}
 
@@ -109,17 +105,17 @@ public class ClientPreferences {
 					this.titleMusicDisabled = var1.readUnsignedByte() == 1; // L: 41
 				}
 
-				if (var2 > 3) { // L: 43
-					this.windowMode = var1.readUnsignedByte(); // L: 44
+				if (var2 > 3) {
+					this.windowMode = var1.readUnsignedByte();
 				}
 
-				if (var2 > 2) { // L: 46
-					int var3 = var1.readUnsignedByte(); // L: 47
+				if (var2 > 2) {
+					int var3 = var1.readUnsignedByte();
 
-					for (int var4 = 0; var4 < var3; ++var4) { // L: 48
-						int var5 = var1.readInt(); // L: 49
+					for (int var4 = 0; var4 < var3; ++var4) {
+						int var5 = var1.readInt();
 						int var6 = var1.readInt(); // L: 50
-						this.parameters.put(var5, var6); // L: 51
+						this.parameters.put(var5, var6);
 					}
 				}
 
@@ -139,29 +135,29 @@ public class ClientPreferences {
 				}
 
 				if (var2 > 7) { // L: 66
-					this.field1182 = var1.readUnsignedByte(); // L: 67
+					this.field1231 = var1.readUnsignedByte(); // L: 67
 				}
 			} else {
-				this.method2231(true); // L: 36
+				this.method2226(true); // L: 36
 			}
 		} else {
-			this.method2231(true); // L: 31
+			this.method2226(true); // L: 31
 		}
 
 	} // L: 71
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
 		descriptor = "(ZI)V",
-		garbageValue = "-1940266105"
+		garbageValue = "65280"
 	)
-	void method2231(boolean var1) {
+	void method2226(boolean var1) {
 	} // L: 73
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "(I)Lop;",
-		garbageValue = "2037390205"
+		descriptor = "(I)Lpi;",
+		garbageValue = "-118732597"
 	)
 	@Export("toBuffer")
 	Buffer toBuffer() {
@@ -185,7 +181,44 @@ public class ClientPreferences {
 		var1.writeByte(this.musicVolume); // L: 92
 		var1.writeByte(this.soundEffectsVolume); // L: 93
 		var1.writeByte(this.areaSoundEffectsVolume); // L: 94
-		var1.writeByte(this.field1182); // L: 95
+		var1.writeByte(this.field1231); // L: 95
 		return var1; // L: 96
+	}
+
+	@ObfuscatedName("c")
+	@ObfuscatedSignature(
+		descriptor = "(B)V",
+		garbageValue = "82"
+	)
+	static void method2236() {
+		WorldMapRegion.WorldMapRegion_cachedSprites.clear(); // L: 38
+	} // L: 39
+
+	@ObfuscatedName("e")
+	@ObfuscatedSignature(
+		descriptor = "(IIII)I",
+		garbageValue = "-1797277779"
+	)
+	public static int method2237(int var0, int var1, int var2) {
+		int var3 = class125.method2741(var2 - var1 + 1); // L: 43
+		var3 <<= var1; // L: 44
+		var0 |= var3; // L: 45
+		return var0; // L: 46
+	}
+
+	@ObfuscatedName("ab")
+	@ObfuscatedSignature(
+		descriptor = "([BIII)I",
+		garbageValue = "-2125194524"
+	)
+	public static int method2230(byte[] var0, int var1, int var2) {
+		int var3 = -1; // L: 47
+
+		for (int var4 = var1; var4 < var2; ++var4) { // L: 48
+			var3 = var3 >>> 8 ^ Buffer.crc32Table[(var3 ^ var0[var4]) & 255]; // L: 49
+		}
+
+		var3 = ~var3; // L: 51
+		return var3; // L: 52
 	}
 }

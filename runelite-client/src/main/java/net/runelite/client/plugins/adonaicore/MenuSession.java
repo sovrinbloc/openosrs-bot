@@ -121,12 +121,12 @@ public class MenuSession
 			 */
 
 			// if the ID is zero, there will be no object or item in this world so return
-			if (event.getId() == 0)
+			if (event.getIdentifier() == 0)
 			{
 				continue;
 			}
 			log.info("target: {}, option: {}, actionParam0: {}, actionParam1: {}, getParam0: {}, getParam1: {}, getId: {}, getIdentifier: {}",
-					event.getTarget(), event.getOption(), event.getActionParam0(), event.getActionParam1(), event.getParam0(), event.getParam1(), event.getId(), event.getIdentifier());
+					event.getTarget(), event.getOption(), event.getActionParam0(), event.getActionParam1(), event.getParam0(), event.getParam1(), event.getIdentifier(), event.getIdentifier());
 
 			Tile tile = Adonai.client.getScene()
 					.getTiles()[Adonai.client.getPlane()][event.getActionParam0()][event.getParam1()];

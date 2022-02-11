@@ -29,9 +29,11 @@ import java.util.Map;
 import net.runelite.api.AmbientSoundEffect;
 import net.runelite.api.Client;
 import net.runelite.api.Deque;
+import net.runelite.api.ModelData;
 import net.runelite.api.SpritePixels;
 import net.runelite.api.World;
 import net.runelite.api.clan.ClanRank;
+import net.runelite.api.clan.ClanSettings;
 import net.runelite.api.widgets.Widget;
 import net.runelite.mapping.Construct;
 import net.runelite.mapping.Import;
@@ -256,6 +258,14 @@ public interface RSClient extends RSGameEngine, Client
 
 	@Import("graphicsObjects")
 	RSNodeDeque getGraphicsObjectDeque();
+
+	@Import("worldSelectOpen")
+	@Override
+	boolean isWorldSelectOpen();
+
+	@Import("worldSelectOpen")
+	@Override
+	void setWorldSelectOpen(boolean open);
 
 	@Import("Login_username")
 	@Override
@@ -537,14 +547,6 @@ public interface RSClient extends RSGameEngine, Client
 	@Import("xteaKeys")
 	@Override
 	int[][] getXteaKeys();
-
-	@Import("gameDrawingMode")
-	@Override
-	int getGameDrawingMode();
-
-	@Import("gameDrawingMode")
-	@Override
-	void setGameDrawingMode(int gameDrawingMode);
 
 	@Import("cycleCntr")
 	int getCycleCntr();
@@ -926,7 +928,7 @@ public interface RSClient extends RSGameEngine, Client
 	int[][] getOccupiedTilesTick();
 
 	@Import("ObjectDefinition_cachedModels")
-	RSEvictingDualNodeHashTable getCachedModels2();
+	RSEvictingDualNodeHashTable getObjectDefinitionModelsCache();
 
 	@Import("Scene_drawnCount")
 	int getCycle();
@@ -1477,8 +1479,109 @@ public interface RSClient extends RSGameEngine, Client
 
 	boolean isUnlockedFps();
 
+	long getUnlockedFpsTarget();
+
 	void posToCameraAngle(int var0, int var1);
 
 	@Import("objectSounds")
 	Deque<AmbientSoundEffect> getAmbientSoundEffects();
+
+	@Import("EnumDefinition_cached")
+	RSEvictingDualNodeHashTable getEnumDefinitionCache();
+
+	@Import("FloorUnderlayDefinition_cached")
+	RSEvictingDualNodeHashTable getFloorUnderlayDefinitionCache();
+
+	@Import("FloorOverlayDefinition_cached")
+	RSEvictingDualNodeHashTable getFloorOverlayDefinitionCache();
+
+	@Import("HitSplatDefinition_cached")
+	RSEvictingDualNodeHashTable getHitSplatDefinitionCache();
+
+	@Import("HitSplatDefinition_cachedSprites")
+	RSEvictingDualNodeHashTable getHitSplatDefinitionSpritesCache();
+
+	@Import("HitSplatDefinition_cachedFonts")
+	RSEvictingDualNodeHashTable getHitSplatDefinitionDontsCache();
+
+	@Import("InvDefinition_cached")
+	RSEvictingDualNodeHashTable getInvDefinitionCache();
+
+	@Import("ItemDefinition_cachedModels")
+	RSEvictingDualNodeHashTable getItemDefinitionModelsCache();
+
+	@Import("ItemDefinition_cachedSprites")
+	RSEvictingDualNodeHashTable getItemDefinitionSpritesCache();
+
+	@Import("KitDefinition_cached")
+	RSEvictingDualNodeHashTable getKitDefinitionCache();
+
+	@Import("NpcDefinition_cached")
+	RSEvictingDualNodeHashTable getNpcDefinitionCache();
+
+	@Import("NpcDefinition_cachedModels")
+	RSEvictingDualNodeHashTable getNpcDefinitionModelsCache();
+
+	@Import("ObjectDefinition_cached")
+	RSEvictingDualNodeHashTable getObjectDefinitionCache();
+
+	@Import("ObjectDefinition_cachedModelData")
+	RSEvictingDualNodeHashTable getObjectDefinitionModelDataCache();
+
+	@Import("ObjectDefinition_cachedEntities")
+	RSEvictingDualNodeHashTable getObjectDefinitionEntitiesCache();
+
+	@Import("ParamDefinition_cached")
+	RSEvictingDualNodeHashTable getParamDefinitionCache();
+
+	@Import("PlayerAppearance_cachedModels")
+	RSEvictingDualNodeHashTable getPlayerAppearanceModelsCache();
+
+	@Import("SequenceDefinition_cached")
+	RSEvictingDualNodeHashTable getSequenceDefinitionCache();
+
+	@Import("SequenceDefinition_cachedFrames")
+	RSEvictingDualNodeHashTable getSequenceDefinitionFramesCache();
+
+	@Import("SequenceDefinition_cachedModel")
+	RSEvictingDualNodeHashTable getSequenceDefinitionModelsCache();
+
+	@Import("SpotAnimationDefinition_cached")
+	RSEvictingDualNodeHashTable getSpotAnimationDefinitionCache();
+
+	@Import("SpotAnimationDefinition_cachedModels")
+	RSEvictingDualNodeHashTable getSpotAnimationDefinitionModlesCache();
+
+	@Import("VarcInt_cached")
+	RSEvictingDualNodeHashTable getVarcIntCache();
+
+	@Import("VarpDefinition_cached")
+	RSEvictingDualNodeHashTable getVarpDefinitionCache();
+
+	@Import("Widget_cachedModels")
+	RSEvictingDualNodeHashTable getModelsCache();
+
+	@Import("Widget_cachedFonts")
+	RSEvictingDualNodeHashTable getFontsCache();
+
+	@Import("Widget_cachedSpriteMasks")
+	RSEvictingDualNodeHashTable getSpriteMasksCache();
+
+	@Import("WorldMapElement_cachedSprites")
+	RSEvictingDualNodeHashTable getSpritesCache();
+
+	@Construct
+	RSIterableNodeHashTable createIterableNodeHashTable(int size);
+
+	@Construct
+	RSRuneLiteClanMember runeliteClanMember(ClanSettings var1, int var2);
+
+	@Construct
+	RSProjectile newProjectile(int var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, int var9, int var10, int var11);
+
+	@Construct
+	RSModelData newModelData(ModelData[] var1, int var2);
+
+	@Construct
+	RSEvictingDualNodeHashTable newEvictingDualNodeHashTable(int var1);
 }

@@ -5,172 +5,197 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("kz")
+@ObfuscatedName("lu")
 @Implements("Language")
 public class Language implements MouseWheel {
-	@ObfuscatedName("td")
-	@Export("foundItemIds")
-	static short[] foundItemIds;
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "Lkz;"
+		descriptor = "Llu;"
 	)
 	@Export("Language_EN")
 	public static final Language Language_EN;
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "Lkz;"
+		descriptor = "Llu;"
 	)
 	@Export("Language_DE")
 	static final Language Language_DE;
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
-		descriptor = "Lkz;"
+		descriptor = "Llu;"
 	)
 	@Export("Language_FR")
 	public static final Language Language_FR;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
-		descriptor = "Lkz;"
+		descriptor = "Llu;"
 	)
 	@Export("Language_PT")
 	static final Language Language_PT;
-	@ObfuscatedName("o")
+	@ObfuscatedName("r")
 	@ObfuscatedSignature(
-		descriptor = "Lkz;"
+		descriptor = "Llu;"
 	)
 	@Export("Language_NL")
 	static final Language Language_NL;
-	@ObfuscatedName("g")
+	@ObfuscatedName("o")
 	@ObfuscatedSignature(
-		descriptor = "Lkz;"
+		descriptor = "Llu;"
 	)
 	@Export("Language_ES")
 	public static final Language Language_ES;
-	@ObfuscatedName("e")
+	@ObfuscatedName("i")
 	@ObfuscatedSignature(
-		descriptor = "Lkz;"
+		descriptor = "Llu;"
 	)
 	@Export("Language_ES_MX")
 	static final Language Language_ES_MX;
-	@ObfuscatedName("x")
+	@ObfuscatedName("y")
 	@ObfuscatedSignature(
-		descriptor = "[Lkz;"
+		descriptor = "[Llu;"
 	)
 	@Export("Language_valuesOrdered")
-	static final Language[] Language_valuesOrdered;
-	@ObfuscatedName("p")
-	final String field3780;
-	@ObfuscatedName("j")
+	public static final Language[] Language_valuesOrdered;
+	@ObfuscatedName("bn")
+	@ObfuscatedSignature(
+		descriptor = "Lkf;"
+	)
+	static GameBuild field3990;
+	@ObfuscatedName("w")
+	final String field3985;
+	@ObfuscatedName("v")
 	@Export("language")
 	final String language;
-	@ObfuscatedName("b")
+	@ObfuscatedName("a")
 	@ObfuscatedGetter(
-		intValue = -1281273687
+		intValue = -5412249
 	)
 	@Export("id")
 	final int id;
 
 	static {
-		Language_EN = new Language("EN", "en", "English", ModeWhere.field3803, 0, "GB"); // L: 10
-		Language_DE = new Language("DE", "de", "German", ModeWhere.field3803, 1, "DE"); // L: 11
-		Language_FR = new Language("FR", "fr", "French", ModeWhere.field3803, 2, "FR"); // L: 12
-		Language_PT = new Language("PT", "pt", "Portuguese", ModeWhere.field3803, 3, "BR"); // L: 13
-		Language_NL = new Language("NL", "nl", "Dutch", ModeWhere.field3793, 4, "NL"); // L: 14
-		Language_ES = new Language("ES", "es", "Spanish", ModeWhere.field3793, 5, "ES"); // L: 15
-		Language_ES_MX = new Language("ES_MX", "es-mx", "Spanish (Latin American)", ModeWhere.field3803, 6, "MX"); // L: 16
-		Language[] var0 = new Language[]{Language_DE, Language_NL, Language_EN, Language_ES, Language_PT, Language_FR, Language_ES_MX}; // L: 25
-		Language_valuesOrdered = new Language[var0.length]; // L: 28
-		Language[] var2 = var0; // L: 30
+		Language_EN = new Language("EN", "en", "English", ModeWhere.field3995, 0, "GB"); // L: 12
+		Language_DE = new Language("DE", "de", "German", ModeWhere.field3995, 1, "DE"); // L: 13
+		Language_FR = new Language("FR", "fr", "French", ModeWhere.field3995, 2, "FR");
+		Language_PT = new Language("PT", "pt", "Portuguese", ModeWhere.field3995, 3, "BR"); // L: 15
+		Language_NL = new Language("NL", "nl", "Dutch", ModeWhere.field3994, 4, "NL");
+		Language_ES = new Language("ES", "es", "Spanish", ModeWhere.field3994, 5, "ES"); // L: 17
+		Language_ES_MX = new Language("ES_MX", "es-mx", "Spanish (Latin American)", ModeWhere.field3995, 6, "MX"); // L: 18
+		Language[] var0 = method5808(); // L: 25
+		Language_valuesOrdered = new Language[var0.length]; // L: 26
+		Language[] var1 = var0;
 
-		for (int var3 = 0; var3 < var2.length; ++var3) { // L: 31
-			Language var4 = var2[var3]; // L: 32
-			if (Language_valuesOrdered[var4.id] != null) { // L: 34
-				throw new IllegalStateException(); // L: 35
+		for (int var2 = 0; var2 < var1.length; ++var2) {
+			Language var3 = var1[var2]; // L: 30
+			if (Language_valuesOrdered[var3.id] != null) { // L: 32
+				throw new IllegalStateException(); // L: 33
 			}
 
-			Language_valuesOrdered[var4.id] = var4; // L: 37
+			Language_valuesOrdered[var3.id] = var3; // L: 35
 		}
 
-	} // L: 41
+	} // L: 39
 
 	@ObfuscatedSignature(
-		descriptor = "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lks;ILjava/lang/String;)V"
+		descriptor = "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lll;ILjava/lang/String;)V"
 	)
 	Language(String var1, String var2, String var3, ModeWhere var4, int var5, String var6) {
-		this.field3780 = var1; // L: 44
-		this.language = var2; // L: 45
-		this.id = var5; // L: 46
-		if (var6 != null) { // L: 47
-			new Locale(var2.substring(0, 2), var6); // L: 48
+		this.field3985 = var1; // L: 46
+		this.language = var2; // L: 47
+		this.id = var5; // L: 48
+		if (var6 != null) { // L: 49
+			new Locale(var2.substring(0, 2), var6); // L: 50
 		} else {
-			new Locale(var2.substring(0, 2)); // L: 51
+			new Locale(var2.substring(0, 2)); // L: 53
 		}
 
-	} // L: 53
+	} // L: 55
 
-	@ObfuscatedName("i")
-	@ObfuscatedSignature(
-		descriptor = "(I)Ljava/lang/String;",
-		garbageValue = "-157236574"
-	)
-	@Export("getLanguage")
-	String getLanguage() {
-		return this.language; // L: 56
-	}
-
-	@ObfuscatedName("w")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
 		descriptor = "(I)I",
-		garbageValue = "238732485"
+		garbageValue = "-303340189"
 	)
 	@Export("rsOrdinal")
 	public int rsOrdinal() {
-		return this.id; // L: 60
+		return this.id; // L: 63
+	}
+
+	@ObfuscatedName("r")
+	@ObfuscatedSignature(
+		descriptor = "(I)Ljava/lang/String;",
+		garbageValue = "408804890"
+	)
+	@Export("getLanguage")
+	String getLanguage() {
+		return this.language; // L: 58
 	}
 
 	public String toString() {
-		return this.getLanguage().toLowerCase(Locale.ENGLISH); // L: 69
+		return this.getLanguage().toLowerCase(Locale.ENGLISH); // L: 68
 	}
 
-	@ObfuscatedName("i")
-	@ObfuscatedSignature(
-		descriptor = "(III)I",
-		garbageValue = "2088906583"
-	)
-	public static int method5533(int var0, int var1) {
-		return (int)Math.round(Math.atan2((double)var0, (double)var1) * 2607.5945876176133D) & 16383; // L: 24
-	}
+	@ObfuscatedName("c")
+	public static final void method5813(long var0) {
+		if (var0 > 0L) { // L: 9
+			if (var0 % 10L == 0L) { // L: 10
+				long var2 = var0 - 1L; // L: 11
 
-	@ObfuscatedName("s")
-	@ObfuscatedSignature(
-		descriptor = "(IB)Lkz;",
-		garbageValue = "60"
-	)
-	public static Language method5519(int var0) {
-		return var0 >= 0 && var0 < Language_valuesOrdered.length ? Language_valuesOrdered[var0] : null; // L: 64 65
-	}
+				try {
+					Thread.sleep(var2); // L: 14
+				} catch (InterruptedException var8) { // L: 16
+				}
 
-	@ObfuscatedName("hv")
-	@ObfuscatedSignature(
-		descriptor = "(B)Z",
-		garbageValue = "-88"
-	)
-	static final boolean method5521() {
-		return Client.isMenuOpen; // L: 8105
-	}
-
-	@ObfuscatedName("hi")
-	@ObfuscatedSignature(
-		descriptor = "(IIIII)V",
-		garbageValue = "440428579"
-	)
-	static final void method5516(int var0, int var1, int var2, int var3) {
-		for (int var4 = 0; var4 < Client.rootWidgetCount; ++var4) { // L: 8109
-			if (Client.rootWidgetWidths[var4] + Client.rootWidgetXs[var4] > var0 && Client.rootWidgetXs[var4] < var0 + var2 && Client.rootWidgetHeights[var4] + Client.rootWidgetYs[var4] > var1 && Client.rootWidgetYs[var4] < var3 + var1) { // L: 8110
-				Client.field553[var4] = true;
+				try {
+					Thread.sleep(1L); // L: 20
+				} catch (InterruptedException var7) { // L: 22
+				}
+			} else {
+				try {
+					Thread.sleep(var0); // L: 27
+				} catch (InterruptedException var6) {
+				}
 			}
-		}
 
-	} // L: 8112
+		}
+	} // L: 31
+
+	@ObfuscatedName("l")
+	@ObfuscatedSignature(
+		descriptor = "(I)Z",
+		garbageValue = "392166386"
+	)
+	public static boolean method5810() {
+		ReflectionCheck var0 = (ReflectionCheck)class33.reflectionChecks.last(); // L: 28
+		return var0 != null; // L: 29
+	}
+
+	@ObfuscatedName("e")
+	@ObfuscatedSignature(
+		descriptor = "(I)[Llu;",
+		garbageValue = "1896848864"
+	)
+	static Language[] method5808() {
+		return new Language[]{Language_ES_MX, Language_EN, Language_FR, Language_DE, Language_NL, Language_ES, Language_PT}; // L: 42
+	}
+
+	@ObfuscatedName("y")
+	@ObfuscatedSignature(
+		descriptor = "(B)V",
+		garbageValue = "33"
+	)
+	public static void method5812() {
+		PlayerComposition.PlayerAppearance_cachedModels.clear(); // L: 263
+	} // L: 264
+
+	@ObfuscatedName("lm")
+	@ObfuscatedSignature(
+		descriptor = "(Ljz;B)I",
+		garbageValue = "19"
+	)
+	@Export("getWidgetFlags")
+	static int getWidgetFlags(Widget var0) {
+		IntegerNode var1 = (IntegerNode)Client.widgetFlags.get(((long)var0.id << 32) + (long)var0.childIndex); // L: 11983
+		return var1 != null ? var1.integer : var0.flags; // L: 11984 11985
+	}
 }

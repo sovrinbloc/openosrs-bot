@@ -4,145 +4,155 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("gh")
+@ObfuscatedName("hz")
 @Implements("WorldMapIcon_0")
 public class WorldMapIcon_0 extends AbstractWorldMapIcon {
-	@ObfuscatedName("fa")
-	@Export("worldHost")
-	static String worldHost;
-	@ObfuscatedName("hd")
-	@ObfuscatedSignature(
-		descriptor = "[Low;"
-	)
-	@Export("mapMarkerSprites")
-	static SpritePixels[] mapMarkerSprites;
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedGetter(
-		intValue = 1687504305
+		intValue = -1986325945
 	)
 	@Export("element")
 	final int element;
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "Lga;"
+		descriptor = "Lhp;"
 	)
 	@Export("label")
 	final WorldMapLabel label;
 	@ObfuscatedName("s")
 	@ObfuscatedGetter(
-		intValue = -515906735
+		intValue = -804430029
 	)
 	@Export("subWidth")
 	final int subWidth;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedGetter(
-		intValue = 724406877
+		intValue = -1605592337
 	)
 	@Export("subHeight")
 	final int subHeight;
 
 	@ObfuscatedSignature(
-		descriptor = "(Lie;Lie;ILga;)V"
+		descriptor = "(Ljd;Ljd;ILhp;)V"
 	)
 	WorldMapIcon_0(Coord var1, Coord var2, int var3, WorldMapLabel var4) {
 		super(var1, var2); // L: 14
 		this.element = var3; // L: 15
 		this.label = var4; // L: 16
-		WorldMapElement var5 = ItemComposition.WorldMapElement_get(this.getElement()); // L: 17
+		WorldMapElement var5 = class126.WorldMapElement_get(this.getElement()); // L: 17
 		SpritePixels var6 = var5.getSpriteBool(false); // L: 18
 		if (var6 != null) { // L: 19
 			this.subWidth = var6.subWidth; // L: 20
 			this.subHeight = var6.subHeight; // L: 21
 		} else {
-			this.subWidth = 0;
-			this.subHeight = 0;
+			this.subWidth = 0; // L: 24
+			this.subHeight = 0; // L: 25
 		}
 
-	}
+	} // L: 27
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
 		descriptor = "(I)I",
-		garbageValue = "-1660589105"
+		garbageValue = "-206805537"
 	)
 	@Export("getElement")
 	public int getElement() {
-		return this.element; // L: 30
+		return this.element; // L: 31
 	}
 
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
-		descriptor = "(B)Lga;",
-		garbageValue = "0"
+		descriptor = "(I)Lhp;",
+		garbageValue = "260379500"
 	)
 	@Export("getLabel")
 	WorldMapLabel getLabel() {
-		return this.label; // L: 34
+		return this.label; // L: 36
 	}
 
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
 		descriptor = "(I)I",
-		garbageValue = "374350712"
+		garbageValue = "-1605473270"
 	)
 	@Export("getSubWidth")
 	int getSubWidth() {
-		return this.subWidth; // L: 38
+		return this.subWidth; // L: 41
 	}
 
-	@ObfuscatedName("o")
+	@ObfuscatedName("r")
 	@ObfuscatedSignature(
 		descriptor = "(I)I",
-		garbageValue = "-1569056170"
+		garbageValue = "-985060397"
 	)
 	@Export("getSubHeight")
 	int getSubHeight() {
-		return this.subHeight; // L: 42
+		return this.subHeight; // L: 46
 	}
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
-		descriptor = "(II)Ljk;",
-		garbageValue = "1771772075"
+		descriptor = "(Ljava/lang/CharSequence;IZB)I",
+		garbageValue = "6"
 	)
-	public static GameBuild method3890(int var0) {
-		GameBuild[] var1 = class245.method4742(); // L: 23
+	public static int method4690(CharSequence var0, int var1, boolean var2) {
+		if (var1 >= 2 && var1 <= 36) { // L: 81
+			boolean var3 = false; // L: 82
+			boolean var4 = false; // L: 83
+			int var5 = 0; // L: 84
+			int var6 = var0.length(); // L: 85
 
-		for (int var2 = 0; var2 < var1.length; ++var2) { // L: 24
-			GameBuild var3 = var1[var2]; // L: 25
-			if (var0 == var3.buildId) { // L: 27
-				return var3;
+			for (int var7 = 0; var7 < var6; ++var7) { // L: 86
+				char var8 = var0.charAt(var7); // L: 87
+				if (var7 == 0) { // L: 88
+					if (var8 == '-') { // L: 89
+						var3 = true; // L: 90
+						continue;
+					}
+
+					if (var8 == '+') { // L: 93
+						continue;
+					}
+				}
+
+				int var10;
+				if (var8 >= '0' && var8 <= '9') { // L: 95
+					var10 = var8 - '0';
+				} else if (var8 >= 'A' && var8 <= 'Z') { // L: 96
+					var10 = var8 - '7';
+				} else {
+					if (var8 < 'a' || var8 > 'z') { // L: 97
+						throw new NumberFormatException(); // L: 98
+					}
+
+					var10 = var8 - 'W';
+				}
+
+				if (var10 >= var1) { // L: 99
+					throw new NumberFormatException();
+				}
+
+				if (var3) { // L: 100
+					var10 = -var10;
+				}
+
+				int var9 = var5 * var1 + var10; // L: 101
+				if (var9 / var1 != var5) { // L: 102
+					throw new NumberFormatException();
+				}
+
+				var5 = var9; // L: 103
+				var4 = true; // L: 104
 			}
-		}
 
-		return null; // L: 31
-	}
-
-	@ObfuscatedName("t")
-	@ObfuscatedSignature(
-		descriptor = "(III)I",
-		garbageValue = "-2005741653"
-	)
-	static final int method3885(int var0, int var1) {
-		if (var0 == -2) { // L: 579
-			return 12345678;
-		} else if (var0 == -1) { // L: 580
-			if (var1 < 2) {
-				var1 = 2; // L: 581
-			} else if (var1 > 126) { // L: 582
-				var1 = 126;
+			if (!var4) { // L: 106
+				throw new NumberFormatException();
+			} else {
+				return var5; // L: 107
 			}
-
-			return var1; // L: 583
 		} else {
-			var1 = (var0 & 127) * var1 / 128; // L: 585
-			if (var1 < 2) { // L: 586
-				var1 = 2;
-			} else if (var1 > 126) { // L: 587
-				var1 = 126;
-			}
-
-			return (var0 & 65408) + var1; // L: 588
+			throw new IllegalArgumentException("" + var1);
 		}
 	}
 }

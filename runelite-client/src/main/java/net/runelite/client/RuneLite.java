@@ -30,19 +30,28 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.openosrs.client.OpenOSRS;
 import com.openosrs.client.game.PlayerManager;
+import com.openosrs.client.ui.OpenOSRSSplashScreen;
+import java.applet.Applet;
 import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -50,8 +59,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.swing.SwingUtilities;
-
-import com.openosrs.client.OpenOSRS;
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -61,6 +68,7 @@ import joptsimple.util.EnumConverter;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.Constants;
 import net.runelite.client.account.SessionManager;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.discord.DiscordService;
@@ -73,7 +81,6 @@ import net.runelite.client.rs.ClientLoader;
 import net.runelite.client.rs.ClientUpdateCheckMode;
 import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.FatalErrorDialog;
-import com.openosrs.client.ui.OpenOSRSSplashScreen;
 import net.runelite.client.ui.SplashScreen;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.WidgetOverlay;
@@ -85,6 +92,7 @@ import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.Response;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +100,8 @@ import org.slf4j.LoggerFactory;
 @Slf4j
 public class RuneLite
 {
-	public static final File RUNELITE_DIR = new File(System.getProperty("user.home"), ".openosrs");
+	public static final String OPENOSRS = ".openosrs";
+	public static final File RUNELITE_DIR = new File(System.getProperty("user.home"), OPENOSRS);
 	public static final File CACHE_DIR = new File(RUNELITE_DIR, "cache");
 	public static final File PLUGINS_DIR = new File(RUNELITE_DIR, "plugin-hub");
 	public static final File PROFILES_DIR = new File(RUNELITE_DIR, "profiles");
@@ -102,6 +111,7 @@ public class RuneLite
 	public static final File DEFAULT_CONFIG_FILE = new File(RUNELITE_DIR, "settings.properties");
 
 	private static final int MAX_OKHTTP_CACHE_SIZE = 20 * 1024 * 1024; // 20mb
+	public static String USER_AGENT = "RuneLite/" + RuneLiteProperties.getVersion() + "-" + RuneLiteProperties.getCommit() + (RuneLiteProperties.isDirty() ? "+" : "");
 
 	@Getter
 	private static Injector injector;
@@ -150,6 +160,10 @@ public class RuneLite
 
 	@Inject
 	private WorldService worldService;
+
+	@Inject
+	@Nullable
+	private Applet applet;
 
 	@Inject
 	@Nullable
@@ -262,16 +276,8 @@ public class RuneLite
 
 		OpenOSRS.preload();
 
-		OkHttpClient.Builder okHttpClientBuilder = RuneLiteAPI.CLIENT.newBuilder();
-		setupCache(okHttpClientBuilder, new File(CACHE_DIR, "okhttp"));
-
-		final boolean insecureSkipTlsVerification = options.has("insecure-skip-tls-verification");
-		if (insecureSkipTlsVerification || RuneLiteProperties.isInsecureSkipTlsVerification())
-		{
-			setupInsecureTrustManager(okHttpClientBuilder);
-		}
-
-		final OkHttpClient okHttpClient = okHttpClientBuilder.build();
+		final OkHttpClient okHttpClient = buildHttpClient(options.has("insecure-skip-tls-verification"));
+		RuneLiteAPI.CLIENT = okHttpClient;
 
 		SplashScreen.init();
 		OpenOSRSSplashScreen.init();
@@ -280,6 +286,7 @@ public class RuneLite
 		try
 		{
 			final ClientLoader clientLoader = new ClientLoader(okHttpClient, options.valueOf(updateMode), (String) options.valueOf("jav_config"));
+			final RuntimeConfigLoader runtimeConfigLoader = new RuntimeConfigLoader(okHttpClient);
 
 			new Thread(() ->
 			{
@@ -300,6 +307,7 @@ public class RuneLite
 			injector = Guice.createInjector(new RuneLiteModule(
 				okHttpClient,
 				clientLoader,
+				runtimeConfigLoader,
 				developerMode,
 				options.has("safe-mode"),
 				options.valueOf(sessionfile),
@@ -334,6 +342,28 @@ public class RuneLite
 		{
 			// Inject members into client
 			injector.injectMembers(client);
+		}
+
+		// Start the applet
+		if (applet != null)
+		{
+			copyJagexCache();
+
+			// Client size must be set prior to init
+			applet.setSize(Constants.GAME_FIXED_SIZE);
+
+			// Change user.home so the client places jagexcache in the .runelite directory
+			String oldHome = System.setProperty("user.home", RUNELITE_DIR.getAbsolutePath());
+			try
+			{
+				applet.init();
+			}
+			finally
+			{
+				System.setProperty("user.home", oldHome);
+			}
+
+			applet.start();
 		}
 
 		SplashScreen.stage(.57, null, "Loading configuration");
@@ -395,7 +425,6 @@ public class RuneLite
 			// Add core overlays
 			WidgetOverlay.createOverlays(overlayManager, client).forEach(overlayManager::add);
 			overlayManager.add(worldMapOverlay.get());
-			eventBus.register(worldMapOverlay.get());
 			overlayManager.add(tooltipOverlay.get());
 
 			playerManager.get();
@@ -500,9 +529,20 @@ public class RuneLite
 	}
 
 	@VisibleForTesting
-	static void setupCache(OkHttpClient.Builder builder, File cacheDir)
+	static OkHttpClient buildHttpClient(boolean insecureSkipTlsVerification)
 	{
-		builder.cache(new Cache(cacheDir, MAX_OKHTTP_CACHE_SIZE))
+		OkHttpClient.Builder builder = new OkHttpClient.Builder()
+			.pingInterval(30, TimeUnit.SECONDS)
+			.addNetworkInterceptor(chain ->
+			{
+				Request userAgentRequest = chain.request()
+					.newBuilder()
+					.header("User-Agent", USER_AGENT)
+					.build();
+				return chain.proceed(userAgentRequest);
+			})
+			// Setup cache
+			.cache(new Cache(new File(CACHE_DIR, "okhttp"), MAX_OKHTTP_CACHE_SIZE))
 			.addNetworkInterceptor(chain ->
 			{
 				// This has to be a network interceptor so it gets hit before the cache tries to store stuff
@@ -516,6 +556,13 @@ public class RuneLite
 				}
 				return res;
 			});
+
+		if (insecureSkipTlsVerification || RuneLiteProperties.isInsecureSkipTlsVerification())
+		{
+			setupInsecureTrustManager(builder);
+		}
+
+		return builder.build();
 	}
 
 	private static void setupInsecureTrustManager(OkHttpClient.Builder okHttpClientBuilder)
@@ -558,5 +605,37 @@ public class RuneLite
 
 		String launcherVersion = System.getProperty("launcher.version");
 		System.setProperty("runelite.launcher.version", launcherVersion == null ? "unknown" : launcherVersion);
+	}
+
+	private static void copyJagexCache()
+	{
+		Path from = Paths.get(System.getProperty("user.home"), "jagexcache");
+		Path to = Paths.get(System.getProperty("user.home"), OPENOSRS, "jagexcache");
+		if (Files.exists(to) || !Files.exists(from))
+		{
+			return;
+		}
+
+		log.info("Copying jagexcache from {} to {}", from, to);
+
+		// Recursively copy path https://stackoverflow.com/a/50418060
+		try (Stream<Path> stream = Files.walk(from))
+		{
+			stream.forEach(source ->
+			{
+				try
+				{
+					Files.copy(source, to.resolve(from.relativize(source)), COPY_ATTRIBUTES);
+				}
+				catch (IOException e)
+				{
+					throw new RuntimeException(e);
+				}
+			});
+		}
+		catch (Exception e)
+		{
+			log.warn("unable to copy jagexcache", e);
+		}
 	}
 }

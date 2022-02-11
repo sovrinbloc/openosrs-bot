@@ -5,47 +5,52 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("er")
+@ObfuscatedName("el")
 @Implements("JagexCache")
 public class JagexCache {
-	@ObfuscatedName("tm")
-	@ObfuscatedSignature(
-		descriptor = "Lkx;"
-	)
-	@Export("grandExchangeEvents")
-	static GrandExchangeEvents grandExchangeEvents;
+	@ObfuscatedName("e")
+	@Export("JagexCache_locationFile")
+	static File JagexCache_locationFile;
 	@ObfuscatedName("o")
-	@Export("cacheDir")
-	static File cacheDir;
-	@ObfuscatedName("y")
+	@ObfuscatedGetter(
+		intValue = -1506580765
+	)
+	@Export("idxCount")
+	public static int idxCount;
+	@ObfuscatedName("a")
+	@ObfuscatedGetter(
+		intValue = -18657443
+	)
+	static int field1695;
+	@ObfuscatedName("u")
 	@ObfuscatedSignature(
-		descriptor = "Lnw;"
+		descriptor = "Loa;"
 	)
 	@Export("JagexCache_randomDat")
 	public static BufferedFile JagexCache_randomDat;
-	@ObfuscatedName("k")
+	@ObfuscatedName("h")
 	@ObfuscatedSignature(
-		descriptor = "Lnw;"
+		descriptor = "Loa;"
 	)
 	@Export("JagexCache_dat2File")
 	public static BufferedFile JagexCache_dat2File;
-	@ObfuscatedName("t")
+	@ObfuscatedName("q")
 	@ObfuscatedSignature(
-		descriptor = "Lnw;"
+		descriptor = "Loa;"
 	)
 	@Export("JagexCache_idx255File")
 	public static BufferedFile JagexCache_idx255File;
-	@ObfuscatedName("u")
-	@ObfuscatedGetter(
-		intValue = 1050074169
+	@ObfuscatedName("gs")
+	@ObfuscatedSignature(
+		descriptor = "Lmg;"
 	)
-	@Export("cacheGamebuild")
-	static int cacheGamebuild;
-	@ObfuscatedName("m")
-	@Export("operatingSystemName")
-	static String operatingSystemName;
-	@ObfuscatedName("fn")
-	static String field1560;
+	static AbstractSocket field1699;
+	@ObfuscatedName("po")
+	@ObfuscatedSignature(
+		descriptor = "Lct;"
+	)
+	@Export("varcs")
+	static Varcs varcs;
 
 	static {
 		JagexCache_randomDat = null; // L: 22

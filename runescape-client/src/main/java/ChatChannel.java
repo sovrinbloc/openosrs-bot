@@ -1,119 +1,91 @@
+import java.applet.Applet;
 import net.runelite.mapping.Export;
 import net.runelite.mapping.Implements;
 import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("be")
+@ObfuscatedName("bj")
 @Implements("ChatChannel")
 public class ChatChannel {
-	@ObfuscatedName("el")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "Lkd;"
-	)
-	@Export("archive10")
-	static Archive archive10;
-	@ObfuscatedName("w")
-	@ObfuscatedSignature(
-		descriptor = "[Lbf;"
+		descriptor = "[Lbd;"
 	)
 	@Export("messages")
 	Message[] messages;
 	@ObfuscatedName("s")
 	@ObfuscatedGetter(
-		intValue = 1060618387
+		intValue = 1692339495
 	)
 	@Export("count")
 	int count;
 
 	ChatChannel() {
-		this.messages = new Message[100]; // L: 85
-	} // L: 88
+		this.messages = new Message[100]; // L: 92
+	} // L: 95
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Lbf;",
-		garbageValue = "-1998830550"
+		descriptor = "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;B)Lbd;",
+		garbageValue = "0"
 	)
 	@Export("addMessage")
 	Message addMessage(int var1, String var2, String var3, String var4) {
-		Message var5 = this.messages[99]; // L: 91
+		Message var5 = this.messages[99]; // L: 98
 
-		for (int var6 = this.count; var6 > 0; --var6) { // L: 92
-			if (var6 != 100) { // L: 93
-				this.messages[var6] = this.messages[var6 - 1]; // L: 94
+		for (int var6 = this.count; var6 > 0; --var6) { // L: 99
+			if (var6 != 100) { // L: 100
+				this.messages[var6] = this.messages[var6 - 1]; // L: 101
 			}
 		}
 
-		if (var5 == null) { // L: 96
+		if (var5 == null) { // L: 103
 			var5 = new Message(var1, var2, var4, var3);
 		} else {
-			var5.remove(); // L: 98
-			var5.removeDual(); // L: 99
-			var5.set(var1, var2, var4, var3); // L: 100
+			var5.remove(); // L: 105
+			var5.removeDual(); // L: 106
+			var5.set(var1, var2, var4, var3); // L: 107
 		}
 
-		this.messages[0] = var5; // L: 102
-		if (this.count < 100) { // L: 103
+		this.messages[0] = var5; // L: 109
+		if (this.count < 100) { // L: 110
 			++this.count;
 		}
 
-		return var5; // L: 104
+		return var5; // L: 111
 	}
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "(IB)Lbf;",
-		garbageValue = "5"
+		descriptor = "(II)Lbd;",
+		garbageValue = "-1545065025"
 	)
 	@Export("getMessage")
 	Message getMessage(int var1) {
-		return var1 >= 0 && var1 < this.count ? this.messages[var1] : null; // L: 108 109
+		return var1 >= 0 && var1 < this.count ? this.messages[var1] : null; // L: 115 116
 	}
 
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
 		descriptor = "(I)I",
-		garbageValue = "-1220983055"
+		garbageValue = "-1227633696"
 	)
 	@Export("size")
 	int size() {
-		return this.count; // L: 113
+		return this.count; // L: 120
 	}
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(Ljava/lang/Object;ZI)[B",
-		garbageValue = "558752868"
+		descriptor = "(Ljava/applet/Applet;Ljava/lang/String;B)V",
+		garbageValue = "1"
 	)
-	public static byte[] method2013(Object var0, boolean var1) {
-		if (var0 == null) { // L: 8
-			return null;
-		} else if (var0 instanceof byte[]) { // L: 9
-			byte[] var3 = (byte[])((byte[])var0); // L: 10
-			return var1 ? EnumComposition.method3106(var3) : var3; // L: 11
-		} else if (var0 instanceof AbstractByteArrayCopier) { // L: 14
-			AbstractByteArrayCopier var2 = (AbstractByteArrayCopier)var0; // L: 15
-			return var2.get(); // L: 16
-		} else {
-			throw new IllegalArgumentException(); // L: 18
+	public static void method2003(Applet var0, String var1) {
+		class29.field177 = var0; // L: 22
+		if (var1 != null) { // L: 23
+			class29.field175 = var1;
 		}
-	}
 
-	@ObfuscatedName("ap")
-	@ObfuscatedSignature(
-		descriptor = "(ILbp;ZI)I",
-		garbageValue = "1766338115"
-	)
-	static int method2012(int var0, Script var1, boolean var2) {
-		if (var0 == 6900) { // L: 4328
-			Interpreter.Interpreter_stringStack[++class295.Interpreter_stringStackSize - 1] = ""; // L: 4329
-			return 1; // L: 4330
-		} else if (var0 == 6950) { // L: 4332
-			Interpreter.Interpreter_intStack[++class14.Interpreter_intStackSize - 1] = -1; // L: 4333
-			return 1; // L: 4334
-		} else {
-			return 2; // L: 4336
-		}
-	}
+	} // L: 24
 }

@@ -1,43 +1,39 @@
-import java.util.Iterator;
 import net.runelite.mapping.Export;
 import net.runelite.mapping.Implements;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("ce")
+@ObfuscatedName("ck")
 @Implements("HealthBar")
 public class HealthBar extends Node {
-	@ObfuscatedName("rt")
-	@ObfuscatedSignature(
-		descriptor = "Lak;"
-	)
-	@Export("pcmPlayer0")
-	static PcmPlayer pcmPlayer0;
+	@ObfuscatedName("fk")
+	@Export("worldHost")
+	static String worldHost;
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
-		descriptor = "Lfd;"
+		descriptor = "Lfs;"
 	)
 	@Export("definition")
 	HealthBarDefinition definition;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
-		descriptor = "Lkf;"
+		descriptor = "Llt;"
 	)
 	@Export("updates")
 	IterableNodeDeque updates;
 
 	@ObfuscatedSignature(
-		descriptor = "(Lfd;)V"
+		descriptor = "(Lfs;)V"
 	)
 	HealthBar(HealthBarDefinition var1) {
 		this.updates = new IterableNodeDeque(); // L: 12
 		this.definition = var1; // L: 15
 	} // L: 16
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(IIIIB)V",
-		garbageValue = "0"
+		descriptor = "(IIIII)V",
+		garbageValue = "-1837572845"
 	)
 	@Export("put")
 	void put(int var1, int var2, int var3, int var4) {
@@ -51,8 +47,8 @@ public class HealthBar extends Node {
 				return; // L: 25
 			}
 
-			if (var7.cycle <= var1) {
-				var5 = var7; // L: 27
+			if (var7.cycle <= var1) { // L: 27
+				var5 = var7;
 			}
 		}
 
@@ -70,10 +66,10 @@ public class HealthBar extends Node {
 		}
 	} // L: 31 35
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "(II)Lcd;",
-		garbageValue = "655971331"
+		descriptor = "(IB)Lcd;",
+		garbageValue = "1"
 	)
 	@Export("get")
 	HealthBarUpdate get(int var1) {
@@ -98,53 +94,30 @@ public class HealthBar extends Node {
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
 		descriptor = "(I)Z",
-		garbageValue = "1027939055"
+		garbageValue = "2000667860"
 	)
 	@Export("isEmpty")
 	boolean isEmpty() {
-		return this.updates.method5633(); // L: 55
+		return this.updates.method5882(); // L: 55
 	}
 
-	@ObfuscatedName("p")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(B)V",
-		garbageValue = "45"
+		descriptor = "(Lkq;Lkq;ZI)V",
+		garbageValue = "-2108078857"
 	)
-	static void method2242() {
-		Iterator var0 = Messages.Messages_hashTable.iterator(); // L: 61
+	public static void method2248(AbstractArchive var0, AbstractArchive var1, boolean var2) {
+		class12.ObjectDefinition_archive = var0; // L: 73
+		ObjectComposition.ObjectDefinition_modelsArchive = var1; // L: 74
+		ObjectComposition.ObjectDefinition_isLowDetail = var2; // L: 75
+	} // L: 76
 
-		while (var0.hasNext()) {
-			Message var1 = (Message)var0.next(); // L: 62
-			var1.clearIsFromIgnored(); // L: 64
-		}
-
-	} // L: 67
-
-	@ObfuscatedName("lq")
+	@ObfuscatedName("gj")
 	@ObfuscatedSignature(
-		descriptor = "(Ljava/lang/String;ZS)Ljava/lang/String;",
-		garbageValue = "-17378"
+		descriptor = "(B)Z",
+		garbageValue = "4"
 	)
-	static String method2246(String var0, boolean var1) {
-		String var2 = var1 ? "https://" : "http://"; // L: 11925
-		if (Client.gameBuild == 1) { // L: 11926
-			var0 = var0 + "-wtrc";
-		} else if (Client.gameBuild == 2) { // L: 11927
-			var0 = var0 + "-wtqa";
-		} else if (Client.gameBuild == 3) { // L: 11928
-			var0 = var0 + "-wtwip";
-		} else if (Client.gameBuild == 5) { // L: 11929
-			var0 = var0 + "-wti";
-		} else if (Client.gameBuild == 4) { // L: 11930
-			var0 = "local";
-		}
-
-		String var3 = ""; // L: 11931
-		if (UserComparator3.field1316 != null) { // L: 11932
-			var3 = "/p=" + UserComparator3.field1316;
-		}
-
-		String var4 = "runescape.com"; // L: 11933
-		return var2 + var0 + "." + var4 + "/l=" + MouseHandler.clientLanguage + "/a=" + TextureProvider.field2483 + var3 + "/"; // L: 11934
+	static boolean method2250() {
+		return (Client.drawPlayerNames & 8) != 0; // L: 4737
 	}
 }

@@ -24,52 +24,16 @@
  */
 package net.runelite.api;
 
-import net.runelite.api.model.Triangle;
-import net.runelite.api.model.Vertex;
-import java.util.List;
-
 /**
  * Represents the model of an object.
  */
-public interface Model extends Renderable
+public interface Model extends Mesh, Renderable
 {
-	/**
-	 * Gets a list of all vertices of the model.
-	 *
-	 * @return the vertices
-	 */
-	List<Vertex> getVertices();
-
-	/**
-	 * Gets a list of all triangles of the model.
-	 *
-	 * @return the triangle
-	 */
-	List<Triangle> getTriangles();
-
-	int getVerticesCount();
-
-	int[] getVerticesX();
-
-	int[] getVerticesY();
-
-	int[] getVerticesZ();
-
-	int getTrianglesCount();
-
-	int[] getTrianglesX();
-
-	int[] getTrianglesY();
-
-	int[] getTrianglesZ();
-
 	int[] getFaceColors1();
 
 	int[] getFaceColors2();
 
 	int[] getFaceColors3();
-
-	byte[] getTriangleTransparencies();
 
 	int getSceneId();
 	void setSceneId(int sceneId);
@@ -87,8 +51,6 @@ public interface Model extends Renderable
 	byte[] getFaceRenderPriorities();
 
 	int getRadius();
-
-	short[] getFaceTextures();
 
 	float[] getFaceTextureUVCoordinates();
 
@@ -109,4 +71,9 @@ public interface Model extends Renderable
 	int[] getVertexNormalsX();
 	int[] getVertexNormalsY();
 	int[] getVertexNormalsZ();
+
+	byte getOverrideAmount();
+	byte getOverrideHue();
+	byte getOverrideSaturation();
+	byte getOverrideLuminance();
 }

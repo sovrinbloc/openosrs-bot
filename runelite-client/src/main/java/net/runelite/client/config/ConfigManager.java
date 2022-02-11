@@ -27,9 +27,9 @@ package net.runelite.client.config;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
+import com.google.gson.Gson;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -44,7 +44,9 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -75,11 +77,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -103,7 +101,6 @@ import net.runelite.client.events.RuneScapeProfileChanged;
 import net.runelite.client.plugins.OPRSExternalPluginManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.util.ColorUtil;
-import net.runelite.http.api.config.ConfigClient;
 import net.runelite.http.api.config.ConfigEntry;
 import net.runelite.http.api.config.Configuration;
 import okhttp3.OkHttpClient;
@@ -128,6 +125,7 @@ public class ConfigManager
 	private final File settingsFileInput;
 	private final EventBus eventBus;
 	private final OkHttpClient okHttpClient;
+	private final Gson gson;
 
 	private AccountSession session;
 	private ConfigClient configClient;
@@ -148,19 +146,21 @@ public class ConfigManager
 
 	@Inject
 	public ConfigManager(
-		@Named("config") File config,
-		ScheduledExecutorService scheduledExecutorService,
-		EventBus eventBus,
-		OkHttpClient okHttpClient,
-		@Nullable Client client)
+			@Named("config") File config,
+			ScheduledExecutorService scheduledExecutorService,
+			EventBus eventBus,
+			OkHttpClient okHttpClient,
+			@Nullable Client client,
+			Gson gson)
 	{
 		this.settingsFileInput = config;
 		this.eventBus = eventBus;
 		this.okHttpClient = okHttpClient;
 		this.client = client;
 		this.propertiesFile = getPropertiesFile();
+		this.gson = gson;
 
-		scheduledExecutorService.scheduleWithFixedDelay(this::sendConfig, 30, 30, TimeUnit.SECONDS);
+		scheduledExecutorService.scheduleWithFixedDelay(this::sendConfig, 30, 5 * 60, TimeUnit.SECONDS);
 	}
 
 	public String getRSProfileKey()
@@ -262,8 +262,6 @@ public class ConfigManager
 				}
 			}
 		}
-
-		migrateConfig();
 	}
 
 	private void syncPropertiesFromFile(File propertiesFile)
@@ -367,9 +365,9 @@ public class ConfigManager
 		}
 
 		T t = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]
-			{
-				clazz
-			}, handler);
+				{
+						clazz
+				}, handler);
 
 		return t;
 	}
@@ -412,12 +410,12 @@ public class ConfigManager
 		return properties.getProperty(getWholeKey(groupName, profile, key));
 	}
 
-	public <T> T getConfiguration(String groupName, String key, Class<T> clazz)
+	public <T> T getConfiguration(String groupName, String key, Type clazz)
 	{
 		return getConfiguration(groupName, null, key, clazz);
 	}
 
-	public <T> T getRSProfileConfiguration(String groupName, String key, Class<T> clazz)
+	public <T> T getRSProfileConfiguration(String groupName, String key, Type clazz)
 	{
 		String rsProfileKey = this.rsProfileKey;
 		if (rsProfileKey == null)
@@ -428,14 +426,14 @@ public class ConfigManager
 		return getConfiguration(groupName, rsProfileKey, key, clazz);
 	}
 
-	public <T> T getConfiguration(String groupName, String profile, String key, Class<T> clazz)
+	public <T> T getConfiguration(String groupName, String profile, String key, Type type)
 	{
 		String value = getConfiguration(groupName, profile, key);
 		if (!Strings.isNullOrEmpty(value))
 		{
 			try
 			{
-				return (T) stringToObject(value, clazz);
+				return (T) stringToObject(value, type);
 			}
 			catch (Exception e)
 			{
@@ -488,12 +486,12 @@ public class ConfigManager
 		eventBus.post(configChanged);
 	}
 
-	public void setConfiguration(String groupName, String profile, String key, Object value)
+	public <T> void setConfiguration(String groupName, String profile, String key, T value)
 	{
 		setConfiguration(groupName, profile, key, objectToString(value));
 	}
 
-	public void setConfiguration(String groupName, String key, Object value)
+	public <T> void setConfiguration(String groupName, String key, T value)
 	{
 		// do not save consumers for buttons, they cannot be changed anyway
 		if (value instanceof Consumer)
@@ -504,7 +502,7 @@ public class ConfigManager
 		setConfiguration(groupName, null, key, value);
 	}
 
-	public void setRSProfileConfiguration(String groupName, String key, Object value)
+	public <T> void setRSProfileConfiguration(String groupName, String key, T value)
 	{
 		String rsProfileKey = this.rsProfileKey;
 		if (rsProfileKey == null)
@@ -599,67 +597,67 @@ public class ConfigManager
 		}
 
 		final List<ConfigSectionDescriptor> sections = getAllDeclaredInterfaceFields(inter).stream()
-			.filter(m -> m.isAnnotationPresent(ConfigSection.class) && m.getType() == String.class)
-			.map(m ->
-			{
-				try
+				.filter(m -> m.isAnnotationPresent(ConfigSection.class) && m.getType() == String.class)
+				.map(m ->
 				{
-					return new ConfigSectionDescriptor(
-						String.valueOf(m.get(inter)),
-						m.getDeclaredAnnotation(ConfigSection.class)
-					);
-				}
-				catch (IllegalAccessException e)
-				{
-					log.warn("Unable to load section {}::{}", inter.getSimpleName(), m.getName());
-					return null;
-				}
-			})
-			.filter(Objects::nonNull)
-			.sorted((a, b) -> ComparisonChain.start()
-				.compare(a.getSection().position(), b.getSection().position())
-				.compare(a.getSection().name(), b.getSection().name())
-				.result())
-			.collect(Collectors.toList());
+					try
+					{
+						return new ConfigSectionDescriptor(
+								String.valueOf(m.get(inter)),
+								m.getDeclaredAnnotation(ConfigSection.class)
+						);
+					}
+					catch (IllegalAccessException e)
+					{
+						log.warn("Unable to load section {}::{}", inter.getSimpleName(), m.getName());
+						return null;
+					}
+				})
+				.filter(Objects::nonNull)
+				.sorted((a, b) -> ComparisonChain.start()
+						.compare(a.getSection().position(), b.getSection().position())
+						.compare(a.getSection().name(), b.getSection().name())
+						.result())
+				.collect(Collectors.toList());
 
 		final List<ConfigTitleDescriptor> titles = getAllDeclaredInterfaceFields(inter).stream()
-			.filter(m -> m.isAnnotationPresent(ConfigTitle.class) && m.getType() == String.class)
-			.map(m ->
-			{
-				try
+				.filter(m -> m.isAnnotationPresent(ConfigTitle.class) && m.getType() == String.class)
+				.map(m ->
 				{
-					return new ConfigTitleDescriptor(
-						String.valueOf(m.get(inter)),
-						m.getDeclaredAnnotation(ConfigTitle.class)
-					);
-				}
-				catch (IllegalAccessException e)
-				{
-					log.warn("Unable to load title {}::{}", inter.getSimpleName(), m.getName());
-					return null;
-				}
-			})
-			.filter(Objects::nonNull)
-			.sorted((a, b) -> ComparisonChain.start()
-				.compare(a.getTitle().position(), b.getTitle().position())
-				.compare(a.getTitle().name(), b.getTitle().name())
-				.result())
-			.collect(Collectors.toList());
+					try
+					{
+						return new ConfigTitleDescriptor(
+								String.valueOf(m.get(inter)),
+								m.getDeclaredAnnotation(ConfigTitle.class)
+						);
+					}
+					catch (IllegalAccessException e)
+					{
+						log.warn("Unable to load title {}::{}", inter.getSimpleName(), m.getName());
+						return null;
+					}
+				})
+				.filter(Objects::nonNull)
+				.sorted((a, b) -> ComparisonChain.start()
+						.compare(a.getTitle().position(), b.getTitle().position())
+						.compare(a.getTitle().name(), b.getTitle().name())
+						.result())
+				.collect(Collectors.toList());
 
 		final List<ConfigItemDescriptor> items = Arrays.stream(inter.getMethods())
-			.filter(m -> m.getParameterCount() == 0 && m.isAnnotationPresent(ConfigItem.class))
-			.map(m -> new ConfigItemDescriptor(
-				m.getDeclaredAnnotation(ConfigItem.class),
-				m.getReturnType(),
-				m.getDeclaredAnnotation(Range.class),
-				m.getDeclaredAnnotation(Alpha.class),
-				m.getDeclaredAnnotation(Units.class)
-			))
-			.sorted((a, b) -> ComparisonChain.start()
-				.compare(a.getItem().position(), b.getItem().position())
-				.compare(a.getItem().name(), b.getItem().name())
-				.result())
-			.collect(Collectors.toList());
+				.filter(m -> m.getParameterCount() == 0 && m.isAnnotationPresent(ConfigItem.class))
+				.map(m -> new ConfigItemDescriptor(
+						m.getDeclaredAnnotation(ConfigItem.class),
+						m.getGenericReturnType(),
+						m.getDeclaredAnnotation(Range.class),
+						m.getDeclaredAnnotation(Alpha.class),
+						m.getDeclaredAnnotation(Units.class)
+				))
+				.sorted((a, b) -> ComparisonChain.start()
+						.compare(a.getItem().position(), b.getItem().position())
+						.compare(a.getItem().name(), b.getItem().name())
+						.result())
+				.collect(Collectors.toList());
 
 		return new ConfigDescriptor(group, sections, titles, items);
 	}
@@ -725,7 +723,7 @@ public class ConfigManager
 				{
 					// This checks if it is set and is also unmarshallable to the correct type; so
 					// we will overwrite invalid config values with the default
-					Object current = getConfiguration(group.value(), item.keyName(), method.getReturnType());
+					Object current = getConfiguration(group.value(), item.keyName(), method.getGenericReturnType());
 					if (current != null)
 					{
 						continue; // something else is already set
@@ -760,7 +758,7 @@ public class ConfigManager
 		}
 	}
 
-	static Object stringToObject(String str, Class<?> type)
+	Object stringToObject(String str, Type type)
 	{
 		if (type == boolean.class || type == Boolean.class)
 		{
@@ -801,7 +799,7 @@ public class ConfigManager
 			int height = Integer.parseInt(splitStr[3]);
 			return new Rectangle(x, y, width, height);
 		}
-		if (type.isEnum())
+		if (type instanceof Class && ((Class<?>) type).isEnum())
 		{
 			return Enum.valueOf((Class<? extends Enum>) type, str);
 		}
@@ -835,6 +833,14 @@ public class ConfigManager
 		if (type == byte[].class)
 		{
 			return Base64.getUrlDecoder().decode(str);
+		}
+		if (type instanceof ParameterizedType)
+		{
+			ParameterizedType parameterizedType = (ParameterizedType) type;
+			if (parameterizedType.getRawType() == Set.class)
+			{
+				return gson.fromJson(str, parameterizedType);
+			}
 		}
 		if (type == EnumSet.class)
 		{
@@ -875,7 +881,7 @@ public class ConfigManager
 	}
 
 	@Nullable
-	static String objectToString(Object object)
+	String objectToString(Object object)
 	{
 		if (object instanceof Color)
 		{
@@ -931,7 +937,10 @@ public class ConfigManager
 
 			return ((EnumSet) object).toArray()[0].getClass().getCanonicalName() + "{" + object.toString() + "}";
 		}
-
+		if (object instanceof Set)
+		{
+			return gson.toJson(object, Set.class);
+		}
 		return object == null ? null : object.toString();
 	}
 
@@ -1050,8 +1059,8 @@ public class ConfigManager
 			if (configClient != null)
 			{
 				Configuration patch = new Configuration(pendingChanges.entrySet().stream()
-					.map(e -> new ConfigEntry(e.getKey(), e.getValue()))
-					.collect(Collectors.toList()));
+						.map(e -> new ConfigEntry(e.getKey(), e.getValue()))
+						.collect(Collectors.toList()));
 
 				future = configClient.patch(patch);
 			}
@@ -1093,18 +1102,18 @@ public class ConfigManager
 		}
 
 		return profileKeys.stream()
-			.map(key ->
-			{
-				RuneScapeProfile prof = new RuneScapeProfile(
-					getConfiguration(RSPROFILE_GROUP, key, RSPROFILE_DISPLAY_NAME),
-					getConfiguration(RSPROFILE_GROUP, key, RSPROFILE_TYPE, RuneScapeProfileType.class),
-					getConfiguration(RSPROFILE_GROUP, key, RSPROFILE_LOGIN_HASH, byte[].class),
-					key
-				);
+				.map(key ->
+				{
+					RuneScapeProfile prof = new RuneScapeProfile(
+							getConfiguration(RSPROFILE_GROUP, key, RSPROFILE_DISPLAY_NAME),
+							getConfiguration(RSPROFILE_GROUP, key, RSPROFILE_TYPE, RuneScapeProfileType.class),
+							getConfiguration(RSPROFILE_GROUP, key, RSPROFILE_LOGIN_HASH, byte[].class),
+							key
+					);
 
-				return prof;
-			})
-			.collect(Collectors.toList());
+					return prof;
+				})
+				.collect(Collectors.toList());
 	}
 
 	private synchronized RuneScapeProfile findRSProfile(List<RuneScapeProfile> profiles, String username, RuneScapeProfileType type, String displayName, boolean create)
@@ -1114,7 +1123,7 @@ public class ConfigManager
 		{
 			salt = new byte[15];
 			new SecureRandom()
-				.nextBytes(salt);
+					.nextBytes(salt);
 			log.info("creating new salt as there is no existing one {}", Base64.getUrlEncoder().encodeToString(salt));
 			setConfiguration(RSPROFILE_GROUP, RSPROFILE_LOGIN_SALT, salt);
 		}
@@ -1125,8 +1134,8 @@ public class ConfigManager
 		byte[] loginHash = h.hash().asBytes();
 
 		Set<RuneScapeProfile> matches = profiles.stream()
-			.filter(p -> Arrays.equals(p.getLoginHash(), loginHash) && p.getType() == type)
-			.collect(Collectors.toSet());
+				.filter(p -> Arrays.equals(p.getLoginHash(), loginHash) && p.getType() == type)
+				.collect(Collectors.toSet());
 
 		if (matches.size() > 1)
 		{
@@ -1235,116 +1244,6 @@ public class ConfigManager
 			key = key.substring(i + 1);
 		}
 		return new String[]{group, profile, key};
-	}
-
-	private synchronized void migrateConfig()
-	{
-		String migrationKey = "profileMigrationDone";
-		if (getConfiguration("runelite", migrationKey) != null)
-		{
-			return;
-		}
-
-		Map<String, String> profiles = new HashMap<>();
-
-		AtomicInteger changes = new AtomicInteger();
-		List<Predicate<String>> migrators = new ArrayList<>();
-		for (String[] tpl : new String[][]
-			{
-				{"(grandexchange)\\.buylimit_(%)\\.(#)", "$1.buylimit.$3"},
-				{"(timetracking)\\.(%)\\.(autoweed|contract)", "$1.$3"},
-				{"(timetracking)\\.(%)\\.(#\\.#)", "$1.$3"},
-				{"(timetracking)\\.(%)\\.(birdhouse)\\.(#)", "$1.$3.$4"},
-				{"(killcount|personalbest)\\.(%)\\.([^.]+)", "$1.$3"},
-				{"(geoffer)\\.(%)\\.(#)", "$1.$3"},
-			})
-		{
-			String replace = tpl[1];
-			String pat = ("^" + tpl[0] + "$")
-				.replace("#", "-?[0-9]+")
-				.replace("(%)", "(?<login>.*)");
-			Pattern p = Pattern.compile(pat);
-
-			migrators.add(oldkey ->
-			{
-				Matcher m = p.matcher(oldkey);
-				if (!m.find())
-				{
-					return false;
-				}
-
-				String newKey = m.replaceFirst(replace);
-				String username = m.group("login").toLowerCase(Locale.US);
-
-				if (username.startsWith(RSPROFILE_GROUP + "."))
-				{
-					return false;
-				}
-
-				String profKey = profiles.computeIfAbsent(username, u ->
-					findRSProfile(getRSProfiles(), u, RuneScapeProfileType.STANDARD, u, true).getKey());
-
-				String[] oldKeySplit = splitKey(oldkey);
-				if (oldKeySplit == null)
-				{
-					log.warn("skipping migration of invalid key \"{}\"", oldkey);
-					return false;
-				}
-				if (oldKeySplit[KEY_SPLITTER_PROFILE] != null)
-				{
-					log.debug("skipping migrated key \"{}\"", oldkey);
-					return false;
-				}
-
-				String[] newKeySplit = splitKey(newKey);
-				if (newKeySplit == null || newKeySplit[KEY_SPLITTER_PROFILE] != null)
-				{
-					log.warn("migration produced a bad key: \"{}\" -> \"{}\"", oldkey, newKey);
-					return false;
-				}
-
-				if (changes.getAndAdd(1) <= 0)
-				{
-					File file = new File(propertiesFile.getParent(), propertiesFile.getName() + "." + TIME_FORMAT.format(new Date()));
-					log.info("backing up pre-migration config to {}", file);
-					try
-					{
-						saveToFile(file);
-					}
-					catch (IOException e)
-					{
-						log.error("Backup failed", e);
-						throw new RuntimeException(e);
-					}
-				}
-
-				String oldGroup = oldKeySplit[KEY_SPLITTER_GROUP];
-				String oldKeyPart = oldKeySplit[KEY_SPLITTER_KEY];
-				String value = getConfiguration(oldGroup, oldKeyPart);
-				setConfiguration(newKeySplit[KEY_SPLITTER_GROUP], profKey, newKeySplit[KEY_SPLITTER_KEY], value);
-				unsetConfiguration(oldGroup, oldKeyPart);
-				return true;
-			});
-		}
-
-		Set<String> keys = (Set<String>) ImmutableSet.copyOf((Set) properties.keySet());
-		keys:
-		for (String key : keys)
-		{
-			for (Predicate<String> mig : migrators)
-			{
-				if (mig.test(key))
-				{
-					continue keys;
-				}
-			}
-		}
-
-		if (changes.get() > 0)
-		{
-			log.info("migrated {} config keys", changes);
-		}
-		setConfiguration("runelite", migrationKey, 1);
 	}
 
 	/**

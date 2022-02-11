@@ -1,61 +1,60 @@
 import net.runelite.mapping.Export;
 import net.runelite.mapping.Implements;
-import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("ny")
+@ObfuscatedName("ox")
 @Implements("FontName")
 public class FontName {
-	@ObfuscatedName("si")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "Laa;"
-	)
-	@Export("decimator")
-	static Decimator decimator;
-	@ObfuscatedName("i")
-	@ObfuscatedSignature(
-		descriptor = "Lny;"
+		descriptor = "Lox;"
 	)
 	@Export("FontName_plain11")
 	public static final FontName FontName_plain11;
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "Lny;"
+		descriptor = "Lox;"
 	)
 	@Export("FontName_plain12")
 	public static final FontName FontName_plain12;
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
-		descriptor = "Lny;"
+		descriptor = "Lox;"
 	)
 	@Export("FontName_bold12")
 	public static final FontName FontName_bold12;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
-		descriptor = "Lny;"
+		descriptor = "Lox;"
 	)
 	@Export("FontName_verdana11")
 	public static final FontName FontName_verdana11;
-	@ObfuscatedName("o")
+	@ObfuscatedName("r")
 	@ObfuscatedSignature(
-		descriptor = "Lny;"
+		descriptor = "Lox;"
 	)
 	@Export("FontName_verdana13")
 	public static final FontName FontName_verdana13;
-	@ObfuscatedName("g")
+	@ObfuscatedName("o")
 	@ObfuscatedSignature(
-		descriptor = "Lny;"
+		descriptor = "Lox;"
 	)
 	@Export("FontName_verdana15")
 	public static final FontName FontName_verdana15;
-	@ObfuscatedName("nb")
-	@ObfuscatedGetter(
-		intValue = -1205124413
+	@ObfuscatedName("dx")
+	@ObfuscatedSignature(
+		descriptor = "Lfw;"
 	)
-	@Export("selectedSpellWidget")
-	static int selectedSpellWidget;
-	@ObfuscatedName("e")
+	@Export("js5SocketTask")
+	static Task js5SocketTask;
+	@ObfuscatedName("eg")
+	@ObfuscatedSignature(
+		descriptor = "Lkz;"
+	)
+	@Export("archive15")
+	static Archive archive15;
+	@ObfuscatedName("i")
 	@Export("name")
 	String name;
 
@@ -69,72 +68,46 @@ public class FontName {
 	}
 
 	FontName(String var1) {
-		this.name = var1; // L: 16
-	} // L: 17
+		this.name = var1; // L: 20
+	} // L: 21
 
-	@ObfuscatedName("w")
-	@Export("base37DecodeLong")
-	public static String base37DecodeLong(long var0) {
-		if (var0 > 0L && var0 < 6582952005840035281L) { // L: 31
-			if (0L == var0 % 37L) { // L: 32
-				return null;
-			} else {
-				int var2 = 0; // L: 33
-
-				for (long var3 = var0; var3 != 0L; var3 /= 37L) { // L: 34 35 37
-					++var2; // L: 36
-				}
-
-				StringBuilder var5;
-				char var8;
-				for (var5 = new StringBuilder(var2); 0L != var0; var5.append(var8)) { // L: 39 40 49
-					long var6 = var0; // L: 41
-					var0 /= 37L; // L: 42
-					var8 = class320.base37Table[(int)(var6 - 37L * var0)]; // L: 43
-					if (var8 == '_') { // L: 44
-						int var9 = var5.length() - 1; // L: 45
-						var5.setCharAt(var9, Character.toUpperCase(var5.charAt(var9))); // L: 46
-						var8 = 160; // L: 47
-					}
-				}
-
-				var5.reverse(); // L: 51
-				var5.setCharAt(0, Character.toUpperCase(var5.charAt(0))); // L: 52
-				return var5.toString(); // L: 53
-			}
-		} else {
-			return null;
-		}
+	@ObfuscatedName("c")
+	@ObfuscatedSignature(
+		descriptor = "(I)[Lox;",
+		garbageValue = "1811636946"
+	)
+	public static FontName[] method7085() {
+		return new FontName[]{FontName_plain12, FontName_verdana11, FontName_bold12, FontName_plain11, FontName_verdana15, FontName_verdana13}; // L: 16
 	}
 
-	@ObfuscatedName("s")
+	@ObfuscatedName("iv")
 	@ObfuscatedSignature(
-		descriptor = "([BIIII[Lfq;I)V",
-		garbageValue = "1067712640"
+		descriptor = "(I)V",
+		garbageValue = "1759173263"
 	)
-	static final void method6688(byte[] var0, int var1, int var2, int var3, int var4, CollisionMap[] var5) {
-		int var7;
-		int var8;
-		for (int var6 = 0; var6 < 4; ++var6) { // L: 77
-			for (var7 = 0; var7 < 64; ++var7) { // L: 78
-				for (var8 = 0; var8 < 64; ++var8) { // L: 79
-					if (var7 + var1 > 0 && var7 + var1 < 103 && var8 + var2 > 0 && var8 + var2 < 103) { // L: 80
-						int[] var10000 = var5[var6].flags[var7 + var1];
-						var10000[var2 + var8] &= -16777217;
+	@Export("decrementMenuEntries")
+	static void decrementMenuEntries() {
+		for (int var0 = 0; var0 < Client.menuOptionsCount; ++var0) { // L: 9355
+			int var2 = Client.menuOpcodes[var0]; // L: 9357
+			boolean var1 = var2 == 57 || var2 == 58 || var2 == 1007 || var2 == 25 || var2 == 30; // L: 9359
+			if (var1) { // L: 9361
+				if (var0 < Client.menuOptionsCount - 1) { // L: 9362
+					for (int var3 = var0; var3 < Client.menuOptionsCount - 1; ++var3) { // L: 9363
+						Client.menuActions[var3] = Client.menuActions[var3 + 1]; // L: 9364
+						Client.menuTargets[var3] = Client.menuTargets[var3 + 1]; // L: 9365
+						Client.menuOpcodes[var3] = Client.menuOpcodes[var3 + 1]; // L: 9366
+						Client.menuIdentifiers[var3] = Client.menuIdentifiers[var3 + 1]; // L: 9367
+						Client.menuArguments1[var3] = Client.menuArguments1[var3 + 1]; // L: 9368
+						Client.menuArguments2[var3] = Client.menuArguments2[var3 + 1]; // L: 9369
+						Client.menuShiftClick[var3] = Client.menuShiftClick[var3 + 1]; // L: 9370
 					}
 				}
+
+				--var0; // L: 9373
+				--Client.menuOptionsCount; // L: 9374
 			}
 		}
 
-		Buffer var10 = new Buffer(var0); // L: 84
-
-		for (var7 = 0; var7 < 4; ++var7) { // L: 85
-			for (var8 = 0; var8 < 64; ++var8) { // L: 86
-				for (int var9 = 0; var9 < 64; ++var9) { // L: 87
-					GameEngine.loadTerrain(var10, var7, var8 + var1, var9 + var2, var3, var4, 0); // L: 88
-				}
-			}
-		}
-
-	} // L: 92
+		Interpreter.method1875(Calendar.menuWidth / 2 + Projectile.menuX, ReflectionCheck.menuY); // L: 9378
+	} // L: 9380
 }

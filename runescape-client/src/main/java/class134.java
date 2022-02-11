@@ -3,83 +3,107 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("ec")
-public class class134 extends class116 {
-	@ObfuscatedName("y")
-	@ObfuscatedSignature(
-		descriptor = "Lko;"
-	)
-	@Export("Widget_fontsArchive")
-	static AbstractArchive Widget_fontsArchive;
-	@ObfuscatedName("of")
+@ObfuscatedName("eh")
+public class class134 extends class142 {
+	@ObfuscatedName("l")
+	@Export("javaVersion")
+	public static String javaVersion;
+	@ObfuscatedName("fr")
 	@ObfuscatedGetter(
-		intValue = -1434510609
+		intValue = -2098238709
 	)
-	@Export("widgetDragDuration")
-	static int widgetDragDuration;
-	@ObfuscatedName("i")
+	static int field1572;
+	@ObfuscatedName("c")
 	@ObfuscatedGetter(
-		intValue = 1414305525
+		intValue = -1109793603
 	)
-	int field1501;
-	@ObfuscatedName("w")
-	@ObfuscatedGetter(
-		intValue = 1373462747
-	)
-	int field1502;
+	int field1573;
 	// $FF: synthetic field
 	@ObfuscatedSignature(
-		descriptor = "Ldg;"
+		descriptor = "Led;"
 	)
-	final class119 this$0;
+	final class143 this$0;
 
 	@ObfuscatedSignature(
-		descriptor = "(Ldg;)V"
+		descriptor = "(Led;)V"
 	)
-	class134(class119 var1) {
-		this.this$0 = var1; // L: 271
-	}
+	class134(class143 var1) {
+		this.this$0 = var1;
+		this.field1573 = -1; // L: 82
+	} // L: 84
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(Lop;I)V",
-		garbageValue = "-2002779676"
+		descriptor = "(Lpi;B)V",
+		garbageValue = "-103"
 	)
-	void vmethod2847(Buffer var1) {
-		this.field1501 = var1.readInt(); // L: 274
-		this.field1502 = var1.readInt(); // L: 275
-	} // L: 276
-
-	@ObfuscatedName("w")
-	@ObfuscatedSignature(
-		descriptor = "(Ldm;I)V",
-		garbageValue = "-293908864"
-	)
-	void vmethod2848(ClanSettings var1) {
-		var1.method2664(this.field1501, this.field1502); // L: 279
-	} // L: 280
-
-	@ObfuscatedName("s")
-	@ObfuscatedSignature(
-		descriptor = "(Ljava/lang/CharSequence;I)Ljava/lang/String;",
-		garbageValue = "-1799070908"
-	)
-	public static String method2788(CharSequence var0) {
-		String var1 = FontName.base37DecodeLong(WorldMapScaleHandler.method4096(var0)); // L: 57
-		if (var1 == null) {
-			var1 = ""; // L: 58
+	void vmethod3014(Buffer var1) {
+		this.field1573 = var1.readUnsignedShort(); // L: 87
+		var1.readUnsignedByte(); // L: 88
+		if (var1.readUnsignedByte() != 255) { // L: 89
+			--var1.offset; // L: 90
+			var1.readLong(); // L: 91
 		}
 
-		return var1; // L: 59
+	} // L: 93
+
+	@ObfuscatedName("l")
+	@ObfuscatedSignature(
+		descriptor = "(Leg;B)V",
+		garbageValue = "48"
+	)
+	void vmethod3015(ClanChannel var1) {
+		var1.removeMember(this.field1573); // L: 96
+	} // L: 97
+
+	@ObfuscatedName("c")
+	@ObfuscatedSignature(
+		descriptor = "(Li;I)Le;",
+		garbageValue = "-62373396"
+	)
+	public static class3 method2824(class6 var0) {
+		switch(var0.field22) { // L: 9
+		case 0:
+			return new class0(); // L: 16
+		default:
+			throw new IllegalArgumentException(); // L: 12
+		}
 	}
 
-	@ObfuscatedName("gc")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(S)I",
-		garbageValue = "7395"
+		descriptor = "([BIIB)Ljava/lang/String;",
+		garbageValue = "-15"
 	)
-	@Export("getWindowedMode")
-	static int getWindowedMode() {
-		return Client.isResizable ? 2 : 1; // L: 4552
+	public static String method2826(byte[] var0, int var1, int var2) {
+		StringBuilder var3 = new StringBuilder(); // L: 58
+
+		for (int var4 = var1; var4 < var2 + var1; var4 += 3) { // L: 59
+			int var5 = var0[var4] & 255; // L: 60
+			var3.append(class334.field4052[var5 >>> 2]); // L: 61
+			if (var4 < var2 - 1) { // L: 62
+				int var6 = var0[var4 + 1] & 255; // L: 63
+				var3.append(class334.field4052[(var5 & 3) << 4 | var6 >>> 4]); // L: 64
+				if (var4 < var2 - 2) { // L: 65
+					int var7 = var0[var4 + 2] & 255; // L: 66
+					var3.append(class334.field4052[(var6 & 15) << 2 | var7 >>> 6]).append(class334.field4052[var7 & 63]); // L: 67
+				} else {
+					var3.append(class334.field4052[(var6 & 15) << 2]).append("="); // L: 69
+				}
+			} else {
+				var3.append(class334.field4052[(var5 & 3) << 4]).append("=="); // L: 71
+			}
+		}
+
+		return var3.toString(); // L: 73
+	}
+
+	@ObfuscatedName("l")
+	@ObfuscatedSignature(
+		descriptor = "(IIIB)I",
+		garbageValue = "6"
+	)
+	static int method2825(int var0, int var1, int var2) {
+		return var0 << 28 | var1 << 14 | var2; // L: 34
 	}
 }

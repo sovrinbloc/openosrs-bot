@@ -4,33 +4,41 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("ga")
+@ObfuscatedName("hp")
 @Implements("WorldMapLabel")
 public class WorldMapLabel {
-	@ObfuscatedName("i")
+	@ObfuscatedName("h")
+	@ObfuscatedGetter(
+		intValue = -485692107
+	)
+	static int field2761;
+	@ObfuscatedName("hw")
+	@Export("regions")
+	static int[] regions;
+	@ObfuscatedName("c")
 	@Export("text")
 	String text;
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedGetter(
-		intValue = 1596677031
+		intValue = -941943719
 	)
 	@Export("width")
 	int width;
 	@ObfuscatedName("s")
 	@ObfuscatedGetter(
-		intValue = 136381791
+		intValue = 238298517
 	)
 	@Export("height")
 	int height;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
-		descriptor = "Lfo;"
+		descriptor = "Lhh;"
 	)
 	@Export("size")
 	WorldMapLabelSize size;
 
 	@ObfuscatedSignature(
-		descriptor = "(Ljava/lang/String;IILfo;)V"
+		descriptor = "(Ljava/lang/String;IILhh;)V"
 	)
 	WorldMapLabel(String var1, int var2, int var3, WorldMapLabelSize var4) {
 		this.text = var1; // L: 10
@@ -39,70 +47,59 @@ public class WorldMapLabel {
 		this.size = var4; // L: 13
 	} // L: 14
 
-	@ObfuscatedName("hg")
+	@ObfuscatedName("fc")
 	@ObfuscatedSignature(
-		descriptor = "(I)V",
-		garbageValue = "-1622810143"
+		descriptor = "(Lkz;Ljava/lang/String;I)V",
+		garbageValue = "-1399246639"
 	)
-	static final void method3970() {
-		PacketBuffer var0 = Client.packetWriter.packetBuffer; // L: 8002
-		var0.importIndex(); // L: 8003
-		int var1 = var0.readBits(8); // L: 8004
-		int var2;
-		if (var1 < Client.npcCount) { // L: 8005
-			for (var2 = var1; var2 < Client.npcCount; ++var2) { // L: 8006
-				Client.field592[++Client.field591 - 1] = Client.npcIndices[var2];
-			}
+	static void method4762(Archive var0, String var1) {
+		ArchiveLoader var2 = new ArchiveLoader(var0, var1); // L: 1457
+		Client.archiveLoaders.add(var2); // L: 1458
+		Client.field698 += var2.groupCount; // L: 1459
+	} // L: 1460
+
+	@ObfuscatedName("iq")
+	@ObfuscatedSignature(
+		descriptor = "(IIIIIII)V",
+		garbageValue = "-1943247102"
+	)
+	static final void method4763(int var0, int var1, int var2, int var3, int var4, int var5) {
+		int var6 = var2 - var0; // L: 10219
+		int var7 = var3 - var1; // L: 10220
+		int var8 = var6 >= 0 ? var6 : -var6; // L: 10221
+		int var9 = var7 >= 0 ? var7 : -var7; // L: 10222
+		int var10 = var8; // L: 10223
+		if (var8 < var9) { // L: 10224
+			var10 = var9;
 		}
 
-		if (var1 > Client.npcCount) { // L: 8008
-			throw new RuntimeException("");
-		} else {
-			Client.npcCount = 0; // L: 8009
-
-			for (var2 = 0; var2 < var1; ++var2) { // L: 8010
-				int var3 = Client.npcIndices[var2]; // L: 8011
-				NPC var4 = Client.npcs[var3]; // L: 8012
-				int var5 = var0.readBits(1); // L: 8013
-				if (var5 == 0) { // L: 8014
-					Client.npcIndices[++Client.npcCount - 1] = var3; // L: 8015
-					var4.npcCycle = Client.cycle; // L: 8016
-				} else {
-					int var6 = var0.readBits(2); // L: 8019
-					if (var6 == 0) { // L: 8020
-						Client.npcIndices[++Client.npcCount - 1] = var3; // L: 8021
-						var4.npcCycle = Client.cycle; // L: 8022
-						Client.field513[++Client.field512 - 1] = var3; // L: 8023
-					} else {
-						int var7;
-						int var8;
-						if (var6 == 1) { // L: 8026
-							Client.npcIndices[++Client.npcCount - 1] = var3; // L: 8027
-							var4.npcCycle = Client.cycle; // L: 8028
-							var7 = var0.readBits(3); // L: 8029
-							var4.method2258(var7, (byte)1); // L: 8030
-							var8 = var0.readBits(1); // L: 8031
-							if (var8 == 1) { // L: 8032
-								Client.field513[++Client.field512 - 1] = var3;
-							}
-						} else if (var6 == 2) { // L: 8035
-							Client.npcIndices[++Client.npcCount - 1] = var3; // L: 8036
-							var4.npcCycle = Client.cycle; // L: 8037
-							var7 = var0.readBits(3); // L: 8038
-							var4.method2258(var7, (byte)2); // L: 8039
-							var8 = var0.readBits(3); // L: 8040
-							var4.method2258(var8, (byte)2); // L: 8041
-							int var9 = var0.readBits(1); // L: 8042
-							if (var9 == 1) {
-								Client.field513[++Client.field512 - 1] = var3; // L: 8043
-							}
-						} else if (var6 == 3) { // L: 8046
-							Client.field592[++Client.field591 - 1] = var3; // L: 8047
-						}
-					}
-				}
+		if (var10 != 0) { // L: 10225
+			int var11 = (var6 << 16) / var10; // L: 10226
+			int var12 = (var7 << 16) / var10; // L: 10227
+			if (var12 <= var11) { // L: 10228
+				var11 = -var11;
+			} else {
+				var12 = -var12; // L: 10229
 			}
 
+			int var13 = var5 * var12 >> 17; // L: 10230
+			int var14 = var5 * var12 + 1 >> 17; // L: 10231
+			int var15 = var5 * var11 >> 17; // L: 10232
+			int var16 = var5 * var11 + 1 >> 17; // L: 10233
+			var0 -= Rasterizer2D.Rasterizer2D_xClipStart; // L: 10234
+			var1 -= Rasterizer2D.Rasterizer2D_yClipStart; // L: 10235
+			int var17 = var0 + var13; // L: 10236
+			int var18 = var0 - var14; // L: 10237
+			int var19 = var0 + var6 - var14; // L: 10238
+			int var20 = var0 + var6 + var13; // L: 10239
+			int var21 = var15 + var1; // L: 10240
+			int var22 = var1 - var16; // L: 10241
+			int var23 = var7 + var1 - var16; // L: 10242
+			int var24 = var15 + var7 + var1; // L: 10243
+			Rasterizer3D.method3792(var17, var18, var19); // L: 10244
+			Rasterizer3D.method3797(var21, var22, var23, var17, var18, var19, var4); // L: 10245
+			Rasterizer3D.method3792(var17, var19, var20); // L: 10246
+			Rasterizer3D.method3797(var21, var23, var24, var17, var19, var20, var4); // L: 10247
 		}
-	} // L: 8051
+	} // L: 10248
 }

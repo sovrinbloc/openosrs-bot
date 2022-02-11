@@ -245,7 +245,7 @@ public class AdonaiPlugin extends Plugin
 			int added = 0;
 			for (MenuEntry e : clientMenuEntries)
 			{
-				if (e.getId() != objectId)
+				if (e.getIdentifier() != objectId)
 				{
 					entries[added] = e;
 					added++;

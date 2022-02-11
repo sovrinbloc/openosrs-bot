@@ -31,7 +31,13 @@ import net.runelite.api.HeadIcon;
 import net.runelite.api.Model;
 import net.runelite.api.Perspective;
 import net.runelite.api.SkullIcon;
-import static net.runelite.api.SkullIcon.*;
+import static net.runelite.api.SkullIcon.DEAD_MAN_FIVE;
+import static net.runelite.api.SkullIcon.DEAD_MAN_FOUR;
+import static net.runelite.api.SkullIcon.DEAD_MAN_ONE;
+import static net.runelite.api.SkullIcon.DEAD_MAN_THREE;
+import static net.runelite.api.SkullIcon.DEAD_MAN_TWO;
+import static net.runelite.api.SkullIcon.SKULL;
+import static net.runelite.api.SkullIcon.SKULL_FIGHT_PIT;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.OverheadPrayerChanged;
 import net.runelite.api.events.PlayerChanged;
@@ -181,13 +187,13 @@ public abstract class RSPlayerMixin implements RSPlayer
 		final int tileHeight = Perspective.getTileHeight(client, new LocalPoint(localX, localY), client.getPlane());
 
 		Perspective.modelToCanvas(client, model.getVerticesCount(), localX, localY, tileHeight, getOrientation(), model.getVerticesX(), model.getVerticesZ(), model.getVerticesY(), x2d, y2d);
-		ArrayList polys = new ArrayList(model.getTrianglesCount());
+		ArrayList polys = new ArrayList(model.getFaceCount());
 
-		int[] trianglesX = model.getTrianglesX();
-		int[] trianglesY = model.getTrianglesY();
-		int[] trianglesZ = model.getTrianglesZ();
+		int[] trianglesX = model.getFaceIndices1();
+		int[] trianglesY = model.getFaceIndices2();
+		int[] trianglesZ = model.getFaceIndices3();
 
-		for (int triangle = 0; triangle < model.getTrianglesCount(); ++triangle)
+		for (int triangle = 0; triangle < model.getFaceCount(); ++triangle)
 		{
 			int[] xx =
 				{
@@ -269,7 +275,7 @@ public abstract class RSPlayerMixin implements RSPlayer
 	{
 		client.getCallbacks().post(new PlayerChanged(this));
 	}
-	
+
 	@Copy("read")
 	@Replace("read")
 	@SuppressWarnings("InfiniteRecursion")

@@ -4,35 +4,43 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("fg")
+@ObfuscatedName("fo")
 @Implements("VerticalAlignment")
 public enum VerticalAlignment implements MouseWheel {
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "Lfg;"
+		descriptor = "Lfo;"
 	)
-	field1743(2, 0),
-	@ObfuscatedName("w")
+	field1887(2, 0),
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "Lfg;"
+		descriptor = "Lfo;"
 	)
 	@Export("VerticalAlignment_centered")
 	VerticalAlignment_centered(0, 1),
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
-		descriptor = "Lfg;"
+		descriptor = "Lfo;"
 	)
-	field1744(1, 2);
+	field1886(1, 2);
 
-	@ObfuscatedName("a")
+	@ObfuscatedName("v")
+	static int[] field1884;
+	@ObfuscatedName("x")
+	@ObfuscatedSignature(
+		descriptor = "[Loa;"
+	)
+	@Export("JagexCache_idxFiles")
+	public static BufferedFile[] JagexCache_idxFiles;
+	@ObfuscatedName("e")
 	@ObfuscatedGetter(
-		intValue = 1028915727
+		intValue = -702197369
 	)
 	@Export("value")
 	public final int value;
-	@ObfuscatedName("o")
+	@ObfuscatedName("r")
 	@ObfuscatedGetter(
-		intValue = 1836218951
+		intValue = 1138323233
 	)
 	@Export("id")
 	final int id;
@@ -42,43 +50,22 @@ public enum VerticalAlignment implements MouseWheel {
 		this.id = var4; // L: 19
 	} // L: 20
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
 		descriptor = "(I)I",
-		garbageValue = "238732485"
+		garbageValue = "-303340189"
 	)
 	@Export("rsOrdinal")
 	public int rsOrdinal() {
-		return this.id; // L: 23
+		return this.id; // L: 24
 	}
 
-	@ObfuscatedName("gv")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(B)V",
-		garbageValue = "-29"
+		descriptor = "(B)[Lij;",
+		garbageValue = "57"
 	)
-	static final void method3159() {
-		int var0 = Players.Players_count; // L: 4244
-		int[] var1 = Players.Players_indices; // L: 4245
-
-		for (int var2 = 0; var2 < var0; ++var2) { // L: 4246
-			Player var3 = Client.players[var1[var2]]; // L: 4247
-			if (var3 != null) { // L: 4248
-				class135.updateActorSequence(var3, 1); // L: 4249
-			}
-		}
-
-	} // L: 4252
-
-	@ObfuscatedName("gr")
-	@ObfuscatedSignature(
-		descriptor = "(I)V",
-		garbageValue = "-375267443"
-	)
-	static void method3157() {
-		if (Client.renderSelf) { // L: 5039
-			class132.addPlayerToScene(HealthBarDefinition.localPlayer, false); // L: 5040
-		}
-
-	} // L: 5042
+	public static class255[] method3321() {
+		return new class255[]{class255.field2941, class255.field2942, class255.field2943, class255.field2949, class255.field2945, class255.field2948, class255.field2946, class255.field2944, class255.field2947, class255.field2950}; // L: 17
+	}
 }

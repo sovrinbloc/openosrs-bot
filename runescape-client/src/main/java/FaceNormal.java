@@ -4,24 +4,24 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("hq")
+@ObfuscatedName("gk")
 @Implements("FaceNormal")
 public class FaceNormal {
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedGetter(
-		intValue = 114850491
+		intValue = -1096643173
 	)
 	@Export("x")
 	int x;
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedGetter(
-		intValue = 2059790001
+		intValue = 142997221
 	)
 	@Export("y")
 	int y;
 	@ObfuscatedName("s")
 	@ObfuscatedGetter(
-		intValue = 1654198693
+		intValue = 1816531673
 	)
 	@Export("z")
 	int z;
@@ -29,33 +29,12 @@ public class FaceNormal {
 	FaceNormal() {
 	} // L: 8
 
-	@ObfuscatedName("gn")
+	@ObfuscatedName("u")
 	@ObfuscatedSignature(
-		descriptor = "(Lcx;IIB)V",
-		garbageValue = "-51"
+		descriptor = "(I)I",
+		garbageValue = "-430184319"
 	)
-	@Export("performPlayerAnimation")
-	static void performPlayerAnimation(Player var0, int var1, int var2) {
-		if (var0.sequence == var1 && var1 != -1) { // L: 4529
-			int var3 = MouseHandler.SequenceDefinition_get(var1).field1965; // L: 4530
-			if (var3 == 1) { // L: 4531
-				var0.sequenceFrame = 0; // L: 4532
-				var0.sequenceFrameCycle = 0; // L: 4533
-				var0.sequenceDelay = var2; // L: 4534
-				var0.field1116 = 0; // L: 4535
-			}
-
-			if (var3 == 2) { // L: 4537
-				var0.field1116 = 0; // L: 4538
-			}
-		} else if (var1 == -1 || var0.sequence == -1 || MouseHandler.SequenceDefinition_get(var1).field1959 >= MouseHandler.SequenceDefinition_get(var0.sequence).field1959) { // L: 4541
-			var0.sequence = var1; // L: 4542
-			var0.sequenceFrame = 0; // L: 4543
-			var0.sequenceFrameCycle = 0; // L: 4544
-			var0.sequenceDelay = var2; // L: 4545
-			var0.field1116 = 0; // L: 4546
-			var0.field1144 = var0.pathLength; // L: 4547
-		}
-
-	} // L: 4549
+	static final int method4095() {
+		return ViewportMouse.ViewportMouse_x; // L: 99
+	}
 }

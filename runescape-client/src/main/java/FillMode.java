@@ -4,55 +4,49 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("om")
+@ObfuscatedName("pd")
 @Implements("FillMode")
 public enum FillMode implements MouseWheel {
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "Lom;"
+		descriptor = "Lpd;"
 	)
 	@Export("SOLID")
 	SOLID(0, 0),
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "Lom;"
+		descriptor = "Lpd;"
 	)
-	field4378(1, 1),
+	field4588(1, 1),
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
-		descriptor = "Lom;"
+		descriptor = "Lpd;"
 	)
-	field4377(2, 2);
+	field4591(2, 2);
 
 	@ObfuscatedName("e")
 	@ObfuscatedGetter(
-		intValue = 2036544943
+		intValue = -1460775291
 	)
-	@Export("musicTrackGroupId")
-	public static int musicTrackGroupId;
-	@ObfuscatedName("a")
+	public final int field4590;
+	@ObfuscatedName("r")
 	@ObfuscatedGetter(
-		intValue = -1855010985
+		intValue = 1881974467
 	)
-	public final int field4379;
-	@ObfuscatedName("o")
-	@ObfuscatedGetter(
-		intValue = 1812864379
-	)
-	final int field4380;
+	final int field4587;
 
 	FillMode(int var3, int var4) {
-		this.field4379 = var3; // L: 19
-		this.field4380 = var4; // L: 20
+		this.field4590 = var3; // L: 19
+		this.field4587 = var4; // L: 20
 	} // L: 21
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
 		descriptor = "(I)I",
-		garbageValue = "238732485"
+		garbageValue = "-303340189"
 	)
 	@Export("rsOrdinal")
 	public int rsOrdinal() {
-		return this.field4380; // L: 24
+		return this.field4587; // L: 25
 	}
 }

@@ -4,24 +4,24 @@ import net.runelite.mapping.Implements;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("mp")
+@ObfuscatedName("mg")
 @Implements("AbstractSocket")
 public abstract class AbstractSocket {
 	protected AbstractSocket() {
 	} // L: 7
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(B)V",
-		garbageValue = "1"
+		descriptor = "(I)V",
+		garbageValue = "-499949391"
 	)
 	@Export("close")
 	public abstract void close();
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "(I)I",
-		garbageValue = "1953698452"
+		descriptor = "(B)I",
+		garbageValue = "-86"
 	)
 	@Export("readUnsignedByte")
 	public abstract int readUnsignedByte() throws IOException;
@@ -29,103 +29,78 @@ public abstract class AbstractSocket {
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
 		descriptor = "(I)I",
-		garbageValue = "-1632705310"
+		garbageValue = "2115909346"
 	)
 	@Export("available")
 	public abstract int available() throws IOException;
 
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
-		descriptor = "(II)Z",
-		garbageValue = "-1771919747"
+		descriptor = "(IB)Z",
+		garbageValue = "67"
 	)
 	@Export("isAvailable")
 	public abstract boolean isAvailable(int var1) throws IOException;
 
-	@ObfuscatedName("o")
+	@ObfuscatedName("r")
 	@ObfuscatedSignature(
 		descriptor = "([BIII)I",
-		garbageValue = "-1246528305"
+		garbageValue = "-781316249"
 	)
 	@Export("read")
 	public abstract int read(byte[] var1, int var2, int var3) throws IOException;
 
-	@ObfuscatedName("e")
+	@ObfuscatedName("i")
 	@ObfuscatedSignature(
 		descriptor = "([BIII)V",
-		garbageValue = "-748791607"
+		garbageValue = "300460862"
 	)
 	@Export("write")
 	public abstract void write(byte[] var1, int var2, int var3) throws IOException;
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(CI)B",
-		garbageValue = "1205000986"
+		descriptor = "(Lpc;I)V",
+		garbageValue = "195231876"
 	)
-	@Export("charToByteCp1252")
-	public static byte charToByteCp1252(char var0) {
-		byte var1;
-		if (var0 > 0 && var0 < 128 || var0 >= 160 && var0 <= 255) { // L: 12
-			var1 = (byte)var0;
-		} else if (var0 == 8364) { // L: 13
-			var1 = -128;
-		} else if (var0 == 8218) { // L: 14
-			var1 = -126;
-		} else if (var0 == 402) { // L: 15
-			var1 = -125;
-		} else if (var0 == 8222) { // L: 16
-			var1 = -124;
-		} else if (var0 == 8230) { // L: 17
-			var1 = -123;
-		} else if (var0 == 8224) { // L: 18
-			var1 = -122;
-		} else if (var0 == 8225) { // L: 19
-			var1 = -121;
-		} else if (var0 == 710) { // L: 20
-			var1 = -120;
-		} else if (var0 == 8240) { // L: 21
-			var1 = -119;
-		} else if (var0 == 352) { // L: 22
-			var1 = -118;
-		} else if (var0 == 8249) { // L: 23
-			var1 = -117;
-		} else if (var0 == 338) { // L: 24
-			var1 = -116;
-		} else if (var0 == 381) { // L: 25
-			var1 = -114;
-		} else if (var0 == 8216) { // L: 26
-			var1 = -111;
-		} else if (var0 == 8217) { // L: 27
-			var1 = -110;
-		} else if (var0 == 8220) { // L: 28
-			var1 = -109;
-		} else if (var0 == 8221) { // L: 29
-			var1 = -108;
-		} else if (var0 == 8226) { // L: 30
-			var1 = -107;
-		} else if (var0 == 8211) { // L: 31
-			var1 = -106;
-		} else if (var0 == 8212) { // L: 32
-			var1 = -105;
-		} else if (var0 == 732) { // L: 33
-			var1 = -104;
-		} else if (var0 == 8482) { // L: 34
-			var1 = -103;
-		} else if (var0 == 353) { // L: 35
-			var1 = -102;
-		} else if (var0 == 8250) { // L: 36
-			var1 = -101;
-		} else if (var0 == 339) { // L: 37
-			var1 = -100;
-		} else if (var0 == 382) { // L: 38
-			var1 = -98;
-		} else if (var0 == 376) { // L: 39
-			var1 = -97;
-		} else {
-			var1 = 63; // L: 40
+	@Export("updatePlayer")
+	static final void updatePlayer(PacketBuffer var0) {
+		var0.importIndex(); // L: 37
+		int var1 = Client.localPlayerIndex; // L: 38
+		Player var2 = WorldMapSprite.localPlayer = Client.players[var1] = new Player(); // L: 39
+		var2.index = var1; // L: 40
+		int var3 = var0.readBits(30); // L: 41
+		byte var4 = (byte)(var3 >> 28); // L: 42
+		int var5 = var3 >> 14 & 16383; // L: 43
+		int var6 = var3 & 16383; // L: 44
+		var2.pathX[0] = var5 - Canvas.baseX; // L: 45
+		var2.x = (var2.pathX[0] << 7) + (var2.transformedSize() << 6); // L: 46
+		var2.pathY[0] = var6 - class118.baseY; // L: 47
+		var2.y = (var2.pathY[0] << 7) + (var2.transformedSize() << 6); // L: 48
+		SoundSystem.Client_plane = var2.plane = var4; // L: 49
+		if (Players.field1278[var1] != null) { // L: 50
+			var2.read(Players.field1278[var1]);
 		}
 
-		return var1; // L: 41
-	}
+		Players.Players_count = 0; // L: 51
+		Players.Players_indices[++Players.Players_count - 1] = var1; // L: 52
+		Players.field1276[var1] = 0; // L: 53
+		Players.Players_emptyIdxCount = 0; // L: 54
+
+		for (int var7 = 1; var7 < 2048; ++var7) { // L: 55
+			if (var7 != var1) { // L: 56
+				int var8 = var0.readBits(18); // L: 57
+				int var9 = var8 >> 16; // L: 58
+				int var10 = var8 >> 8 & 597; // L: 59
+				int var11 = var8 & 597; // L: 60
+				Players.Players_regions[var7] = (var10 << 14) + var11 + (var9 << 28); // L: 61
+				Players.Players_orientations[var7] = 0; // L: 62
+				Players.Players_targetIndices[var7] = -1; // L: 63
+				Players.Players_emptyIndices[++Players.Players_emptyIdxCount - 1] = var7; // L: 64
+				Players.field1276[var7] = 0; // L: 65
+			}
+		}
+
+		var0.exportIndex(); // L: 67
+	} // L: 68
 }

@@ -1,19 +1,13 @@
 import java.util.Comparator;
 import net.runelite.mapping.Export;
 import net.runelite.mapping.Implements;
-import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("oy")
+@ObfuscatedName("pk")
 @Implements("UserComparator2")
 public class UserComparator2 implements Comparator {
-	@ObfuscatedName("o")
-	@ObfuscatedGetter(
-		intValue = 419330147
-	)
-	public static int field4359;
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@Export("reversed")
 	final boolean reversed;
 
@@ -21,10 +15,10 @@ public class UserComparator2 implements Comparator {
 		this.reversed = var1; // L: 10
 	} // L: 11
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(Lla;Lla;B)I",
-		garbageValue = "86"
+		descriptor = "(Lmy;Lmy;I)I",
+		garbageValue = "2031661860"
 	)
 	@Export("compare_bridged")
 	int compare_bridged(User var1, User var2) {

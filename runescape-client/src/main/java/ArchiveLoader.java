@@ -4,46 +4,33 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("ba")
+@ObfuscatedName("bk")
 @Implements("ArchiveLoader")
 public class ArchiveLoader {
-	@ObfuscatedName("sz")
-	@ObfuscatedGetter(
-		intValue = 1501018991
-	)
-	static int field985;
-	@ObfuscatedName("aa")
-	@Export("client")
+	@ObfuscatedName("f")
+	@Export("formattedOperatingSystemName")
+	public static String formattedOperatingSystemName;
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "Lclient;"
-	)
-	static Client client;
-	@ObfuscatedName("bx")
-	@ObfuscatedSignature(
-		descriptor = "Ljk;"
-	)
-	static GameBuild field984;
-	@ObfuscatedName("w")
-	@ObfuscatedSignature(
-		descriptor = "Lkd;"
+		descriptor = "Lkz;"
 	)
 	@Export("archive")
 	final Archive archive;
 	@ObfuscatedName("s")
 	@ObfuscatedGetter(
-		intValue = 1984155091
+		intValue = 588213751
 	)
 	@Export("groupCount")
 	final int groupCount;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedGetter(
-		intValue = 756623687
+		intValue = 315923437
 	)
 	@Export("loadedCount")
 	int loadedCount;
 
 	@ObfuscatedSignature(
-		descriptor = "(Lkd;Ljava/lang/String;)V"
+		descriptor = "(Lkz;Ljava/lang/String;)V"
 	)
 	ArchiveLoader(Archive var1, String var2) {
 		this.loadedCount = 0; // L: 9
@@ -51,17 +38,17 @@ public class ArchiveLoader {
 		this.groupCount = var1.getGroupCount(); // L: 13
 	} // L: 14
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(I)Z",
-		garbageValue = "897874246"
+		descriptor = "(B)Z",
+		garbageValue = "1"
 	)
 	@Export("isLoaded")
 	boolean isLoaded() {
 		this.loadedCount = 0; // L: 17
 
 		for (int var1 = 0; var1 < this.groupCount; ++var1) { // L: 18
-			if (!this.archive.method5270(var1) || this.archive.method5269(var1)) {
+			if (!this.archive.method5530(var1) || this.archive.method5557(var1)) {
 				++this.loadedCount; // L: 19
 			}
 		}
@@ -69,34 +56,69 @@ public class ArchiveLoader {
 		return this.loadedCount >= this.groupCount; // L: 21
 	}
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("o")
 	@ObfuscatedSignature(
-		descriptor = "(II)Lef;",
-		garbageValue = "-1421588196"
+		descriptor = "(Lkq;Ljava/lang/String;Ljava/lang/String;I)[Lpt;",
+		garbageValue = "1930156810"
 	)
-	@Export("VarpDefinition_get")
-	public static VarpDefinition VarpDefinition_get(int var0) {
-		VarpDefinition var1 = (VarpDefinition)VarpDefinition.VarpDefinition_cached.get((long)var0); // L: 23
-		if (var1 != null) { // L: 24
-			return var1;
-		} else {
-			byte[] var2 = VarpDefinition.VarpDefinition_archive.takeFile(16, var0); // L: 25
-			var1 = new VarpDefinition(); // L: 26
-			if (var2 != null) { // L: 27
-				var1.decode(new Buffer(var2));
-			}
+	public static SpritePixels[] method2061(AbstractArchive var0, String var1, String var2) {
+		int var3 = var0.getGroupId(var1); // L: 83
+		int var4 = var0.getFileId(var3, var2); // L: 84
+		return UserList.method6415(var0, var3, var4); // L: 85
+	}
 
-			VarpDefinition.VarpDefinition_cached.put(var1, (long)var0); // L: 28
-			return var1; // L: 29
+	@ObfuscatedName("bk")
+	@ObfuscatedSignature(
+		descriptor = "([BB)[B",
+		garbageValue = "70"
+	)
+	@Export("decompressBytes")
+	static final byte[] decompressBytes(byte[] var0) {
+		Buffer var1 = new Buffer(var0); // L: 424
+		int var2 = var1.readUnsignedByte(); // L: 425
+		int var3 = var1.readInt(); // L: 426
+		if (var3 < 0 || AbstractArchive.field3910 != 0 && var3 > AbstractArchive.field3910) { // L: 427
+			throw new RuntimeException(); // L: 428
+		} else if (var2 == 0) { // L: 430
+			byte[] var6 = new byte[var3]; // L: 431
+			var1.readBytes(var6, 0, var3); // L: 432
+			return var6; // L: 433
+		} else {
+			int var4 = var1.readInt(); // L: 436
+			if (var4 >= 0 && (AbstractArchive.field3910 == 0 || var4 <= AbstractArchive.field3910)) { // L: 437
+				byte[] var5 = new byte[var4]; // L: 440
+				if (var2 == 1) { // L: 441
+					BZip2Decompressor.BZip2Decompressor_decompress(var5, var4, var0, var3, 9);
+				} else {
+					AbstractArchive.gzipDecompressor.decompress(var1, var5); // L: 442
+				}
+
+				return var5; // L: 443
+			} else {
+				throw new RuntimeException(); // L: 438
+			}
 		}
 	}
 
-	@ObfuscatedName("lo")
+	@ObfuscatedName("iz")
 	@ObfuscatedSignature(
-		descriptor = "(IB)V",
-		garbageValue = "-67"
+		descriptor = "(Ljava/lang/String;Ljava/lang/String;IIIIZI)V",
+		garbageValue = "57386745"
 	)
-	static void method2056(int var0) {
-		Client.oculusOrbState = var0; // L: 12012
-	} // L: 12013
+	@Export("insertMenuItem")
+	static final void insertMenuItem(String var0, String var1, int var2, int var3, int var4, int var5, boolean var6) {
+		if (!Client.isMenuOpen) { // L: 9341
+			if (Client.menuOptionsCount < 500) { // L: 9342
+				Client.menuActions[Client.menuOptionsCount] = var0; // L: 9343
+				Client.menuTargets[Client.menuOptionsCount] = var1; // L: 9344
+				Client.menuOpcodes[Client.menuOptionsCount] = var2; // L: 9345
+				Client.menuIdentifiers[Client.menuOptionsCount] = var3; // L: 9346
+				Client.menuArguments1[Client.menuOptionsCount] = var4; // L: 9347
+				Client.menuArguments2[Client.menuOptionsCount] = var5; // L: 9348
+				Client.menuShiftClick[Client.menuOptionsCount] = var6; // L: 9349
+				++Client.menuOptionsCount; // L: 9350
+			}
+
+		}
+	} // L: 9352
 }

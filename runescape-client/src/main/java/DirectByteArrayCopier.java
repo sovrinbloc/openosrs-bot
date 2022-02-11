@@ -1,47 +1,46 @@
 import java.nio.ByteBuffer;
 import net.runelite.mapping.Export;
 import net.runelite.mapping.Implements;
+import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("jz")
+@ObfuscatedName("ja")
 @Implements("DirectByteArrayCopier")
 public class DirectByteArrayCopier extends AbstractByteArrayCopier {
-	@ObfuscatedName("g")
-	@ObfuscatedSignature(
-		descriptor = "Lko;"
+	@ObfuscatedName("k")
+	@ObfuscatedGetter(
+		intValue = -1534991819
 	)
-	@Export("ItemDefinition_archive")
-	public static AbstractArchive ItemDefinition_archive;
-	@ObfuscatedName("j")
-	static int[][] field3212;
-	@ObfuscatedName("bn")
+	@Export("canvasWidth")
+	public static int canvasWidth;
+	@ObfuscatedName("cd")
 	@ObfuscatedSignature(
-		descriptor = "[Low;"
+		descriptor = "Lpg;"
 	)
-	@Export("worldSelectBackSprites")
-	static SpritePixels[] worldSelectBackSprites;
-	@ObfuscatedName("i")
+	@Export("worldSelectRightSprite")
+	static IndexedSprite worldSelectRightSprite;
+	@ObfuscatedName("c")
 	@Export("directBuffer")
 	ByteBuffer directBuffer;
 
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
-		descriptor = "(B)[B",
-		garbageValue = "99"
+		descriptor = "(I)[B",
+		garbageValue = "1552068154"
 	)
 	@Export("get")
 	byte[] get() {
 		byte[] var1 = new byte[this.directBuffer.capacity()]; // L: 13
-		this.directBuffer.position(0); // L: 14
-		this.directBuffer.get(var1); // L: 15
-		return var1; // L: 16
+		this.directBuffer.position(0);
+		this.directBuffer.get(var1);
+		return var1;
 	}
 
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
 		descriptor = "([BB)V",
-		garbageValue = "-48"
+		garbageValue = "46"
 	)
 	@Export("set")
 	public void set(byte[] var1) {
@@ -50,14 +49,18 @@ public class DirectByteArrayCopier extends AbstractByteArrayCopier {
 		this.directBuffer.put(var1); // L: 22
 	} // L: 23
 
-	@ObfuscatedName("ju")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(II)V",
-		garbageValue = "-1646184786"
+		descriptor = "(I)J",
+		garbageValue = "2011171655"
 	)
-	static final void method5179(int var0) {
-		if (class174.loadInterface(var0)) { // L: 11315
-			class135.drawModelComponents(WorldMapSection1.Widget_interfaceComponents[var0], -1); // L: 11316
+	public static final synchronized long method5318() {
+		long var0 = System.currentTimeMillis(); // L: 14
+		if (var0 < class261.field3087) { // L: 15
+			class261.field3083 += class261.field3087 - var0; // L: 16
 		}
-	} // L: 11317
+
+		class261.field3087 = var0; // L: 18
+		return var0 + class261.field3083; // L: 19
+	}
 }

@@ -18,12 +18,14 @@ import com.openosrs.injector.injectors.RSApiInjector;
 import com.openosrs.injector.injectors.raw.AddPlayerToMenu;
 import com.openosrs.injector.injectors.raw.ClearColorBuffer;
 import com.openosrs.injector.injectors.raw.DrawMenu;
+import com.openosrs.injector.injectors.raw.GameDrawingMode;
 import com.openosrs.injector.injectors.raw.GraphicsObject;
 import com.openosrs.injector.injectors.raw.Occluder;
 import com.openosrs.injector.injectors.raw.RasterizerAlpha;
 import com.openosrs.injector.injectors.raw.RenderDraw;
 import com.openosrs.injector.injectors.raw.CopyRuneLiteClasses;
-import com.openosrs.injector.injectors.raw.RuneLiteIterableHashTable;
+import com.openosrs.injector.injectors.raw.RuneLiteIterables;
+import com.openosrs.injector.injectors.raw.RuneliteMenuEntry;
 import com.openosrs.injector.injectors.raw.RuneliteObject;
 import com.openosrs.injector.injectors.raw.ScriptVM;
 import com.openosrs.injector.rsapi.RSApi;
@@ -117,7 +119,7 @@ public class Injector extends InjectData implements InjectTaskHandler
 
 		inject(new CopyRuneLiteClasses(this));
 
-		inject(new RuneLiteIterableHashTable(this));
+		inject(new RuneLiteIterables(this));
 
 		inject(new RuneliteObject(this));
 
@@ -148,7 +150,11 @@ public class Injector extends InjectData implements InjectTaskHandler
 
 		inject(new DrawMenu(this));
 
+		inject(new GameDrawingMode(this));
+
 		inject(new AddPlayerToMenu(this));
+
+		inject(new RuneliteMenuEntry(this));
 
 		validate(new InjectorValidator(this));
 

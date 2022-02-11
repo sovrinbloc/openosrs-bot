@@ -103,9 +103,9 @@ class AdonaiTooltipOverlay extends Overlay
 		MenuEntry menuEntry = menuEntries[last];
 		String target = menuEntry.getTarget();
 		String option = menuEntry.getOption();
-		int objectId = menuEntry.getId();
+		int objectId = menuEntry.getIdentifier();
 
-		MenuAction type = MenuAction.of(menuEntry.getType());
+		MenuAction type = MenuAction.of(menuEntry.getType().getId());
 
 		if (client.isMenuOpen())
 		{

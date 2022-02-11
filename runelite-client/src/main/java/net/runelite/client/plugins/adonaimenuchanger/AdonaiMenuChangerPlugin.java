@@ -203,14 +203,14 @@ public class AdonaiMenuChangerPlugin extends Plugin
 			{
 				boolean addedEntry = false;
 
-				if (!objectOptions.containsKey(entry.getId()))
+				if (!objectOptions.containsKey(entry.getIdentifier()))
 				{
 					entries[added] = entry;
 					added++;
 					continue;
 				}
 
-				for (String exceptOption : objectOptions.get(entry.getId()))
+				for (String exceptOption : objectOptions.get(entry.getIdentifier()))
 				{
 					if (entry.getOption().toLowerCase().contains(exceptOption))
 					{

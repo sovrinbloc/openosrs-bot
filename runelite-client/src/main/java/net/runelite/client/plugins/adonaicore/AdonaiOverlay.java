@@ -72,7 +72,7 @@ public class AdonaiOverlay extends Overlay
 	 */
 	private void renderTileObjectOutline(MenuEntry entry)
 	{
-		MenuAction menuAction = MenuAction.of(entry.getType());
+		MenuAction menuAction = MenuAction.of(entry.getType().getId());
 
 		switch (menuAction)
 		{
@@ -142,7 +142,7 @@ public class AdonaiOverlay extends Overlay
 
 		// top item as only one are shown, they do not overlap? (maybe true)
 		MenuEntry top = menuEntries[menuEntries.length - 1];
-		MenuAction menuAction = MenuAction.of(top.getType());
+		MenuAction menuAction = MenuAction.of(top.getType().getId());
 
 		switch (menuAction)
 		{

@@ -3,23 +3,29 @@ import net.runelite.mapping.Implements;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("eq")
+@ObfuscatedName("ft")
 @Implements("VarcInt")
 public class VarcInt extends DualNode {
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "Lko;"
+		descriptor = "Lkq;"
 	)
 	@Export("VarcInt_archive")
-	public static AbstractArchive VarcInt_archive;
-	@ObfuscatedName("w")
+	static AbstractArchive VarcInt_archive;
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
-		descriptor = "Lig;"
+		descriptor = "Lic;"
 	)
 	@Export("VarcInt_cached")
-	public static EvictingDualNodeHashTable VarcInt_cached;
-	@ObfuscatedName("ar")
-	protected static String field1645;
+	static EvictingDualNodeHashTable VarcInt_cached;
+	@ObfuscatedName("q")
+	static int[] field1789;
+	@ObfuscatedName("bd")
+	@ObfuscatedSignature(
+		descriptor = "Lok;"
+	)
+	@Export("loginType")
+	static LoginType loginType;
 	@ObfuscatedName("s")
 	@Export("persist")
 	public boolean persist;
@@ -28,44 +34,35 @@ public class VarcInt extends DualNode {
 		VarcInt_cached = new EvictingDualNodeHashTable(64); // L: 11
 	}
 
-	public VarcInt() {
+	VarcInt() {
 		this.persist = false; // L: 12
-	}
-
-	@ObfuscatedName("w")
-	@ObfuscatedSignature(
-		descriptor = "(Lop;I)V",
-		garbageValue = "-1726990903"
-	)
-	public void method3026(Buffer var1) {
-		while (true) {
-			int var2 = var1.readUnsignedByte(); // L: 20
-			if (var2 == 0) { // L: 21
-				return; // L: 24
-			}
-
-			this.method3027(var1, var2); // L: 22
-		}
-	}
+	} // L: 14
 
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
-		descriptor = "(Lop;II)V",
-		garbageValue = "-1102307189"
+		descriptor = "(Lpi;I)V",
+		garbageValue = "-972393082"
 	)
-	void method3027(Buffer var1, int var2) {
-		if (var2 == 2) { // L: 27
-			this.persist = true; // L: 28
+	void method3202(Buffer var1) {
+		while (true) {
+			int var2 = var1.readUnsignedByte(); // L: 32
+			if (var2 == 0) { // L: 33
+				return; // L: 36
+			}
+
+			this.method3195(var1, var2); // L: 34
+		}
+	}
+
+	@ObfuscatedName("e")
+	@ObfuscatedSignature(
+		descriptor = "(Lpi;IB)V",
+		garbageValue = "121"
+	)
+	void method3195(Buffer var1, int var2) {
+		if (var2 == 2) { // L: 39
+			this.persist = true; // L: 40
 		}
 
-	} // L: 31
-
-	@ObfuscatedName("ke")
-	@ObfuscatedSignature(
-		descriptor = "(I)V",
-		garbageValue = "2018767281"
-	)
-	static final void method3033() {
-		Client.field679 = Client.cycleCntr; // L: 11790
-	} // L: 11791
+	} // L: 43
 }

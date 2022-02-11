@@ -4,30 +4,35 @@ import net.runelite.mapping.ObfuscatedGetter;
 import net.runelite.mapping.ObfuscatedName;
 import net.runelite.mapping.ObfuscatedSignature;
 
-@ObfuscatedName("mo")
+@ObfuscatedName("na")
 @Implements("Bounds")
 public class Bounds {
-	@ObfuscatedName("i")
+	@ObfuscatedName("p")
+	@ObfuscatedSignature(
+		descriptor = "Lpg;"
+	)
+	static IndexedSprite field4220;
+	@ObfuscatedName("c")
 	@ObfuscatedGetter(
-		intValue = -1843320923
+		intValue = 134357295
 	)
 	@Export("lowX")
 	public int lowX;
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedGetter(
-		intValue = 1031650591
+		intValue = -1700768065
 	)
 	@Export("lowY")
 	public int lowY;
 	@ObfuscatedName("s")
 	@ObfuscatedGetter(
-		intValue = -1371710773
+		intValue = 1258350879
 	)
 	@Export("highX")
 	public int highX;
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedGetter(
-		intValue = -179878711
+		intValue = -1496551937
 	)
 	@Export("highY")
 	public int highY;
@@ -41,10 +46,10 @@ public class Bounds {
 		this(0, 0, var1, var2); // L: 10
 	} // L: 11
 
-	@ObfuscatedName("i")
+	@ObfuscatedName("c")
 	@ObfuscatedSignature(
-		descriptor = "(IIS)V",
-		garbageValue = "7696"
+		descriptor = "(IIB)V",
+		garbageValue = "115"
 	)
 	@Export("setLow")
 	public void setLow(int var1, int var2) {
@@ -52,10 +57,10 @@ public class Bounds {
 		this.lowY = var2; // L: 20
 	} // L: 21
 
-	@ObfuscatedName("w")
+	@ObfuscatedName("l")
 	@ObfuscatedSignature(
 		descriptor = "(IIB)V",
-		garbageValue = "101"
+		garbageValue = "6"
 	)
 	@Export("setHigh")
 	public void setHigh(int var1, int var2) {
@@ -66,37 +71,37 @@ public class Bounds {
 	@ObfuscatedName("s")
 	@ObfuscatedSignature(
 		descriptor = "(III)Z",
-		garbageValue = "-1805672690"
+		garbageValue = "1655191906"
 	)
-	public boolean method6341(int var1, int var2) {
-		return var1 >= this.lowX && var1 < this.highX + this.lowX && var2 >= this.lowY && var2 < this.highY + this.lowY; // L: 29
+	public boolean method6599(int var1, int var2) {
+		return var1 >= this.lowX && var1 < this.lowX + this.highX && var2 >= this.lowY && var2 < this.lowY + this.highY; // L: 29
 	}
 
-	@ObfuscatedName("a")
+	@ObfuscatedName("e")
 	@ObfuscatedSignature(
-		descriptor = "(Lmo;Lmo;I)V",
-		garbageValue = "-1080090251"
+		descriptor = "(Lna;Lna;B)V",
+		garbageValue = "-63"
 	)
-	public void method6353(Bounds var1, Bounds var2) {
-		this.method6343(var1, var2); // L: 37
-		this.method6344(var1, var2); // L: 38
+	public void method6600(Bounds var1, Bounds var2) {
+		this.method6613(var1, var2); // L: 37
+		this.method6602(var1, var2); // L: 38
 	} // L: 39
 
-	@ObfuscatedName("o")
+	@ObfuscatedName("r")
 	@ObfuscatedSignature(
-		descriptor = "(Lmo;Lmo;I)V",
-		garbageValue = "-953724915"
+		descriptor = "(Lna;Lna;B)V",
+		garbageValue = "53"
 	)
-	void method6343(Bounds var1, Bounds var2) {
+	void method6613(Bounds var1, Bounds var2) {
 		var2.lowX = this.lowX; // L: 42
 		var2.highX = this.highX; // L: 43
 		if (this.lowX < var1.lowX) { // L: 44
-			var2.highX = (var2.highX * -373048605 - (var1.lowX * -373048605 - this.lowX * -373048605)) * -1371710773; // L: 45
+			var2.highX = (var2.highX * 441930463 - (var1.lowX * 441930463 - this.lowX * 441930463)) * 1258350879; // L: 45
 			var2.lowX = var1.lowX; // L: 46
 		}
 
-		if (var2.method6345() > var1.method6345()) { // L: 48
-			var2.highX -= var2.method6345() - var1.method6345(); // L: 49
+		if (var2.method6603() > var1.method6603()) { // L: 48
+			var2.highX -= var2.method6603() - var1.method6603(); // L: 49
 		}
 
 		if (var2.highX < 0) { // L: 51
@@ -105,21 +110,21 @@ public class Bounds {
 
 	} // L: 52
 
-	@ObfuscatedName("g")
+	@ObfuscatedName("o")
 	@ObfuscatedSignature(
-		descriptor = "(Lmo;Lmo;B)V",
-		garbageValue = "107"
+		descriptor = "(Lna;Lna;I)V",
+		garbageValue = "2050658212"
 	)
-	void method6344(Bounds var1, Bounds var2) {
+	void method6602(Bounds var1, Bounds var2) {
 		var2.lowY = this.lowY; // L: 55
 		var2.highY = this.highY; // L: 56
 		if (this.lowY < var1.lowY) { // L: 57
-			var2.highY = (var2.highY * -447998599 - (var1.lowY * -447998599 - this.lowY * -447998599)) * -179878711; // L: 58
+			var2.highY = (var2.highY * -1578135041 - (var1.lowY * -1578135041 - this.lowY * -1578135041)) * -1496551937; // L: 58
 			var2.lowY = var1.lowY; // L: 59
 		}
 
-		if (var2.method6369() > var1.method6369()) { // L: 61
-			var2.highY -= var2.method6369() - var1.method6369(); // L: 62
+		if (var2.method6604() > var1.method6604()) { // L: 61
+			var2.highY -= var2.method6604() - var1.method6604(); // L: 62
 		}
 
 		if (var2.highY < 0) { // L: 64
@@ -128,69 +133,25 @@ public class Bounds {
 
 	} // L: 65
 
-	@ObfuscatedName("e")
+	@ObfuscatedName("i")
 	@ObfuscatedSignature(
 		descriptor = "(I)I",
-		garbageValue = "-123662248"
+		garbageValue = "1461378032"
 	)
-	int method6345() {
+	int method6603() {
 		return this.lowX + this.highX; // L: 68
 	}
 
-	@ObfuscatedName("p")
+	@ObfuscatedName("w")
 	@ObfuscatedSignature(
 		descriptor = "(I)I",
-		garbageValue = "539098241"
+		garbageValue = "2137637262"
 	)
-	int method6369() {
-		return this.highY + this.lowY; // L: 72
+	int method6604() {
+		return this.lowY + this.highY; // L: 72
 	}
 
 	public String toString() {
 		return null; // L: 33
 	}
-
-	@ObfuscatedName("ft")
-	@ObfuscatedSignature(
-		descriptor = "(B)V",
-		garbageValue = "-113"
-	)
-	static void method6370() {
-		Client.packetWriter.clearBuffer(); // L: 3043
-		Client.packetWriter.packetBuffer.offset = 0; // L: 3044
-		Client.packetWriter.serverPacket = null; // L: 3045
-		Client.packetWriter.field1277 = null; // L: 3046
-		Client.packetWriter.field1284 = null; // L: 3047
-		Client.packetWriter.field1285 = null; // L: 3048
-		Client.packetWriter.serverPacketLength = 0; // L: 3049
-		Client.packetWriter.field1275 = 0; // L: 3050
-		Client.rebootTimer = 0; // L: 3051
-		KeyHandler.method343(); // L: 3052
-		Client.minimapState = 0; // L: 3053
-		Client.destinationX = 0; // L: 3054
-
-		int var0;
-		for (var0 = 0; var0 < 2048; ++var0) { // L: 3055
-			Client.players[var0] = null;
-		}
-
-		HealthBarDefinition.localPlayer = null; // L: 3056
-
-		for (var0 = 0; var0 < Client.npcs.length; ++var0) { // L: 3057
-			NPC var1 = Client.npcs[var0]; // L: 3058
-			if (var1 != null) { // L: 3059
-				var1.targetIndex = -1; // L: 3060
-				var1.false0 = false; // L: 3061
-			}
-		}
-
-		GrandExchangeOfferUnitPriceComparator.method5485(); // L: 3064
-		WorldMapData_1.updateGameState(30); // L: 3065
-
-		for (var0 = 0; var0 < 100; ++var0) { // L: 3066
-			Client.field594[var0] = true;
-		}
-
-		Frames.method4481(); // L: 3067
-	} // L: 3068
 }

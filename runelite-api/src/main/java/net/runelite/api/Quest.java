@@ -183,6 +183,7 @@ public enum Quest
 	GETTING_AHEAD(752, "Getting Ahead"),
 	A_KINGDOM_DIVIDED(2971, "A Kingdom Divided"),
 	A_NIGHT_AT_THE_THEATRE(949, "A Night at the Theatre"),
+	LAND_OF_THE_GOBLINS(4135, "Land of the Goblins"),
 
 	//Miniquests
 	ENTER_THE_ABYSS(3140, "Enter the Abyss"),
@@ -198,7 +199,10 @@ public enum Quest
 	FAMILY_PEST(329, "Family Pest"),
 	MAGE_ARENA_II(330, "Mage Arena II"),
 	IN_SEARCH_OF_KNOWLEDGE(3143, "In Search of Knowledge"),
-	DADDYS_HOME(1688, "Daddy's Home");
+	DADDYS_HOME(1688, "Daddy's Home"),
+	THE_FROZEN_DOOR(3768, "The Frozen Door"),
+	HOPESPEARS_WILL(4136, "Hopespear's Will"),
+;
 
 	@Getter
 	private final int id;
