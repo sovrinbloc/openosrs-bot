@@ -8,7 +8,7 @@ public class ScreenPosition
 {
 	public static Client client = Adonai.Client;
 
-	public static Point getScreenPosition(Point point)
+	public static Point getScreenPosition(Client client, Point point)
 	{
 		java.awt.Point locationOnScreen = client.getCanvas().getLocationOnScreen();
 		return new Point(point.getX() + (int)locationOnScreen.getX(), point.getY() + (int)locationOnScreen.getY());

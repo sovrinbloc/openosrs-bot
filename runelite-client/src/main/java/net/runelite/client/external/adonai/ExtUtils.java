@@ -20,6 +20,7 @@ import net.runelite.client.external.Tab;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.adonaicore.Adonai;
 import net.runelite.client.plugins.adonaifarmer.AdonaiFarmerFinderPlugin;
+import net.runelite.client.plugins.adonaifarmer.Clickable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -1054,6 +1055,7 @@ public class ExtUtils<operator, T2>
 				final Item            item = items[i];
 				final ItemComposition c    = itemManager.getItemComposition(item.getId());
 				out[i] = new InventoryItem(i, item, c.getName(), c.isStackable());
+				out[i].setBounds(invBounds(items[i].getId()));
 			}
 
 			return out;
@@ -1136,6 +1138,44 @@ public class ExtUtils<operator, T2>
 			return iItems;
 		}
 
+		public static List<InventoryItem> getItems(List<Integer> itemIds)
+		{
+			ItemContainer       itemContainer = client.getItemContainer(InventoryID.INVENTORY);
+			List<InventoryItem> iItems        = new ArrayList<>();
+
+			final Item[]                       items          = itemContainer.getItems();
+			ExtUtils.Inventory.InventoryItem[] inventoryItems = ExtUtils.Inventory.convertToInventoryItems(items);
+			for (ExtUtils.Inventory.InventoryItem item :
+					inventoryItems)
+			{
+				if (itemIds.contains(item.getItem()
+						.getId()))
+				{
+					iItems.add(item);
+				}
+			}
+			return iItems;
+		}
+
+		public static InventoryItem getItem(int itemId)
+		{
+			ItemContainer       itemContainer = client.getItemContainer(InventoryID.INVENTORY);
+			List<InventoryItem> iItems        = new ArrayList<>();
+
+			final Item[]                       items          = itemContainer.getItems();
+			ExtUtils.Inventory.InventoryItem[] inventoryItems = ExtUtils.Inventory.convertToInventoryItems(items);
+			for (ExtUtils.Inventory.InventoryItem item :
+					inventoryItems)
+			{
+				if (itemId == item.getItem()
+						.getId())
+				{
+					return item;
+				}
+			}
+			return null;
+		}
+
 		public static int getInventorySize()
 		{
 			ItemContainer itemContainer = client.getItemContainer(InventoryID.INVENTORY);
@@ -1159,13 +1199,34 @@ public class ExtUtils<operator, T2>
 
 
 		@Data
-		@AllArgsConstructor
-		public static class InventoryItem
+		public static class InventoryItem implements Clickable
 		{
 			private final int slot;
 			private Item item;
 			private final String name;
 			private final boolean stackable;
+
+			 InventoryItem(int slot, Item item, String name, boolean stackable) {
+			 	this.slot = slot;
+			 	this.item = item;
+			 	this.name = name;
+			 	this.stackable = stackable;
+			 }
+
+			@Nullable
+			private Rectangle bounds;
+
+			@Override
+			public Rectangle getBounds()
+			{
+				return bounds;
+			}
+
+			@Override
+			public void setBounds(Rectangle bounds)
+			{
+				this.bounds = bounds;
+			}
 		}
 
 	}

@@ -1,16 +1,12 @@
 package net.runelite.client.plugins.adonaifarmer;
 
 import com.google.inject.Provides;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.api.widgets.WidgetItem;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.external.adonai.ExtUtils;
@@ -24,13 +20,12 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.io.InputStream;
-import java.net.URL;
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 
 @PluginDescriptor(
 		name = "Adonai Farmer Finder",
@@ -58,26 +53,67 @@ public class AdonaiFarmerFinderPlugin extends Plugin
 	@Inject
 	private OverlayManager overlayManager;
 
+
 	@Inject
 	private AdonaiFarmerFinderOverlay overlay;
+
+
+	@Inject
+	private ItemManager itemManager;
+
+	// mutex for updating the count of dropped items in new thread.
+	private ReentrantLock mutex = new ReentrantLock();
+
+
+	enum PlayerState
+	{
+		THIEVING,
+		DROPPING,
+		NOTHING,
+		STARTING,
+		SHUTTING_DOWN
+
+	}
+
+	public static PlayerState state = PlayerState.NOTHING;
+
 
 	@Override
 	protected void startUp()
 	{
 		startTime = Instant.now();
 		overlayManager.add(overlay);
+
 		Adonai.client = client;
 		initializeExecutorService();
+		ExtUtils.Inventory.init(itemManager);
+
+		state = PlayerState.STARTING;
 	}
 
 	Instant startTime;
+
 	Instant next;
+
+	int dropCount = 0;
+
 
 	@Subscribe
 	public void onGameTick(GameTick tick)
 			throws InterruptedException
 	{
-		findMasterFarmer();
+		// this works
+		int inventorySize = ExtUtils.Inventory.getInventorySize();
+		if (inventorySize < 28 && (state != PlayerState.DROPPING || dropCount <= 0))
+		{
+			findAndThieveMasterFarmer();
+			return;
+		}
+		log.info("Inventory size to drop: {}", inventorySize);
+		if (state != PlayerState.DROPPING)
+		{
+			drop();
+		}
 	}
 
 	/**
@@ -85,6 +121,7 @@ public class AdonaiFarmerFinderPlugin extends Plugin
 	 * Herein is the variables for this.
 	 */
 	private ExecutorService executorService;
+
 
 	private void initializeExecutorService()
 	{
@@ -101,11 +138,14 @@ public class AdonaiFarmerFinderPlugin extends Plugin
 	/**
 	 *
 	 */
-	private void findMasterFarmer()
+	private void findAndThieveMasterFarmer()
 			throws InterruptedException
 	{
 
 		assert client.isClientThread();
+
+		// set player to thieving
+		state = PlayerState.THIEVING;
 
 		NPC farmer = NPCs.findNearestNPC("Master Farmer");
 		if (farmer == null)
@@ -114,7 +154,7 @@ public class AdonaiFarmerFinderPlugin extends Plugin
 			return;
 		}
 		log.info("Farmer found");
-		dropItemsExcept();
+
 		LocalPoint localLocation = farmer.getLocalLocation();
 		Point      point         = Perspective.localToCanvas(client, localLocation, client.getPlane());
 		if (point == null)
@@ -123,7 +163,7 @@ public class AdonaiFarmerFinderPlugin extends Plugin
 			return;
 		}
 
-		Point pt = ScreenPosition.getScreenPosition(point);
+		Point pt = ScreenPosition.getScreenPosition(client, point);
 		log.info("Screen position: {}, {}", pt.getX(), pt.getY());
 
 		// this works
@@ -131,74 +171,114 @@ public class AdonaiFarmerFinderPlugin extends Plugin
 
 		log.info("Inventory size: {}", itemSize);
 		// testing to see if this works
-
-		boolean stopThieving = itemSize >= 28;
-		if (stopThieving)
+		if (itemSize < 28)
 		{
-			System.out.println("We should be stopping thieving at this point.");
-			return;
+			trackFarmer(pt);
 		}
-		moveToFarmer(pt);
 	}
-	
+
+	private void drop()
+	{
+		dropItemsExcept();
+		randomClickPoint = null;
+	}
+
+	Point randomClickPoint;
+
+
 	void dropItemsExcept()
 	{
-		List<Integer> keepItems = new ArrayList<>(){
-			{
-				add(ItemIdentification.HARRALANDER_SEED.itemIDs[0]);
-				add(ItemIdentification.RANARR_SEED.itemIDs[0]);
-				add(ItemIdentification.TOADFLAX_SEED.itemIDs[0]);
-				add(ItemIdentification.IRIT_SEED.itemIDs[0]);
-				add(ItemIdentification.AVANTOE_SEED.itemIDs[0]);
-				add(ItemIdentification.KWUARM_SEED.itemIDs[0]);
-				add(ItemIdentification.SNAPDRAGON_SEED.itemIDs[0]);
-				add(ItemIdentification.CADANTINE_SEED.itemIDs[0]);
-				add(ItemIdentification.LANTADYME_SEED.itemIDs[0]);
-				add(ItemIdentification.DWARF_WEED_SEED.itemIDs[0]);
-				add(ItemIdentification.TORSTOL_SEED.itemIDs[0]);
-				add(ItemIdentification.JANGERBERRY_SEED.itemIDs[0]);
-				add(ItemIdentification.POISON_IVY_SEED.itemIDs[0]);
-				add(ItemIdentification.SNAPE_GRASS_SEED.itemIDs[0]);
-						add(ItemIdentification.SEED_BOX.itemIDs[0]);
-		}};
-		ExtUtils.Inventory.init(itemManager);
-		List<ExtUtils.Inventory.InventoryItem> itemsExcept = ExtUtils.Inventory.getItemsExcept(keepItems);
-		for (ExtUtils.Inventory.InventoryItem i :
-				itemsExcept)
+		// set player state to DROPPING
+		state = PlayerState.DROPPING;
+
+		List<ExtUtils.Inventory.InventoryItem> itemsExcept = ExtUtils.Inventory.getItemsExcept(DropConfig.keepItems);
+		dropCount = itemsExcept.size();
+
+		ItemIdentification clickItem = ItemIdentification.SEED_BOX;
+
+
+		ExtUtils.Inventory.InventoryItem seedBox = ExtUtils.Inventory.getItem(clickItem.itemIDs[0]);
+		if (randomClickPoint == null)
 		{
-			Rectangle itemBounds = ExtUtils.Inventory.invBounds(i.getItem()
+			randomClickPoint = ExtUtils.AdonaiScreen.getClickPoint(seedBox.getBounds());
+		}
+
+		Point clickPoint = ScreenPosition.getScreenPosition(client, randomClickPoint);
+		doClick(clickPoint);
+
+
+		Iterator<ExtUtils.Inventory.InventoryItem> iterator = itemsExcept.iterator();
+		ExtUtils.Inventory.InventoryItem iItem = null;
+		for (int i = 0; i < itemsExcept.size(); i++)
+		{
+			iItem = itemsExcept.get(i);
+			Rectangle itemBounds = ExtUtils.Inventory.invBounds(iItem.getItem()
 					.getId());
-			log.info("Inventory Item: {}, Bounds: {}, {}", i.getName(), itemBounds.getX(), itemBounds.getY());
+
+			doClick(ScreenPosition.getScreenPosition(
+					client,
+					ExtUtils.AdonaiScreen.getClickPoint(itemBounds.getBounds())
+			));
+		}
+		log.info("Done dropping");
+	}
+
+	private void doClick(Point clickPoint)
+	{
+		executorService.submit(() ->
+		{
+			sendClick(clickPoint);
+			//			sleep(300);
+			try {
+				mutex.lock();
+				--dropCount;
+				log.info("dropCount: {}", dropCount);
+			} finally
+			{
+				mutex.unlock();
+			}
+		});
+	}
+
+	private void sendClick(Point clickPoint)
+	{
+		try
+		{
+			ClickService.click(clickPoint.getX(), clickPoint.getY());
+		}
+		catch (Exception e)
+		{
+			log.info("Could do nothing on seed box");
 		}
 	}
 
 	public Point getScreenPosition(Point point)
 	{
-		java.awt.Point locationOnScreen = client.getCanvas().getLocationOnScreen();
-		return new Point(point.getX() + (int)locationOnScreen.getX(), point.getY() + (int)locationOnScreen.getY());
+		java.awt.Point locationOnScreen = client.getCanvas()
+				.getLocationOnScreen();
+		return new Point(point.getX() + (int) locationOnScreen.getX(), point.getY() + (int) locationOnScreen.getY());
 	}
 
-	private void moveToFarmer(Point pt)
+	private void trackFarmer(Point pt)
 	{
 		log.info("We are inside moving farmer;");
 		executorService.submit(() ->
 		{
-			try
-			{
-				URL url = new URL("http://0.0.0.0:4567/track/" + pt.getX() + "/" + pt.getY());
-				InputStream is = url.openConnection()
-						.getInputStream();
-			}
-			catch (Exception e)
-			{
-				log.info("Could do nothing");
-			}
+			sendTrackFarmer(pt);
 		});
 	}
 
-
-	@Inject
-	private ItemManager itemManager;
+	private void sendTrackFarmer(Point pt)
+	{
+		try
+		{
+			ClickService.sendToServer("http://0.0.0.0:4567/track/" + pt.getX() + "/" + pt.getY());
+		}
+		catch (Exception e)
+		{
+			log.info("Could do nothing");
+		}
+	}
 
 
 	void getItemNames()
@@ -217,6 +297,27 @@ public class AdonaiFarmerFinderPlugin extends Plugin
 					item.getItem()
 							.getId()
 			);
+		}
+	}
+
+	Map<Integer, Integer> thievedItems = new HashMap<>();
+	@Subscribe
+	public void onItemContainerChanged(ItemContainerChanged event)
+	{
+		if (event.getItemContainer() != client.getItemContainer(InventoryID.INVENTORY))
+		{
+			return;
+		}
+
+		int quant = 0;
+
+		for (Item item : event.getItemContainer().getItems())
+		{
+			thievedItems.put(item.getId(), thievedItems.getOrDefault(item.getId(), 0) + item.getQuantity());
+			if (thievedItems.containsKey(item.getId()))
+			{
+				quant++;
+			}
 		}
 	}
 
