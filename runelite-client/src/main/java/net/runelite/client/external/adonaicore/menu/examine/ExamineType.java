@@ -1,5 +1,9 @@
 /*
+<<<<<<< HEAD:runelite-client/src/main/java/net/runelite/client/external/adonaicore/menu/examine/ExamineType.java
  * Copyright (c) 2017, Adam <Adam@sigterm.info>
+=======
+ * Copyright (c) 2021, Adam <Adam@sigterm.info>
+>>>>>>> fba6f9b58bb7fa460262280f02db9641486614bf:runelite-client/src/main/java/net/runelite/client/hiscore/Skill.java
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,11 +27,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package net.runelite.client.external.adonaicore.menu.examine;
+import lombok.Value;
 
 public enum ExamineType
-{
+		{
 	ITEM,
 	ITEM_BANK_EQ,
 	NPC,
 	OBJECT;
 }
+//package net.runelite.client.hiscore;
+
+
+//@Value
+//public class Skill
+//{
+//	int rank;
+//	int level;
+//	long experience;
+//}

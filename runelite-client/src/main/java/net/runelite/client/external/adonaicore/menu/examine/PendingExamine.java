@@ -1,5 +1,9 @@
 /*
+<<<<<<< HEAD:runelite-client/src/main/java/net/runelite/client/external/adonaicore/menu/examine/PendingExamine.java
  * Copyright (c) 2017, Adam <Adam@sigterm.info>
+=======
+ * Copyright (c) 2022, Adam <Adam@sigterm.info>
+>>>>>>> fba6f9b58bb7fa460262280f02db9641486614bf:runelite-client/src/main/java/net/runelite/client/RuntimeConfig.java
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

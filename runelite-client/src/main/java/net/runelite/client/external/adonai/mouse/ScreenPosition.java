@@ -2,18 +2,16 @@ package net.runelite.client.external.adonai.mouse;
 
 import net.runelite.api.Client;
 import net.runelite.api.Point;
+import net.runelite.client.external.adonai.Adonai;
 
 public class ScreenPosition
 {
-	public Client client;
-	public ScreenPosition(Client client)
-	{
-		this.client = client;
-	}
+	public static Client client = Adonai.Client;
 
-	public Point getScreenPosition(Point point)
+	public static Point getScreenPosition(Point point)
 	{
 		java.awt.Point locationOnScreen = client.getCanvas().getLocationOnScreen();
 		return new Point(point.getX() + (int)locationOnScreen.getX(), point.getY() + (int)locationOnScreen.getY());
 	}
+
 }

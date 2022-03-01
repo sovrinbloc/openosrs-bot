@@ -28,7 +28,7 @@ public class NPCs
 	}
 
 	@Nullable
-	public NPC findNearestNPC(String... names)
+	public static NPC findNearestNPC(String... names)
 	{
 		assert Adonai.client.isClientThread();
 

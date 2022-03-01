@@ -5,6 +5,8 @@
  */
 package net.runelite.client.external.adonai;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.api.*;
@@ -15,7 +17,9 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.external.PrayerMap;
 import net.runelite.client.external.Spells;
 import net.runelite.client.external.Tab;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.adonaicore.Adonai;
+import net.runelite.client.plugins.adonaifarmer.AdonaiFarmerFinderPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -37,7 +41,7 @@ import static net.runelite.client.external.adonai.ExtUtils.AdonaiDecorativeObjec
 @Singleton
 public class ExtUtils<operator, T2>
 {
-	final private Client client;
+	private static Client client;
 	private Keyboard keyboard = null;
 
 	ExtUtils(Client client, Keyboard keyboard)
@@ -53,15 +57,29 @@ public class ExtUtils<operator, T2>
 
 	public int[] stringToIntArray(String string)
 	{
-		return Arrays.stream(string.split(",")).map(String::trim).mapToInt(Integer::parseInt).toArray();
+		return Arrays.stream(string.split(","))
+				.map(String::trim)
+				.mapToInt(Integer::parseInt)
+				.toArray();
+	}
+
+	public static void initialize(Client client)
+	{
+		AdonaiGameObjects.client = client;
+		AdonaiWidgetItems.client = client;
+		AdonaiObjects.client = client;
+		AdonaiDecorativeObjects.client = client;
+		AdonaiEquippedItems.client = client;
+		AdonaiWallObjects.client = client;
+		Adonai.client = client;
 	}
 
 	// find in game items
 
-	static class AdonaiGameObjects
+	public static class AdonaiGameObjects
 	{
 
-		public static Client client;
+		public static Client client = Adonai.client;
 
 		@Nullable
 		public static GameObject findNearestGameObject(int... ids)
@@ -157,10 +175,10 @@ public class ExtUtils<operator, T2>
 		}
 	}
 
-	static class AdonaiWallObjects
+	public static class AdonaiWallObjects
 	{
 
-		public static Client client;
+		public static Client client = Adonai.client;
 
 		@Nullable
 		public static WallObject findNearestWallObject(int... ids)
@@ -256,10 +274,10 @@ public class ExtUtils<operator, T2>
 		}
 	}
 
-	static class AdonaiDecorativeObjects
+	public static class AdonaiDecorativeObjects
 	{
 
-		public static Client client;
+		public static Client client = Adonai.client;
 
 		@Nullable
 		public static DecorativeObject findNearestDecorObject(int... ids)
@@ -356,9 +374,9 @@ public class ExtUtils<operator, T2>
 
 	}
 
-	static class AdonaiGroundObjects
+	public static class AdonaiGroundObjects
 	{
-		public static Client client;
+		public static Client client = Adonai.client;
 
 		@Nullable
 		public static GroundObject findNearestGroundObject(int... ids)
@@ -455,7 +473,7 @@ public class ExtUtils<operator, T2>
 
 	}
 
-	static class NPCs
+	public static class NPCs
 	{
 		public static Client client = Adonai.client;
 
@@ -509,10 +527,10 @@ public class ExtUtils<operator, T2>
 	}
 
 
-	static class AdonaiObjects
+	public static class AdonaiObjects
 	{
 
-		public static Client client;
+		public static Client client = Adonai.client;
 
 		@Nullable
 		public TileObject findNearestObject(int... ids)
@@ -567,10 +585,10 @@ public class ExtUtils<operator, T2>
 		}
 	}
 
-	static class AdonaiWidgetItems
+	public static class AdonaiWidgetItems
 	{
 
-		public static Client client;
+		public static Client client = Adonai.client;
 
 		public static List<WidgetItem> getItems(int... itemIDs)
 		{
@@ -591,7 +609,9 @@ public class ExtUtils<operator, T2>
 					.list;
 
 			new ArrayList<>(Arrays.asList(names)).forEach(inventoryItem ->
-					items.removeIf(item -> item.getWidget().getName().equals(inventoryItem)));
+					items.removeIf(item -> item.getWidget()
+							.getName()
+							.equals(inventoryItem)));
 
 			return items;
 		}
@@ -609,9 +629,9 @@ public class ExtUtils<operator, T2>
 	}
 
 	// widget items
-	static class AdonaiEquippedItems
+	public static class AdonaiEquippedItems
 	{
-		public static Client client;
+		public static Client client = Adonai.client;
 
 		public static List<Widget> getEquippedItems(int[] itemIds)
 		{
@@ -706,11 +726,90 @@ public class ExtUtils<operator, T2>
 		}
 	}
 
+	public static class AdonaiScreen
+	{
+		public static Point getScreenPosition(Point point)
+		{
+			java.awt.Point locationOnScreen = client.getCanvas()
+					.getLocationOnScreen();
+			return new Point(
+					point.getX() + (int) locationOnScreen.getX(),
+					point.getY() + (int) locationOnScreen.getY()
+			);
+		}
+
+		public static Point getClickPoint(@NotNull Rectangle rect)
+		{
+			final int x = (int) (rect.getX() + getRandomIntBetweenRange(
+					(int) rect.getWidth() / 6 * -1,
+					(int) rect.getWidth() / 6
+			) + rect.getWidth() / 2);
+			final int y = (int) (rect.getY() + getRandomIntBetweenRange(
+					(int) rect.getHeight() / 6 * -1,
+					(int) rect.getHeight() / 6
+			) + rect.getHeight() / 2);
+
+			return new Point(x, y);
+		}
+
+		public static int getRandomIntBetweenRange(int min, int max)
+		{
+			return (int) ((Math.random() * ((max - min) + 1)) + min);
+		}
+
+		public static boolean isOnScreen(TileObject point)
+		{
+			return client.getCanvas()
+					.contains(
+							point.getCanvasLocation()
+									.getX(),
+							point.getCanvasLocation()
+									.getY()
+					);
+		}
+
+		public static boolean isOnScreen(WidgetItem point)
+		{
+			return client.getCanvas()
+					.contains(
+							point.getCanvasLocation()
+									.getX(),
+							point.getCanvasLocation()
+									.getY()
+					);
+		}
+
+		public static boolean isOnScreen(Actor actor)
+		{
+			assert client.isClientThread();
+			// that was my last resort that worked
+			client.getCanvas()
+					.getLocationOnScreen();
+			client.getCanvas()
+					.isShowing();
+			client.getCanvas()
+					.getMousePosition();
+			client.getCanvasHeight();
+			client.getCanvasWidth();
+			Point actorPoint = Perspective.localToCanvas(client, actor.getLocalLocation(), client.getPlane());
+			assert actorPoint != null;
+			return isOnScreen(actorPoint);
+		}
+
+		public static boolean isOnScreen(Point point)
+		{
+			assert client.isClientThread();
+			return (point.getX() >= 0 && point.getX() <= client.getCanvasWidth() && point.getY() >= 0 &&
+					point.getY() <= client.getCanvasHeight());
+		}
+
+	}
+
 	public int getTabHotkey(Tab tab)
 	{
 		assert client.isClientThread();
 
-		final int var = client.getVarbitValue(client.getVarps(), tab.getVarbit());
+		final int var    = client.getVarbitValue(client.getVarps(), tab.getVarbit());
 		final int offset = 111;
 
 		switch (var)
@@ -731,7 +830,7 @@ public class ExtUtils<operator, T2>
 			case 13:
 				return 27;
 			default:
-				return - 1;
+				return -1;
 		}
 	}
 
@@ -767,7 +866,7 @@ public class ExtUtils<operator, T2>
 	 */
 	public void typeString(String string)
 	{
-		assert ! client.isClientThread();
+		assert !client.isClientThread();
 
 		try
 		{
@@ -782,12 +881,15 @@ public class ExtUtils<operator, T2>
 
 	private void keyEvent(int id, char key)
 	{
+		assert !client.isClientThread();
+
 		KeyEvent e = new KeyEvent(
 				client.getCanvas(), id, System.currentTimeMillis(),
 				0, KeyEvent.VK_UNDEFINED, key
 		);
 
-		client.getCanvas().dispatchEvent(e);
+		client.getCanvas()
+				.dispatchEvent(e);
 	}
 
 	/**
@@ -798,22 +900,22 @@ public class ExtUtils<operator, T2>
 	 */
 	public void click(Rectangle rectangle)
 	{
-		assert ! client.isClientThread();
+		assert !client.isClientThread();
 		Point point = getClickPoint(rectangle);
 		click(point);
 	}
 
 	public void click(Point p)
 	{
-		assert ! client.isClientThread();
+		assert !client.isClientThread();
 
 		if (client.isStretchedEnabled())
 		{
-			final Dimension stretched = Adonai.client.getStretchedDimensions();
+			final Dimension stretched      = Adonai.client.getStretchedDimensions();
 			final Dimension realDimensions = Adonai.client.getRealDimensions();
-			final double width = (stretched.width / realDimensions.getWidth());
-			final double height = (stretched.height / realDimensions.getHeight());
-			final Point point = new Point((int) (p.getX() * width), (int) (p.getY() * height));
+			final double    width          = (stretched.width / realDimensions.getWidth());
+			final double    height         = (stretched.height / realDimensions.getHeight());
+			final Point     point          = new Point((int) (p.getX() * width), (int) (p.getY() * height));
 			mouseEvent(501, point);
 			mouseEvent(502, point);
 			mouseEvent(500, point);
@@ -826,8 +928,14 @@ public class ExtUtils<operator, T2>
 
 	public Point getClickPoint(@NotNull Rectangle rect)
 	{
-		final int x = (int) (rect.getX() + getRandomIntBetweenRange((int) rect.getWidth() / 6 * - 1, (int) rect.getWidth() / 6) + rect.getWidth() / 2);
-		final int y = (int) (rect.getY() + getRandomIntBetweenRange((int) rect.getHeight() / 6 * - 1, (int) rect.getHeight() / 6) + rect.getHeight() / 2);
+		final int x = (int) (rect.getX() + getRandomIntBetweenRange(
+				(int) rect.getWidth() / 6 * -1,
+				(int) rect.getWidth() / 6
+		) + rect.getWidth() / 2);
+		final int y = (int) (rect.getY() + getRandomIntBetweenRange(
+				(int) rect.getHeight() / 6 * -1,
+				(int) rect.getHeight() / 6
+		) + rect.getHeight() / 2);
 
 		return new Point(x, y);
 	}
@@ -846,25 +954,42 @@ public class ExtUtils<operator, T2>
 				1, false, 1
 		);
 
-		client.getCanvas().dispatchEvent(e);
+		client.getCanvas()
+				.dispatchEvent(e);
 	}
 
 	public boolean isOnScreen(TileObject point)
 	{
-		return client.getCanvas().contains(point.getCanvasLocation().getX(), point.getCanvasLocation().getY());
+		return client.getCanvas()
+				.contains(
+						point.getCanvasLocation()
+								.getX(),
+						point.getCanvasLocation()
+								.getY()
+				);
 	}
 
 	public boolean isOnScreen(WidgetItem point)
 	{
-		return client.getCanvas().contains(point.getCanvasLocation().getX(), point.getCanvasLocation().getY());
+		return client.getCanvas()
+				.contains(
+						point.getCanvasLocation()
+								.getX(),
+						point.getCanvasLocation()
+								.getY()
+				);
 	}
 
 	public boolean isOnScreen(Actor actor)
 	{
+		assert client.isClientThread();
 		// that was my last resort that worked
-		client.getCanvas().getLocationOnScreen();
-		client.getCanvas().isShowing();
-		client.getCanvas().getMousePosition();
+		client.getCanvas()
+				.getLocationOnScreen();
+		client.getCanvas()
+				.isShowing();
+		client.getCanvas()
+				.getMousePosition();
 		client.getCanvasHeight();
 		client.getCanvasWidth();
 		Point actorPoint = Perspective.localToCanvas(client, actor.getLocalLocation(), client.getPlane());
@@ -874,11 +999,13 @@ public class ExtUtils<operator, T2>
 
 	public boolean isOnScreen(Point point)
 	{
+		assert client.isClientThread();
 		return (point.getX() >= 0 && point.getX() <= client.getCanvasWidth() && point.getY() >= 0 &&
 				point.getY() <= client.getCanvasHeight());
 	}
 
-	private void robotClick() throws AWTException
+	private void robotClick()
+			throws AWTException
 	{
 		Robot bot = new Robot();
 		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
@@ -900,7 +1027,146 @@ public class ExtUtils<operator, T2>
 
 	public static int random(int min, int max)
 	{
-		return ThreadLocalRandom.current().nextInt(min, max);
+		return ThreadLocalRandom.current()
+				.nextInt(min, max);
 	}
 
+	public static class Inventory
+	{
+		private static Client client = Adonai.client;
+		private static ItemManager itemManager;
+
+		public static Point getInventoryLocation()
+		{
+			return null;
+		}
+
+		public static void init(ItemManager itemManager)
+		{
+			Inventory.itemManager = itemManager;
+		}
+
+		public static InventoryItem[] convertToInventoryItems(final Item[] items)
+		{
+			final InventoryItem[] out = new InventoryItem[items.length];
+			for (int i = 0; i < items.length; i++)
+			{
+				final Item            item = items[i];
+				final ItemComposition c    = itemManager.getItemComposition(item.getId());
+				out[i] = new InventoryItem(i, item, c.getName(), c.isStackable());
+			}
+
+			return out;
+		}
+
+		public static Rectangle invBounds(int id)
+		{
+			final Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
+
+			if (inventoryWidget == null)
+			{
+				return null;
+			}
+
+			for (WidgetItem item : inventoryWidget.getWidgetItems())
+			{
+				if (item.getId() == id)
+				{
+					return item.getCanvasBounds();
+				}
+			}
+
+			return null;
+		}
+
+		public static java.util.List<Rectangle> listOfBounds(int id)
+		{
+			final Widget          inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
+			final List<Rectangle> bounds          = new ArrayList<>();
+
+			if (inventoryWidget == null)
+			{
+				return bounds;
+			}
+
+			for (WidgetItem item : inventoryWidget.getWidgetItems())
+			{
+				if (item.getId() == id)
+				{
+					bounds.add(item.getCanvasBounds());
+				}
+			}
+			return bounds;
+		}
+
+		InventoryItem getItemByName(String name)
+		{
+			ItemContainer itemContainer = client.getItemContainer(InventoryID.INVENTORY);
+
+			final Item[]                       items          = itemContainer.getItems();
+			ExtUtils.Inventory.InventoryItem[] inventoryItems = ExtUtils.Inventory.convertToInventoryItems(items);
+			for (ExtUtils.Inventory.InventoryItem item :
+					inventoryItems)
+			{
+				if (item.getName()
+						.equals(name))
+				{
+					return item;
+				}
+			}
+			return null;
+		}
+
+		public static List<InventoryItem> getItemsExcept(List<Integer> itemIds)
+		{
+			ItemContainer       itemContainer = client.getItemContainer(InventoryID.INVENTORY);
+			List<InventoryItem> iItems        = new ArrayList<>();
+
+			final Item[]                       items          = itemContainer.getItems();
+			ExtUtils.Inventory.InventoryItem[] inventoryItems = ExtUtils.Inventory.convertToInventoryItems(items);
+			for (ExtUtils.Inventory.InventoryItem item :
+					inventoryItems)
+			{
+				if (!itemIds.contains(item.getItem()
+						.getId()))
+				{
+					iItems.add(item);
+				}
+			}
+			return iItems;
+		}
+
+		public static int getInventorySize()
+		{
+			ItemContainer itemContainer = client.getItemContainer(InventoryID.INVENTORY);
+
+			final Item[] items    = itemContainer.getItems();
+			int          itemSize = 0;
+			for (int i = 0; i < 28; i++)
+			{
+				if (i < items.length)
+				{
+					final Item item = items[i];
+					if (item.getQuantity() > 0)
+					{
+						itemSize++;
+					}
+				}
+			}
+
+			return itemSize;
+		}
+
+
+		@Data
+		@AllArgsConstructor
+		public static class InventoryItem
+		{
+			private final int slot;
+			private Item item;
+			private final String name;
+			private final boolean stackable;
+		}
+
+	}
 }

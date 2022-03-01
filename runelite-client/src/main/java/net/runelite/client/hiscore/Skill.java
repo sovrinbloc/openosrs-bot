@@ -1,5 +1,13 @@
 /*
+<<<<<<< HEAD
  * Copyright (c) 2021, Adam <Adam@sigterm.info>
+=======
+<<<<<<< HEAD:runelite-client/src/main/java/net/runelite/client/external/adonaicore/menu/examine/ExamineType.java
+ * Copyright (c) 2017, Adam <Adam@sigterm.info>
+=======
+ * Copyright (c) 2021, Adam <Adam@sigterm.info>
+>>>>>>> fba6f9b58bb7fa460262280f02db9641486614bf:runelite-client/src/main/java/net/runelite/client/hiscore/Skill.java
+>>>>>>> fba6f9b58bb7fa460262280f02db9641486614bf
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,6 +30,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+//package net.runelite.client.external.adonaicore.menu.examine;
+
+//public enum ExamineType
+//{
+//	ITEM,
+//	ITEM_BANK_EQ,
+//	NPC,
+//	OBJECT;
+//}
 package net.runelite.client.hiscore;
 
 import lombok.Value;

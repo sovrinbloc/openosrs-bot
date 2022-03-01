@@ -36,7 +36,6 @@ import net.runelite.api.widgets.menu.ContextMenu;
 import net.runelite.rs.api.RSClient;
 import net.runelite.rs.api.RSFont;
 import net.runelite.rs.api.RSMenuAction;
-import net.runelite.rs.api.RSRuneLiteMenuEntry;
 
 @Mixin(RSClient.class)
 public abstract class MenuMixin implements RSClient

@@ -42,10 +42,12 @@ public class AdonaiMenuChangerPlugin extends Plugin
 
 	final private Map<Integer, List<String>> objectOptions = new HashMap<>();
 	final private Map<Integer, List<String>> npcOptions = new HashMap<>();
+	final private Map<Integer, List<String>> itemOptions = new HashMap<>();
 	final private List<String> removeOptions = new ArrayList<>();
 
 	final public static String MENU_OPTION_SEARCH_FOR_TRAPS = "search for traps";
 	final public static String MENU_OPTION_EXAMINE = "examine";
+	final public static String DRINK = "drink";
 	final public static int OBJECT_ID_NATURE_CHEST = 11736;
 
 	@Override

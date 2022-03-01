@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2021 Abex
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,35 +37,4 @@ class CacheKey
 		this.id = id;
 	}
 
-	@Override
-	public int hashCode()
-	{
-		int hash = 3;
-		hash = 23 * hash + Objects.hashCode(this.type);
-		hash = 23 * hash + this.id;
-		return hash;
-	}
-
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-		{
-			return true;
-		}
-		if (obj == null)
-		{
-			return false;
-		}
-		if (getClass() != obj.getClass())
-		{
-			return false;
-		}
-		final CacheKey other = (CacheKey) obj;
-		if (this.id != other.id)
-		{
-			return false;
-		}
-		return this.type == other.type;
-	}
 }

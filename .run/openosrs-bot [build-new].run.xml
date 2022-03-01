@@ -1,5 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="openosrs-bot [build]" type="GradleRunConfiguration" factoryName="Gradle">
+    <selectedOptions>
+      <option name="external.system.vm.parameters.fragment" />
+    </selectedOptions>
     <ExternalSystemSettings>
       <option name="env">
         <map>
@@ -16,7 +19,7 @@
       <option name="taskNames">
         <list />
       </option>
-      <option name="vmOptions" />
+      <option name="vmOptions" value="" />
     </ExternalSystemSettings>
     <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
