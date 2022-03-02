@@ -5,7 +5,6 @@
  */
 package net.runelite.client.external.adonai;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
@@ -19,7 +18,6 @@ import net.runelite.client.external.Spells;
 import net.runelite.client.external.Tab;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.adonaicore.Adonai;
-import net.runelite.client.plugins.adonaifarmer.AdonaiFarmerFinderPlugin;
 import net.runelite.client.plugins.adonaifarmer.Clickable;
 import org.jetbrains.annotations.NotNull;
 

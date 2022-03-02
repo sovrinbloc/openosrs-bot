@@ -28,10 +28,14 @@ import com.google.inject.Inject;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.FontManager;
+import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
 import net.runelite.client.ui.overlay.components.TextComponent;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static net.runelite.api.widgets.WidgetID.*;
 
@@ -40,14 +44,25 @@ class AdonaiFarmerFinderOverlay extends WidgetItemOverlay
 	private final ItemIdentificationConfig config;
 	private final ItemManager itemManager;
 
+
+	public static Map<Integer, Integer> thievedItems = new HashMap<>();
+	public static Map<Integer, String> seedMap = new HashMap<>();
+
 	@Inject
 	AdonaiFarmerFinderOverlay(ItemIdentificationConfig config, ItemManager itemManager)
 	{
 		this.config = config;
 		this.itemManager = itemManager;
+
 		showOnInventory();
 		showOnBank();
-		showOnInterfaces(KEPT_ON_DEATH_GROUP_ID, GUIDE_PRICE_GROUP_ID, LOOTING_BAG_GROUP_ID, SEED_BOX_GROUP_ID, KINGDOM_GROUP_ID);
+		showOnInterfaces(
+				KEPT_ON_DEATH_GROUP_ID,
+				GUIDE_PRICE_GROUP_ID,
+				LOOTING_BAG_GROUP_ID,
+				SEED_BOX_GROUP_ID,
+				KINGDOM_GROUP_ID
+		);
 	}
 
 	@Override
@@ -61,6 +76,7 @@ class AdonaiFarmerFinderOverlay extends WidgetItemOverlay
 
 		graphics.setFont(FontManager.getRunescapeSmallFont());
 		renderText(graphics, widgetItem.getCanvasBounds(), iden);
+		renderItems(graphics, new Rectangle(30, 30), seedMap, thievedItems);
 	}
 
 	private void renderText(Graphics2D graphics, Rectangle bounds, ItemIdentification iden)
@@ -78,6 +94,20 @@ class AdonaiFarmerFinderOverlay extends WidgetItemOverlay
 				break;
 		}
 		textComponent.render(graphics);
+	}
+
+	public void renderItems(Graphics2D graphics, Rectangle bounds, Map<Integer, String> items, Map<Integer, Integer> thieved)
+	{
+		final TextComponent textComponent = new TextComponent();
+		int hX = 1;
+		for (Map.Entry<Integer, Integer> entry : thieved.entrySet()) {
+			textComponent.setPosition(new Point(bounds.x - 1, bounds.y + bounds.height - 1 + (14 * hX)));
+			textComponent.setColor(Color.GREEN);
+			textComponent.setText(items.get(entry.getKey()) + ": " + entry.getValue());
+			textComponent.render(graphics);
+			hX++;
+		}
+
 	}
 
 	private ItemIdentification findItemIdentification(final int itemID)
