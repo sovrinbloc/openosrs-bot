@@ -11,7 +11,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.external.adonai.ExtUtils;
 import net.runelite.client.external.adonai.mouse.ScreenPosition;
-import net.runelite.client.external.adonai.randoms.RandomEventEasyPlugin;
+import net.runelite.client.plugins.adonairandoms.*;
 import net.runelite.client.external.adonaicore.ClickService;
 import net.runelite.client.external.adonaicore.npc.NPCs;
 import net.runelite.client.game.ItemManager;

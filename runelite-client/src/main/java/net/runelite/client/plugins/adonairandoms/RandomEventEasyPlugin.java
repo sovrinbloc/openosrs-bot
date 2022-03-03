@@ -23,17 +23,15 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.runelite.client.external.adonai.randoms;
+package net.runelite.client.plugins.adonairandoms;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.InteractingChanged;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.client.Notifier;
-import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -100,15 +98,6 @@ public class RandomEventEasyPlugin extends Plugin
 	@Inject
 	private Notifier notifier;
 
-	@Inject
-	private RandomEventEasyConfig config;
-
-	@Provides
-	RandomEventEasyConfig getConfig(ConfigManager configManager)
-	{
-		return configManager.getConfig(RandomEventEasyConfig.class);
-	}
-
 	@Override
 	protected void shutDown()
 			throws Exception
@@ -165,7 +154,7 @@ public class RandomEventEasyPlugin extends Plugin
 				&& EVENT_OPTIONS.contains(event.getOption()))
 		{
 			NPC npc = client.getCachedNPCs()[event.getIdentifier()];
-			if (npc != null && EVENT_NPCS.contains(npc.getId()) && npc != currentRandomEvent && config.removeMenuOptions())
+			if (npc != null && EVENT_NPCS.contains(npc.getId()) && npc != currentRandomEvent)
 			{
 				client.setMenuEntries(Arrays.copyOf(client.getMenuEntries(), client.getMenuEntries().length - 1));
 			}
@@ -189,34 +178,31 @@ public class RandomEventEasyPlugin extends Plugin
 
 	private boolean shouldNotify(int id)
 	{
-		if (config.notifyAllEvents())
-		{
-			return true;
-		}
+		return true;
 
-		switch (id)
-		{
-			case NpcID.BEE_KEEPER_6747:
-			case NpcID.SERGEANT_DAMIEN_6743:
-			case NpcID.FREAKY_FORESTER_6748:
-			case NpcID.FROG_5429:
-			case NpcID.GENIE:
-			case NpcID.GENIE_327:
-			case NpcID.DR_JEKYLL:
-			case NpcID.DR_JEKYLL_314:
-			case NpcID.EVIL_BOB:
-			case NpcID.EVIL_BOB_6754:
-			case NpcID.LEO_6746:
-			case NpcID.MYSTERIOUS_OLD_MAN_6750:
-			case NpcID.MYSTERIOUS_OLD_MAN_6751:
-			case NpcID.MYSTERIOUS_OLD_MAN_6752:
-			case NpcID.MYSTERIOUS_OLD_MAN_6753:
-			case NpcID.QUIZ_MASTER_6755:
-			case NpcID.DUNCE_6749:
-			case NpcID.SANDWICH_LADY:
-				return true;
-			default:
-				return false;
-		}
+//		switch (id)
+//		{
+//			case NpcID.BEE_KEEPER_6747:
+//			case NpcID.SERGEANT_DAMIEN_6743:
+//			case NpcID.FREAKY_FORESTER_6748:
+//			case NpcID.FROG_5429:
+//			case NpcID.GENIE:
+//			case NpcID.GENIE_327:
+//			case NpcID.DR_JEKYLL:
+//			case NpcID.DR_JEKYLL_314:
+//			case NpcID.EVIL_BOB:
+//			case NpcID.EVIL_BOB_6754:
+//			case NpcID.LEO_6746:
+//			case NpcID.MYSTERIOUS_OLD_MAN_6750:
+//			case NpcID.MYSTERIOUS_OLD_MAN_6751:
+//			case NpcID.MYSTERIOUS_OLD_MAN_6752:
+//			case NpcID.MYSTERIOUS_OLD_MAN_6753:
+//			case NpcID.QUIZ_MASTER_6755:
+//			case NpcID.DUNCE_6749:
+//			case NpcID.SANDWICH_LADY:
+//				return true;
+//			default:
+//				return false;
+//		}
 	}
 }
