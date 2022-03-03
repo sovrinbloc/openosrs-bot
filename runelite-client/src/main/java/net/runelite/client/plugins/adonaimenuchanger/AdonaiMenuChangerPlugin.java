@@ -66,6 +66,7 @@ public class AdonaiMenuChangerPlugin extends Plugin
 			if (config.resetOptions())
 			{
 				objectOptions.clear();
+				removeOptions.clear();
 				npcOptions.clear();
 				return;
 			}
@@ -85,8 +86,15 @@ public class AdonaiMenuChangerPlugin extends Plugin
 			if (config.commitRemoveOption())
 			{
 				String[] removed = new String[removeOptions.size()];
-				removeFromAllMenus(config.removeOption());
+				String[] split   = config.removeOption()
+						.split(",");
+				for (String s :
+						split)
+				{
+					removeFromAllMenus(s);
+				}
 				log.info("Items left in options: {}", Strings.join(removeOptions.toArray(removed), ", "));
+				//				removeFromAllMenus(config.removeOption());
 				return;
 			}
 
@@ -204,6 +212,11 @@ public class AdonaiMenuChangerPlugin extends Plugin
 			for (MenuEntry entry : clientMenuEntries)
 			{
 				boolean addedEntry = false;
+
+				if (removeOptions.contains(entry.getOption().toLowerCase()))
+				{
+					continue;
+				}
 
 				if (!objectOptions.containsKey(entry.getIdentifier()))
 				{

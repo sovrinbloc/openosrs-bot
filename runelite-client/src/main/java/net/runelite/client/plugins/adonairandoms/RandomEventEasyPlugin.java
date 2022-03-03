@@ -171,7 +171,7 @@ public class RandomEventEasyPlugin extends Plugin
 						entries[0] = entry;
 					}
 				}
-				client.setMenuEntries(Arrays.copyOf(entries, client.getMenuEntries().length - 1));
+				client.setMenuEntries(entries);
 			}
 		}
 	}
