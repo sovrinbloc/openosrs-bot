@@ -1,18 +1,20 @@
 package net.runelite.client.external.adonaicore;
 
+import net.runelite.api.Point;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class ClickService
+public class ClickService implements Auto
 {
-	private static String TRACK_URL = "http://0.0.0.0:4567/track/";
-	private static String CLICK_URL = "http://0.0.0.0:4567/click/";
-	private static String MOVE_URL = "http://0.0.0.0:4567/move/";
-	private static String TYPE_URL = "http://0.0.0.0:4567/type";
-	private static String PRESS_URL = "http://0.0.0.0:4567/key/";
+	private static final String TRACK_URL = "http://0.0.0.0:4567/track/";
+	private static final String CLICK_URL = "http://0.0.0.0:4567/click/";
+	private static final String MOVE_URL = "http://0.0.0.0:4567/move/";
+	private static final String TYPE_URL = "http://0.0.0.0:4567/type";
+	private static final String PRESS_URL = "http://0.0.0.0:4567/key/";
+	private static final String HELLO_URL = "http://0.0.0.0:4567/hello/";
 
 	private static String getTrackUrl(int x, int y)
 	{
@@ -39,53 +41,81 @@ public class ClickService
 		return TYPE_URL + text;
 	}
 
-	public static void track(int x, int y)
-			throws IOException
+	private static String getHello()
 	{
-		sendToServer(getTrackUrl(x, y));
+		return HELLO_URL;
 	}
 
-	public static void click(int x, int y)
+	public static int track(Point pt)
 			throws IOException
 	{
-		sendToServer(getClickUrl(x, y));
+		return track(pt.getX(), pt.getY());
 	}
 
-	public static void move(int x, int y)
+	public static int track(int x, int y)
 			throws IOException
 	{
-		sendToServer(getMoveUrl(x, y));
+		return execute(getTrackUrl(x, y));
 	}
 
-	public static void press(char key)
+	public static int click(Point pt)
 			throws IOException
 	{
-		sendToServer(getPressUrl(key));
+		return click(pt.getX(), pt.getY());
 	}
 
-	public static void type(String text)
+	public static int click(int x, int y)
 			throws IOException
 	{
-		sendToServer(getTypeUrl(text));
+		return execute(getClickUrl(x, y));
 	}
 
-	public static void sendToServer(String urlString)
+	public static int move(Point pt)
 			throws IOException
 	{
-		URL url = new URL(urlString);
-		InputStream is = url.openConnection()
-				.getInputStream();
+		return move(pt.getX(), pt.getY());
+	}
+
+	public static int move(int x, int y)
+			throws IOException
+	{
+		return execute(getMoveUrl(x, y));
+	}
+
+	public static int press(char key)
+			throws IOException
+	{
+		return execute(getPressUrl(key));
+	}
+
+	public static int type(String text)
+			throws IOException
+	{
+		return execute(getTypeUrl(text));
+	}
+
+	public static boolean hello()
+			throws IOException
+	{
+		int execute = execute(getHello());
+		return execute >= 200 && execute < 300;
+	}
+
+	public static int execute(String urlString)
+			throws IOException
+	{
+		URL               url               = new URL(urlString);
+		HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+		return httpURLConnection.getResponseCode();
 	}
 
 	public static void connect(String urlString)
 			throws IOException
 	{
-		URL url = new URL(urlString);
+		URL           url           = new URL(urlString);
 		URLConnection urlConnection = url.openConnection();
-		urlConnection
-				.connect();
+		urlConnection.connect();
 	}
-
 
 
 }

@@ -28,25 +28,31 @@ package net.runelite.client.plugins.adonairandoms;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.Point;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.InteractingChanged;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.client.Notifier;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.external.adonai.mouse.ScreenPosition;
+import net.runelite.client.external.adonaicore.ClickService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
 import javax.inject.Inject;
+import java.awt.*;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
 @PluginDescriptor(
-		name = "Random Events Removal of Talk",
-		description = "Remove Talk-To on Random Events.",
+		name = "Adonai Random Event Dismiss",
+		description = "Dismisses Random Events Automatically",
 		enabledByDefault = false
 )
 @Slf4j
-public class RandomEventEasyPlugin extends Plugin
+public class RandomEventDismissPlugin extends Plugin
 {
 	private static final Set<Integer> EVENT_NPCS = ImmutableSet.of(
 			NpcID.BEE_KEEPER_6747,
@@ -70,10 +76,15 @@ public class RandomEventEasyPlugin extends Plugin
 			NpcID.QUIZ_MASTER_6755,
 			NpcID.RICK_TURPENTINE, NpcID.RICK_TURPENTINE_376,
 			NpcID.SANDWICH_LADY,
-			NpcID.SERGEANT_DAMIEN_6743
+			NpcID.SERGEANT_DAMIEN_6743,
+			NpcID.STRANGE_PLANT
 	);
 	private static final Set<String> EVENT_OPTIONS = ImmutableSet.of(
 			"Talk-to",
+			"Dismiss"
+	);
+	private static final Set<String> EVENT_OPTIONS_PLANT = ImmutableSet.of(
+			"Pick",
 			"Dismiss"
 	);
 	private static final int RANDOM_EVENT_TIMEOUT = 150;
@@ -107,6 +118,32 @@ public class RandomEventEasyPlugin extends Plugin
 	}
 
 	@Subscribe
+	public void onGameTick(GameTick tick)
+			throws InterruptedException, IOException
+	{
+		if (!ClickService.hello()) {
+			return;
+		}
+		if (hasRandomEvent())
+		{
+			sendClick(ScreenPosition.getNpcScreenPoint(getCurrentRandomEvent()));
+			notifier.notify("Sending click to dismiss random event: " + currentRandomEvent.getName(), TrayIcon.MessageType.INFO, true);
+		}
+	}
+
+	private void sendClick(Point clickPoint)
+	{
+		try
+		{
+			ClickService.click(clickPoint.getX(), clickPoint.getY());
+		}
+		catch (Exception e)
+		{
+			log.info("Could do nothing on seed box");
+		}
+	}
+
+	@Subscribe
 	public void onInteractingChanged(InteractingChanged event)
 	{
 		Actor source  = event.getSource();
@@ -131,7 +168,7 @@ public class RandomEventEasyPlugin extends Plugin
 		if (client.getTickCount() - lastNotificationTick > RANDOM_EVENT_TIMEOUT)
 		{
 			lastNotificationTick = client.getTickCount();
-			notifier.notify("Random event spawned: " + currentRandomEvent.getName());
+			notifier.notify("Random event spawned: " + currentRandomEvent.getName(), TrayIcon.MessageType.INFO, true);
 		}
 	}
 
@@ -151,7 +188,7 @@ public class RandomEventEasyPlugin extends Plugin
 	{
 		if (event.getType() >= MenuAction.NPC_FIRST_OPTION.getId()
 				&& event.getType() <= MenuAction.NPC_FIFTH_OPTION.getId()
-				&& EVENT_OPTIONS.contains(event.getOption()))
+				&& (EVENT_OPTIONS.contains(event.getOption()) || EVENT_OPTIONS_PLANT.contains(event.getOption())))
 		{
 			NPC npc = client.getCachedNPCs()[event.getIdentifier()];
 			if (npc != null && EVENT_NPCS.contains(npc.getId()) && npc != currentRandomEvent)
@@ -174,35 +211,5 @@ public class RandomEventEasyPlugin extends Plugin
 				client.setMenuEntries(entries);
 			}
 		}
-	}
-
-	private boolean shouldNotify(int id)
-	{
-		return true;
-
-//		switch (id)
-//		{
-//			case NpcID.BEE_KEEPER_6747:
-//			case NpcID.SERGEANT_DAMIEN_6743:
-//			case NpcID.FREAKY_FORESTER_6748:
-//			case NpcID.FROG_5429:
-//			case NpcID.GENIE:
-//			case NpcID.GENIE_327:
-//			case NpcID.DR_JEKYLL:
-//			case NpcID.DR_JEKYLL_314:
-//			case NpcID.EVIL_BOB:
-//			case NpcID.EVIL_BOB_6754:
-//			case NpcID.LEO_6746:
-//			case NpcID.MYSTERIOUS_OLD_MAN_6750:
-//			case NpcID.MYSTERIOUS_OLD_MAN_6751:
-//			case NpcID.MYSTERIOUS_OLD_MAN_6752:
-//			case NpcID.MYSTERIOUS_OLD_MAN_6753:
-//			case NpcID.QUIZ_MASTER_6755:
-//			case NpcID.DUNCE_6749:
-//			case NpcID.SANDWICH_LADY:
-//				return true;
-//			default:
-//				return false;
-//		}
 	}
 }

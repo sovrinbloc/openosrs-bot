@@ -18,7 +18,6 @@ import net.runelite.client.external.Spells;
 import net.runelite.client.external.Tab;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.adonaicore.Adonai;
-import net.runelite.client.plugins.adonaifarmer.Clickable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -27,12 +26,13 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import static java.util.Comparator.naturalOrder;
 import static net.runelite.client.external.adonai.ExtUtils.AdonaiDecorativeObjects.findNearestDecorObject;
 
 @Slf4j
@@ -1050,13 +1050,20 @@ public class ExtUtils<operator, T2>
 			final InventoryItem[] out = new InventoryItem[items.length];
 			for (int i = 0; i < items.length; i++)
 			{
-				final Item            item = items[i];
-				final ItemComposition c    = itemManager.getItemComposition(item.getId());
-				out[i] = new InventoryItem(i, item, c.getName(), c.isStackable());
-				out[i].setBounds(invBounds(items[i].getId()));
+				InventoryItem iItem = getInventoryItem(items[i], i);
+				out[i] = iItem;
 			}
 
 			return out;
+		}
+
+		@NotNull
+		private static ExtUtils.Inventory.InventoryItem getInventoryItem(Item item, int slot)
+		{
+			final ItemComposition c     = itemManager.getItemComposition(item.getId());
+			InventoryItem         iItem = new InventoryItem(slot, item, c.getName(), c.isStackable());
+			iItem.setBounds(invBounds(item.getId()));
+			return iItem;
 		}
 
 		public static Rectangle invBounds(int id)
@@ -1136,6 +1143,44 @@ public class ExtUtils<operator, T2>
 			return iItems;
 		}
 
+		@NotNull
+		public static List<Rectangle> getNonStackableInventoryRectanglesExcept(List<Integer> ids)
+		{
+			List<ExtUtils.Inventory.InventoryItem> itemsExcept = ExtUtils.Inventory.getItemsExcept(ids);
+			log.info("Items size (except necessity items): {}", itemsExcept.size());
+
+			// list of unique item ids
+			List<Integer> objects = new ArrayList<>();
+
+			for (InventoryItem item :
+					itemsExcept)
+			{
+				if (objects.contains(item.getItem().getId())) {
+					continue;
+				}
+				objects.add(item.getItem().getId());
+			}
+
+			log.info("Length of items: {}", objects.size());
+
+			// this will store all the rectangles of the items in the inventory (even duplicate rects)
+			List<Rectangle> invBounds = new ArrayList<>();
+
+			// get the integer id of each, and then get each rectangle of the items in the inventory, and
+			// add them to a list.
+			for (int id : objects)
+			{
+				invBounds.addAll(ExtUtils.Inventory.listOfBounds(id));
+			}
+
+			Comparator<Rectangle> COMPARATOR = Comparator
+					.comparing(Rectangle::getY, java.util.Comparator.nullsLast(naturalOrder()))
+					.thenComparing(Rectangle::getX);
+
+			log.info("List of inventory bounds is {} long", invBounds.size());
+			return invBounds;
+		}
+
 		public static List<InventoryItem> getItems(List<Integer> itemIds)
 		{
 			ItemContainer       itemContainer = client.getItemContainer(InventoryID.INVENTORY);
@@ -1187,6 +1232,12 @@ public class ExtUtils<operator, T2>
 					final Item item = items[i];
 					if (item.getQuantity() > 0)
 					{
+						if (!Inventory.getItem(item.getId())
+								.isStackable())
+						{
+							itemSize += item.getQuantity();
+							continue;
+						}
 						itemSize++;
 					}
 				}
@@ -1204,12 +1255,13 @@ public class ExtUtils<operator, T2>
 			private final String name;
 			private final boolean stackable;
 
-			 InventoryItem(int slot, Item item, String name, boolean stackable) {
-			 	this.slot = slot;
-			 	this.item = item;
-			 	this.name = name;
-			 	this.stackable = stackable;
-			 }
+			InventoryItem(int slot, Item item, String name, boolean stackable)
+			{
+				this.slot = slot;
+				this.item = item;
+				this.name = name;
+				this.stackable = stackable;
+			}
 
 			@Nullable
 			private Rectangle bounds;

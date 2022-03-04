@@ -150,18 +150,28 @@ public class Notifier
 
 	public void notify(String message)
 	{
-		notify(message, TrayIcon.MessageType.NONE);
+		notify(message, TrayIcon.MessageType.NONE, false);
 	}
 
-	public void notify(String message, TrayIcon.MessageType type)
+	public void notify(String message, TrayIcon.MessageType type, boolean force)
 	{
 		eventBus.post(new NotificationFired(message, type));
 
-		if (!runeLiteConfig.sendNotificationsWhenFocused() && clientUI.isFocused())
+		if (!runeLiteConfig.sendNotificationsWhenFocused() && clientUI.isFocused() && !force)
 		{
 			return;
 		}
 
+		sendNotification(message, type);
+	}
+
+	public void notify(String message, TrayIcon.MessageType type)
+	{
+		notify(message, type, false);
+	}
+
+	private void sendNotification(String message, TrayIcon.MessageType type)
+	{
 		switch (runeLiteConfig.notificationRequestFocus())
 		{
 			case REQUEST:
@@ -180,7 +190,8 @@ public class Notifier
 		switch (runeLiteConfig.notificationSound())
 		{
 			case NATIVE:
-				Toolkit.getDefaultToolkit().beep();
+				Toolkit.getDefaultToolkit()
+						.beep();
 				break;
 			case CUSTOM:
 				executorService.submit(this::playCustomSound);
@@ -189,15 +200,15 @@ public class Notifier
 		if (runeLiteConfig.enableGameMessageNotification() && client.getGameState() == GameState.LOGGED_IN)
 		{
 			final String formattedMessage = new ChatMessageBuilder()
-				.append(ChatColorType.HIGHLIGHT)
-				.append(message)
-				.build();
+					.append(ChatColorType.HIGHLIGHT)
+					.append(message)
+					.build();
 
 			chatMessageManager.queue(QueuedMessage.builder()
-				.type(ChatMessageType.CONSOLE)
-				.name(appName)
-				.runeLiteFormattedMessage(formattedMessage)
-				.build());
+					.type(ChatMessageType.CONSOLE)
+					.name(appName)
+					.runeLiteFormattedMessage(formattedMessage)
+					.build());
 		}
 
 		if (runeLiteConfig.flashNotification() != FlashNotification.DISABLED)

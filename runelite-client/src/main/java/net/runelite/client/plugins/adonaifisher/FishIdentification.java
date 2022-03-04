@@ -36,8 +36,15 @@ enum FishIdentification
 {
 	// Other
 	TROUT(Type.FISH, "Raw trout", "T", ItemID.RAW_TROUT),
-	SALMON(Type.FISH, "Raw salmon", "T", ItemID.RAW_SALMON),
-	ROD(Type.ITEMS, "Fly rod", "F", ItemID.FLY_FISHING_ROD),
+	SALMON(Type.FISH, "Raw salmon", "S", ItemID.RAW_SALMON),
+	LEAPING_SALMON(Type.FISH, "Raw salmon", "LS", ItemID.LEAPING_SALMON),
+	LEAPING_TROUT(Type.FISH, "Raw salmon", "LT", ItemID.LEAPING_TROUT),
+
+	ROD(Type.ITEMS, "Fly rod", "FR", ItemID.FLY_FISHING_ROD),
+	BARB_ROD(Type.ITEMS, "Barb Rod", "BR", ItemID.BARBARIAN_ROD),
+	HARPOON(Type.ITEMS, "Barb Rod", "HRP", ItemID.HARPOON),
+	LOBSTER_POT(Type.ITEMS, "Barb Rod", "LP", ItemID.LOBSTER_POT),
+	BIG_NET(Type.ITEMS, "Barb Rod", "BN", ItemID.BIG_FISHING_NET),
 	FEATHER(Type.ITEMS, "Feathers", "FE", ItemID.FEATHER);
 
 	final Type type;

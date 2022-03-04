@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.adonaifarmer;
+package net.runelite.client.external.adonai;
 
 import java.awt.*;
 

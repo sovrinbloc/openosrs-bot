@@ -31,7 +31,7 @@ import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 
 @ConfigGroup("randomeventseasy")
-public interface RandomEventEasyConfig extends Config
+public interface RandomEventDismissConfig extends Config
 {
 	@ConfigSection(
 		name = "Notification Settings",

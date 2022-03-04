@@ -2,17 +2,19 @@ package net.runelite.client.plugins.adonaifisher;
 
 
 import com.google.inject.Provides;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.external.adonai.ExtUtils;
 import net.runelite.client.external.adonai.mouse.ScreenPosition;
 import net.runelite.client.external.adonaicore.npc.NPCs;
+import net.runelite.client.game.FishingSpot;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -21,6 +23,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -58,26 +61,28 @@ public class AdonaiFisherPlugin extends Plugin
 	@Inject
 	private AdonaiFisherOverlay overlay;
 
-
 	@Inject
 	private ItemManager itemManager;
 
 	// mutex for updating the count of dropped items in new thread.
 	private ReentrantLock mutex = new ReentrantLock();
 
+	public static FishingSession.PlayerState state = FishingSession.PlayerState.NOTHING;
 
-	enum PlayerState
-	{
-		FISHING,
-		DROPPING,
-		NOTHING,
-		STARTING,
-		SHUTTING_DOWN
+	@Getter(AccessLevel.PACKAGE)
+	private final List<NPC> fishingSpots = new ArrayList<>();
 
-	}
+	@Getter(AccessLevel.PACKAGE)
+	private FishingSpot currentSpot;
 
-	public static AdonaiFisherPlugin.PlayerState state = AdonaiFisherPlugin.PlayerState.NOTHING;
+	@Getter(AccessLevel.PACKAGE)
+	private final FishingSession session = new FishingSession();
 
+	private Instant startTime;
+
+	private Instant next;
+
+	private int dropCount = 0;
 
 	@Override
 	protected void startUp()
@@ -86,36 +91,171 @@ public class AdonaiFisherPlugin extends Plugin
 		overlayManager.add(overlay);
 
 		Adonai.client = client;
+		ExtUtils.initialize(client);
 		ScreenPosition.initialize(client);
 		initializeExecutorService();
 		ExtUtils.Inventory.init(itemManager);
-
-		state = AdonaiFisherPlugin.PlayerState.STARTING;
+		state = FishingSession.PlayerState.NOTHING;
 	}
 
-	Instant startTime;
+	@Override
+	protected void shutDown()
+	{
+		executorService.shutdown();
+		overlayManager.remove(overlay);
+		currentSpot = null;
+		fishingSpots.clear();
+	}
 
-	Instant next;
+	@Subscribe
+	public void onGameStateChanged(GameStateChanged gameStateChanged)
+	{
+		GameState gameState = gameStateChanged.getGameState();
+		if (gameState == GameState.CONNECTION_LOST || gameState == GameState.LOGIN_SCREEN || gameState == GameState.HOPPING)
+		{
+			fishingSpots.clear();
+		}
+	}
 
-	int dropCount = 0;
+	@Subscribe
+	public void onChatMessage(ChatMessage event)
+	{
+		if (event.getType() != ChatMessageType.SPAM)
+		{
+			return;
+		}
 
+		if (event.getMessage()
+				.contains("You catch a") || event.getMessage()
+				.contains("You catch some") ||
+				event.getMessage()
+						.equals("Your cormorant returns with its catch."))
+		{
+			session.setLastFishCaught(Instant.now());
+		}
+	}
+
+	@Subscribe
+	public void onInteractingChanged(InteractingChanged event)
+	{
+		if (event.getSource() != client.getLocalPlayer())
+		{
+			return;
+		}
+
+		final Actor target = event.getTarget();
+
+		if (!(target instanceof NPC))
+		{
+			return;
+		}
+
+		final NPC   npc  = (NPC) target;
+		FishingSpot spot = FishingSpot.findSpot(npc.getId());
+
+		if (spot == null)
+		{
+			return;
+		}
+
+		currentSpot = spot;
+	}
 
 	@Subscribe
 	public void onGameTick(GameTick tick)
-			throws InterruptedException
+			throws InterruptedException, IOException
 	{
 		// this works
-		int inventorySize = ExtUtils.Inventory.getInventorySize();
-		if (inventorySize < 28 && (state != AdonaiFisherPlugin.PlayerState.DROPPING || dropCount <= 0))
+		int inventorySize = getNonstackableInventorySize();
+		log.info("Ticking... Inventory size: {}", inventorySize);
+
+		FishingSession.PlayerState tmpPlayerState = defineState();
+		log.info("Player state: {}", tmpPlayerState);
+
+		if (state == FishingSession.PlayerState.FISHING)
 		{
+			// do nothing.
+			log.info("Does nothing because the player is still fishing.");
+			return;
+		}
+
+		if (state == FishingSession.PlayerState.DROPPING_FISH)
+		{
+			log.info("Does nothing because the player is still dropping.");
+			// keep dropping.
+			return;
+		}
+
+		// new
+		if (state == FishingSession.PlayerState.SHOULD_START_FISHING)
+		{
+			log.info("Player is about to fish");
 			fish();
 			return;
 		}
-		log.info("Inventory size to drop: {}", inventorySize);
-		if (state != AdonaiFisherPlugin.PlayerState.DROPPING)
+
+		if (state == FishingSession.PlayerState.SHOULD_START_DROPPING)
 		{
+			log.info("Player is about to start dropping");
 			drop();
 		}
+	}
+
+	private int getNonstackableInventorySize()
+	{
+		return ExtUtils.Inventory.getNonStackableInventoryRectanglesExcept(new ArrayList<>())
+				.size();
+	}
+
+	private FishingSession.PlayerState defineState()
+	{
+		int fishInInventory = ExtUtils.Inventory.getNonStackableInventoryRectanglesExcept(DropConfig.keepItems)
+				.size();
+		int nonStackableInventorySize = getNonstackableInventorySize();
+		log.info("Nonstackable inventory size: {}", nonStackableInventorySize);
+
+		// are they fishing?
+		if (isFishing())
+		{
+			state = FishingSession.PlayerState.FISHING;
+			return state;
+		}
+
+		// is their inventory full?
+		if (nonStackableInventorySize >= 28 && state != FishingSession.PlayerState.DROPPING_FISH)
+		{
+			// they are no longer fishing because their inventory is full.
+			// drop fish.
+			state = FishingSession.PlayerState.SHOULD_START_DROPPING;
+			return state;
+		}
+
+		// are they still dropping?
+		if ((state == FishingSession.PlayerState.DROPPING_FISH && fishInInventory > 0) || dropCount > 0)
+		{
+			// remain dropping.
+			state = FishingSession.PlayerState.DROPPING_FISH;
+			return state;
+		}
+
+		state = FishingSession.PlayerState.SHOULD_START_FISHING;
+		return state;
+	}
+
+	private boolean isFishing()
+	{
+
+		return (client.getLocalPlayer()
+				.getInteracting() != null
+				&& client.getLocalPlayer()
+				.getInteracting()
+				.getName()
+				.contains(FishingSession.FISHING_SPOT)
+				&& client.getLocalPlayer()
+				.getInteracting()
+				.getGraphic() != GraphicID.FLYING_FISH
+				&& FishingSession.FISHING_ANIMATIONS.contains(client.getLocalPlayer()
+				.getAnimation()));
 	}
 
 	/**
@@ -124,34 +264,36 @@ public class AdonaiFisherPlugin extends Plugin
 	 */
 	private ExecutorService executorService;
 
-
 	private void initializeExecutorService()
 	{
 		executorService = Executors.newSingleThreadExecutor();
 	}
 
-	@Override
-	protected void shutDown()
-	{
-		executorService.shutdown();
-		overlayManager.remove(overlay);
-	}
-
 	/**
+	 * Begins fishing the nearest spot.
+	 * <p>
+	 * This method gets the position on the screen of the nearest fishing spot
+	 * and clicks it. It will also set the flag of the user to FISHING so we cannot
+	 * drop at the same time. It will stop when full.
 	 *
+	 * @throws IOException
+	 * @implSpec The default implementation will only work with Fly Fishing spots
+	 * and also drop them.
+	 * @implNote This should add other fish.
 	 */
 	private void fish()
+			throws IOException
 	{
 
 		assert client.isClientThread();
 
 		// set player to thieving
-		state = AdonaiFisherPlugin.PlayerState.FISHING;
+		state = FishingSession.PlayerState.FISHING;
 
-		NPC fishingSpot = NPCs.findNearestNPC("Rod Fishing spot");
+		NPC fishingSpot = NPCs.findNearestNPC("Fishing spot");
 		if (fishingSpot == null)
 		{
-			log.info("Not found");
+			log.info("Rod Spot Not found");
 			return;
 		}
 		log.info("Fishing spot found");
@@ -160,64 +302,60 @@ public class AdonaiFisherPlugin extends Plugin
 		Point      point         = Perspective.localToCanvas(client, localLocation, client.getPlane());
 		if (point == null)
 		{
-			log.info("No point");
+			log.info("No fishing Point");
 			return;
 		}
 
 		Point pt = ScreenPosition.getScreenPosition(point);
-		log.info("Screen position: {}, {}", pt.getX(), pt.getY());
+		log.info("Screen position of Fishing Spot: {}, {}", pt.getX(), pt.getY());
 
 		// this works
 		int itemSize = ExtUtils.Inventory.getInventorySize();
 
 		log.info("Inventory size: {}", itemSize);
 		// testing to see if this works
-		if (itemSize < 28 && Objects.requireNonNull(client.getLocalPlayer())
-				.getAnimation() != 623)
-		{
-			trackSpot(pt);
-		}
+
+		net.runelite.client.external.adonaicore.ClickService.track(pt);
 	}
 
 	private void drop()
 	{
-		dropItemsExcept();
+		dropItemsExcept(DropConfig.keepItems);
 	}
 
-	void dropItemsExcept()
+	void dropItemsExcept(List<Integer> ids)
 	{
 		// set player state to DROPPING
-		state = AdonaiFisherPlugin.PlayerState.DROPPING;
+		state = FishingSession.PlayerState.DROPPING_FISH;
 
-		List<ExtUtils.Inventory.InventoryItem> itemsExcept = ExtUtils.Inventory.getItemsExcept(DropConfig.keepItems);
-		dropCount = itemsExcept.size();
+		List<Rectangle> invBounds = ExtUtils.Inventory.getNonStackableInventoryRectanglesExcept(ids);
 
-		Iterator<ExtUtils.Inventory.InventoryItem> iterator = itemsExcept.iterator();
-		ExtUtils.Inventory.InventoryItem           iItem    = null;
-		for (int i = 0; i < itemsExcept.size(); i++)
+		dropCount = invBounds.size();
+
+		// loop through and drop each of the items in this inventory
+		// 	(with support of left-click dropper)
+		for (Rectangle bound : invBounds)
 		{
-			iItem = itemsExcept.get(i);
-			Rectangle itemBounds = ExtUtils.Inventory.invBounds(iItem.getItem()
-					.getId());
-
 			doClick(ScreenPosition.getScreenPosition(
-					ExtUtils.AdonaiScreen.getClickPoint(itemBounds.getBounds())
+					ExtUtils.AdonaiScreen.getClickPoint(bound.getBounds())
 			));
 		}
 		log.info("Done dropping");
 	}
+
 
 	private void doClick(Point clickPoint)
 	{
 		executorService.submit(() ->
 		{
 			sendClick(clickPoint);
-			//			sleep(300);
-			try {
+			try
+			{
 				mutex.lock();
 				--dropCount;
 				log.info("dropCount: {}", dropCount);
-			} finally
+			}
+			finally
 			{
 				mutex.unlock();
 			}
@@ -236,16 +374,8 @@ public class AdonaiFisherPlugin extends Plugin
 		}
 	}
 
-	public Point getScreenPosition(Point point)
-	{
-		java.awt.Point locationOnScreen = client.getCanvas()
-				.getLocationOnScreen();
-		return new Point(point.getX() + (int) locationOnScreen.getX(), point.getY() + (int) locationOnScreen.getY());
-	}
-
 	private void trackSpot(Point pt)
 	{
-		log.info("We are inside moving farmer;");
 		executorService.submit(() ->
 		{
 			sendFish(pt);
@@ -284,7 +414,8 @@ public class AdonaiFisherPlugin extends Plugin
 		}
 	}
 
-	Map<Integer, Integer> thievedItems = new HashMap<>();
+	Map<Integer, Integer> caughtFish = new HashMap<>();
+
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
@@ -295,13 +426,61 @@ public class AdonaiFisherPlugin extends Plugin
 
 		int quant = 0;
 
-		for (Item item : event.getItemContainer().getItems())
+		for (Item item : event.getItemContainer()
+				.getItems())
 		{
-			thievedItems.put(item.getId(), thievedItems.getOrDefault(item.getId(), 0) + item.getQuantity());
-			if (thievedItems.containsKey(item.getId()))
+			caughtFish.put(item.getId(), caughtFish.getOrDefault(item.getId(), 0) + item.getQuantity());
+			if (caughtFish.containsKey(item.getId()))
 			{
 				quant++;
 			}
 		}
 	}
+
+
+	private void inverseSortSpotDistanceFromPlayer()
+	{
+		if (fishingSpots.isEmpty())
+		{
+			return;
+		}
+
+		final LocalPoint cameraPoint = new LocalPoint(client.getCameraX(), client.getCameraY());
+		fishingSpots.sort(
+				Comparator.comparingInt(
+								// Negate to have the furthest first
+								(NPC npc) -> -npc.getLocalLocation()
+										.distanceTo(cameraPoint))
+						// Order by position
+						.thenComparing(NPC::getLocalLocation, Comparator.comparingInt(LocalPoint::getX)
+								.thenComparingInt(LocalPoint::getY))
+						// And then by id
+						.thenComparingInt(NPC::getId)
+		);
+	}
+
+
+	@Subscribe
+	public void onNpcSpawned(NpcSpawned event)
+	{
+		final NPC npc = event.getNpc();
+
+		if (FishingSpot.findSpot(npc.getId()) == null)
+		{
+			return;
+		}
+
+		fishingSpots.add(npc);
+		inverseSortSpotDistanceFromPlayer();
+	}
+
+	@Subscribe
+	public void onNpcDespawned(NpcDespawned npcDespawned)
+	{
+		final NPC npc = npcDespawned.getNpc();
+
+		fishingSpots.remove(npc);
+
+	}
+
 }

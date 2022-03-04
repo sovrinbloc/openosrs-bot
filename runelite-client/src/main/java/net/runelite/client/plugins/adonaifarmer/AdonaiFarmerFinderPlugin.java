@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -104,13 +105,18 @@ public class AdonaiFarmerFinderPlugin extends Plugin
 
 	@Subscribe
 	public void onGameTick(GameTick tick)
-			throws InterruptedException
+			throws InterruptedException, IOException
 	{
 
+		if (!ClickService.hello()) {
+			return;
+		}
+
 		// check Random
-		if (RandomEventEasyPlugin.hasRandomEvent())
+		if (RandomEventDismissPlugin.hasRandomEvent())
 		{
-			sendClick(ScreenPosition.getNpcScreenPoint(RandomEventEasyPlugin.getCurrentRandomEvent()));
+			log.info("Random Event has spawned: {}", RandomEventDismissPlugin.getCurrentRandomEvent().getName());
+			return;
 		}
 		// this works
 		int inventorySize = ExtUtils.Inventory.getInventorySize();
@@ -248,7 +254,6 @@ public class AdonaiFarmerFinderPlugin extends Plugin
 		executorService.submit(() ->
 		{
 			sendClick(clickPoint);
-			//			sleep(300);
 			try
 			{
 				mutex.lock();
@@ -294,7 +299,7 @@ public class AdonaiFarmerFinderPlugin extends Plugin
 	{
 		try
 		{
-			ClickService.sendToServer("http://0.0.0.0:4567/track/" + pt.getX() + "/" + pt.getY());
+			ClickService.execute("http://0.0.0.0:4567/track/" + pt.getX() + "/" + pt.getY());
 		}
 		catch (Exception e)
 		{
