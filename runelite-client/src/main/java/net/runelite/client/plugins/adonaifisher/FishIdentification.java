@@ -35,17 +35,18 @@ import java.util.function.Predicate;
 enum FishIdentification
 {
 	// Other
-	TROUT(Type.FISH, "Raw trout", "T", ItemID.RAW_TROUT),
-	SALMON(Type.FISH, "Raw salmon", "S", ItemID.RAW_SALMON),
-	LEAPING_SALMON(Type.FISH, "Raw salmon", "LS", ItemID.LEAPING_SALMON),
-	LEAPING_TROUT(Type.FISH, "Raw salmon", "LT", ItemID.LEAPING_TROUT),
+	TROUT(Type.FISH, "Raw trout", "T", ItemID.RAW_TROUT), // 335
+	SALMON(Type.FISH, "Raw salmon", "S", ItemID.RAW_SALMON), // 331
+	LEAPING_SALMON(Type.FISH, "L. Slmn", "LSL", ItemID.LEAPING_SALMON), // 11330
+	LEAPING_STURGEON(Type.FISH, "L. Strgn", "LST", ItemID.LEAPING_STURGEON), // 11332
+	LEAPING_TROUT(Type.FISH, "L. Trt", "LT", ItemID.LEAPING_TROUT), // 11328
 
-	ROD(Type.ITEMS, "Fly rod", "FR", ItemID.FLY_FISHING_ROD),
-	BARB_ROD(Type.ITEMS, "Barb Rod", "BR", ItemID.BARBARIAN_ROD),
-	HARPOON(Type.ITEMS, "Barb Rod", "HRP", ItemID.HARPOON),
-	LOBSTER_POT(Type.ITEMS, "Barb Rod", "LP", ItemID.LOBSTER_POT),
-	BIG_NET(Type.ITEMS, "Barb Rod", "BN", ItemID.BIG_FISHING_NET),
-	FEATHER(Type.ITEMS, "Feathers", "FE", ItemID.FEATHER);
+	ROD(Type.ITEMS, "Fly rod", "FR", ItemID.FLY_FISHING_ROD), // 309
+	BARB_ROD(Type.ITEMS, "Barb Rod", "BR", ItemID.BARBARIAN_ROD), // 11323
+	HARPOON(Type.ITEMS, "Barb Rod", "HRP", ItemID.HARPOON), // 311
+	LOBSTER_POT(Type.ITEMS, "Barb Rod", "LP", ItemID.LOBSTER_POT), // 301
+	BIG_NET(Type.ITEMS, "Barb Rod", "BN", ItemID.BIG_FISHING_NET), // 305
+	FEATHER(Type.ITEMS, "Feathers", "FE", ItemID.FEATHER); // 314
 
 	final Type type;
 	final String medName;

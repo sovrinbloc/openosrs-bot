@@ -16,6 +16,7 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.external.PrayerMap;
 import net.runelite.client.external.Spells;
 import net.runelite.client.external.Tab;
+import net.runelite.client.external.adonaicore.toolbox.Text;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.adonaicore.Adonai;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,6 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static java.util.Comparator.naturalOrder;
 import static net.runelite.client.external.adonai.ExtUtils.AdonaiDecorativeObjects.findNearestDecorObject;
@@ -1035,6 +1035,48 @@ public class ExtUtils<operator, T2>
 		private static Client client = Adonai.client;
 		private static ItemManager itemManager;
 
+		public static enum InventoryDropMode
+		{
+			LEFT_RIGHT_TOP_DOWN,
+			TOP_DOWN_LEFT_RIGHT,
+			LEFT_RIGHT_BOTTOM_UP,
+		}
+
+		// left to right, top to bottom
+		final public static Comparator<Rectangle> DROP_SORT_NORMAL_HORIZONTAL = Comparator.comparingDouble(
+						// Negate to have the furthest first
+						Rectangle::getY)
+				// Order by position
+				.thenComparingDouble(Rectangle::getX);
+
+		// left to right, bottom to top
+		final public static Comparator<Rectangle> DROP_SORT_HORIZONTAL_BOTTOM_UP = Comparator.comparingDouble(
+						// Negate to have the furthest first
+						Rectangle::getY)
+				.reversed()
+				// Order by position
+				.thenComparingDouble(Rectangle::getX);
+
+		// top to bottom, left to right
+		final public static Comparator<Rectangle> DROP_SORT_VERTICAL = Comparator.comparingDouble(
+						// Negate to have the furthest first
+						Rectangle::getX)
+				// Order by position
+				.thenComparingDouble(Rectangle::getY);
+
+		public static Comparator<Rectangle> getDropMode(InventoryDropMode mode)
+		{
+			switch (mode)
+			{
+				case LEFT_RIGHT_BOTTOM_UP:
+					return DROP_SORT_HORIZONTAL_BOTTOM_UP;
+				case TOP_DOWN_LEFT_RIGHT:
+					return DROP_SORT_VERTICAL;
+				default:
+					return DROP_SORT_NORMAL_HORIZONTAL;
+			}
+		}
+
 		public static Point getInventoryLocation()
 		{
 			return null;
@@ -1124,7 +1166,7 @@ public class ExtUtils<operator, T2>
 			return null;
 		}
 
-		public static List<InventoryItem> getItemsExcept(List<Integer> itemIds)
+		public static List<InventoryItem> getItemsExceptById(List<Integer> itemIds)
 		{
 			ItemContainer       itemContainer = client.getItemContainer(InventoryID.INVENTORY);
 			List<InventoryItem> iItems        = new ArrayList<>();
@@ -1143,12 +1185,72 @@ public class ExtUtils<operator, T2>
 			return iItems;
 		}
 
-		@NotNull
-		public static List<Rectangle> getNonStackableInventoryRectanglesExcept(List<Integer> ids)
+		public static List<InventoryItem> getItemsExceptByName(List<String> itemNames)
 		{
-			List<ExtUtils.Inventory.InventoryItem> itemsExcept = ExtUtils.Inventory.getItemsExcept(ids);
-			log.info("Items size (except necessity items): {}", itemsExcept.size());
+			ItemContainer       itemContainer = client.getItemContainer(InventoryID.INVENTORY);
+			List<InventoryItem> iItems        = new ArrayList<>();
 
+			final Item[]                       items          = itemContainer.getItems();
+			ExtUtils.Inventory.InventoryItem[] inventoryItems = ExtUtils.Inventory.convertToInventoryItems(items);
+
+			List<String> cleanNames = new ArrayList<>();
+			itemNames.forEach(n -> {
+				String cleanName = Text.removeWhitespace(n.toLowerCase());
+				if (!cleanName.isEmpty())
+				{
+					cleanNames.add(cleanName);
+				}
+			});
+
+			for (ExtUtils.Inventory.InventoryItem item :
+					inventoryItems)
+			{
+				if (!cleanNames.contains(Text.removeWhitespace(item.getName().toLowerCase())))
+				{
+					iItems.add(item);
+				}
+			}
+			return iItems;
+		}
+
+		@NotNull
+		public static List<Rectangle> getNonStackableInventoryRectanglesExceptById(List<Integer> ids)
+		{
+			List<ExtUtils.Inventory.InventoryItem> items = ExtUtils.Inventory.getItemsExceptById(ids);
+			log.info("Items size (except necessity items [by id]): {}", items.size());
+
+			return getInventoryItemsBounds(items);
+		}
+
+		@NotNull
+		public static List<Rectangle> getAllNonStackableInventoryRectangles(List<Integer> ids)
+		{
+			List<ExtUtils.Inventory.InventoryItem> items = ExtUtils.Inventory.getItemsExceptById(ids);
+			log.info("Items size (except necessity items [by id]): {}", items.size());
+
+			return getInventoryItemsBounds(items);
+		}
+
+		public static int getAllNonStackableInventoryCount()
+		{
+			List<Integer> ids = new ArrayList<>();
+			List<ExtUtils.Inventory.InventoryItem> items = ExtUtils.Inventory.getItemsExceptById(ids);
+
+			return getInventoryItemsBounds(items).size();
+		}
+
+		@NotNull
+		public static List<Rectangle> getNonStackableInventoryRectanglesExceptByName(List<String> names)
+		{
+			List<ExtUtils.Inventory.InventoryItem> items = ExtUtils.Inventory.getItemsExceptByName(names);
+			log.info("Items size (except necessity items [by name]): {}", items.size());
+
+			return getInventoryItemsBounds(items);
+		}
+
+		@NotNull
+		private static List<Rectangle> getInventoryItemsBounds(List<InventoryItem> itemsExcept)
+		{
 			// list of unique item ids
 			List<Integer> objects = new ArrayList<>();
 
@@ -1170,11 +1272,11 @@ public class ExtUtils<operator, T2>
 			// add them to a list.
 			for (int id : objects)
 			{
-				invBounds.addAll(ExtUtils.Inventory.listOfBounds(id));
+				invBounds.addAll(Inventory.listOfBounds(id));
 			}
 
 			Comparator<Rectangle> COMPARATOR = Comparator
-					.comparing(Rectangle::getY, java.util.Comparator.nullsLast(naturalOrder()))
+					.comparing(Rectangle::getY, Comparator.nullsLast(naturalOrder()))
 					.thenComparing(Rectangle::getX);
 
 			log.info("List of inventory bounds is {} long", invBounds.size());

@@ -49,7 +49,7 @@ public class NPCs
 	}
 
 	@Nullable
-	public NPC findNearestNPC(Predicate<NPC> filter)
+	public static NPC findNearestNPC(Predicate<NPC> filter)
 	{
 		assert Adonai.client.isClientThread();
 

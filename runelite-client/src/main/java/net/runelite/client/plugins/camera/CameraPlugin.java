@@ -72,8 +72,8 @@ import net.runelite.client.ui.overlay.tooltip.TooltipManager;
 public class CameraPlugin extends Plugin implements KeyListener, MouseListener
 {
 	private static final int DEFAULT_ZOOM_INCREMENT = 25;
-	private static final int DEFAULT_OUTER_ZOOM_LIMIT = 128;
-	static final int DEFAULT_INNER_ZOOM_LIMIT = 896;
+	private static final int DEFAULT_OUTER_ZOOM_LIMIT = 1000;
+	static final int DEFAULT_INNER_ZOOM_LIMIT = 1000;
 
 	private boolean controlDown;
 	// flags used to store the mousedown states

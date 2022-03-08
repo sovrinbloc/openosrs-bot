@@ -45,6 +45,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @PluginDescriptor(
 		name = "Adonai Random Event Dismiss",
@@ -117,16 +119,19 @@ public class RandomEventDismissPlugin extends Plugin
 		currentRandomEvent = null;
 	}
 
+	@Override
+	protected void startUp()
+	{
+		initializeExecutorService();
+	}
+
 	@Subscribe
 	public void onGameTick(GameTick tick)
 			throws InterruptedException, IOException
 	{
-		if (!ClickService.hello()) {
-			return;
-		}
 		if (hasRandomEvent())
 		{
-			sendClick(ScreenPosition.getNpcScreenPoint(getCurrentRandomEvent()));
+			doClick(ScreenPosition.getNpcScreenPoint(getCurrentRandomEvent()));
 			notifier.notify("Sending click to dismiss random event: " + currentRandomEvent.getName(), TrayIcon.MessageType.INFO, true);
 		}
 	}
@@ -141,6 +146,26 @@ public class RandomEventDismissPlugin extends Plugin
 		{
 			log.info("Could do nothing on seed box");
 		}
+	}
+
+
+	/**
+	 * MultiThread for Farmer Test
+	 * Herein is the variables for this.
+	 */
+	private ExecutorService executorService;
+
+	private void initializeExecutorService()
+	{
+		executorService = Executors.newSingleThreadExecutor();
+	}
+
+	private void doClick(Point clickPoint)
+	{
+		executorService.submit(() ->
+		{
+			sendClick(clickPoint);
+		});
 	}
 
 	@Subscribe

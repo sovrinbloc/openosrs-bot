@@ -19,6 +19,7 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.adonaicore.Adonai;
+import net.runelite.client.plugins.adonairandoms.RandomEventDismissPlugin;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -170,7 +171,13 @@ public class AdonaiFisherPlugin extends Plugin
 		log.info("Ticking... Inventory size: {}", inventorySize);
 
 		FishingSession.PlayerState tmpPlayerState = defineState();
-		log.info("Player state: {}", tmpPlayerState);
+		log.info("Player is now state: {}", tmpPlayerState);
+
+		if (state == FishingSession.PlayerState.RANDOM_EVENT)
+		{
+			log.info("Has a random event, so pausing");
+			return;
+		}
 
 		if (state == FishingSession.PlayerState.FISHING)
 		{
@@ -203,17 +210,22 @@ public class AdonaiFisherPlugin extends Plugin
 
 	private int getNonstackableInventorySize()
 	{
-		return ExtUtils.Inventory.getNonStackableInventoryRectanglesExcept(new ArrayList<>())
+		return ExtUtils.Inventory.getNonStackableInventoryRectanglesExceptById(new ArrayList<>())
 				.size();
 	}
 
 	private FishingSession.PlayerState defineState()
 	{
-		int fishInInventory = ExtUtils.Inventory.getNonStackableInventoryRectanglesExcept(DropConfig.keepItems)
+		int fishInInventory = ExtUtils.Inventory.getNonStackableInventoryRectanglesExceptById(DropConfig.keepItems)
 				.size();
 		int nonStackableInventorySize = getNonstackableInventorySize();
 		log.info("Nonstackable inventory size: {}", nonStackableInventorySize);
 
+		if (RandomEventDismissPlugin.hasRandomEvent())
+		{
+			state = FishingSession.PlayerState.RANDOM_EVENT;
+			return state;
+		}
 		// are they fishing?
 		if (isFishing())
 		{
@@ -290,7 +302,7 @@ public class AdonaiFisherPlugin extends Plugin
 		// set player to thieving
 		state = FishingSession.PlayerState.FISHING;
 
-		NPC fishingSpot = NPCs.findNearestNPC("Fishing spot");
+		NPC fishingSpot = NPCs.findNearestNPC(n -> n.getName().toLowerCase().contains("fishing spot"));
 		if (fishingSpot == null)
 		{
 			log.info("Rod Spot Not found");
@@ -315,7 +327,10 @@ public class AdonaiFisherPlugin extends Plugin
 		log.info("Inventory size: {}", itemSize);
 		// testing to see if this works
 
-		net.runelite.client.external.adonaicore.ClickService.track(pt);
+		if (!client.getLocalPlayer().isMoving())
+		{
+			doClick(pt);
+		}
 	}
 
 	private void drop()
@@ -323,12 +338,19 @@ public class AdonaiFisherPlugin extends Plugin
 		dropItemsExcept(DropConfig.keepItems);
 	}
 
+	void debugMsg(String message, Object ... arguments)
+	{
+		log.info("DEBUG MESSAGE: " + message, arguments);
+	}
+
 	void dropItemsExcept(List<Integer> ids)
 	{
 		// set player state to DROPPING
 		state = FishingSession.PlayerState.DROPPING_FISH;
 
-		List<Rectangle> invBounds = ExtUtils.Inventory.getNonStackableInventoryRectanglesExcept(ids);
+		List<Rectangle> invBounds = ExtUtils.Inventory.getNonStackableInventoryRectanglesExceptById(ids);
+
+		invBounds.sort(ExtUtils.Inventory.getDropMode(ExtUtils.Inventory.InventoryDropMode.TOP_DOWN_LEFT_RIGHT));
 
 		dropCount = invBounds.size();
 
@@ -336,6 +358,7 @@ public class AdonaiFisherPlugin extends Plugin
 		// 	(with support of left-click dropper)
 		for (Rectangle bound : invBounds)
 		{
+			debugMsg("inside DROP function loop");
 			doClick(ScreenPosition.getScreenPosition(
 					ExtUtils.AdonaiScreen.getClickPoint(bound.getBounds())
 			));
@@ -346,6 +369,7 @@ public class AdonaiFisherPlugin extends Plugin
 
 	private void doClick(Point clickPoint)
 	{
+		debugMsg("doClick: {}, {}", clickPoint.getX(), clickPoint.getY());;
 		executorService.submit(() ->
 		{
 			sendClick(clickPoint);

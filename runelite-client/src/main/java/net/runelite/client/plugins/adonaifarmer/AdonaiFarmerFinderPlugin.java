@@ -218,7 +218,7 @@ public class AdonaiFarmerFinderPlugin extends Plugin
 		// set player state to DROPPING
 		state = PlayerState.DROPPING;
 
-		List<ExtUtils.Inventory.InventoryItem> itemsExcept = ExtUtils.Inventory.getItemsExcept(DropConfig.keepItems);
+		List<ExtUtils.Inventory.InventoryItem> itemsExcept = ExtUtils.Inventory.getItemsExceptById(DropConfig.keepItems);
 		dropCount = itemsExcept.size();
 
 		ItemIdentification clickItem = ItemIdentification.SEED_BOX;

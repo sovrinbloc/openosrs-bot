@@ -72,6 +72,7 @@ class FishingSession
 
 	enum PlayerState
 	{
+		RANDOM_EVENT,
 		FISHING,
 		NOT_FISHING,
 		INVENTORY_FULL,
