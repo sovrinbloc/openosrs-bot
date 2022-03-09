@@ -9,6 +9,7 @@ import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.*;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.external.adonai.ExtUtils;
@@ -162,6 +163,8 @@ public class AdonaiFisherPlugin extends Plugin
 		currentSpot = spot;
 	}
 
+	boolean forceClick;
+
 	@Subscribe
 	public void onGameTick(GameTick tick)
 			throws InterruptedException, IOException
@@ -194,10 +197,15 @@ public class AdonaiFisherPlugin extends Plugin
 		}
 
 		// new
-		if (state == FishingSession.PlayerState.SHOULD_START_FISHING)
+		if (state == FishingSession.PlayerState.SHOULD_START_FISHING || state == FishingSession.PlayerState.LEVELED_UP)
 		{
+			if (state == FishingSession.PlayerState.LEVELED_UP)
+			{
+				forceClick = true;
+			}
 			log.info("Player is about to fish");
 			fish();
+			forceClick = false;
 			return;
 		}
 
@@ -233,7 +241,7 @@ public class AdonaiFisherPlugin extends Plugin
 			return state;
 		}
 
-		// is their inventory full?
+		// is their inventory full and are NOT dropping fish yet? and not fishing
 		if (nonStackableInventorySize >= 28 && state != FishingSession.PlayerState.DROPPING_FISH)
 		{
 			// they are no longer fishing because their inventory is full.
@@ -242,12 +250,18 @@ public class AdonaiFisherPlugin extends Plugin
 			return state;
 		}
 
-		// are they still dropping?
+		// are they still dropping? and not fishing
 		if ((state == FishingSession.PlayerState.DROPPING_FISH && fishInInventory > 0) || dropCount > 0)
 		{
 			// remain dropping.
 			state = FishingSession.PlayerState.DROPPING_FISH;
 			return state;
+		}
+		// and not fishing && drop count <= 0
+
+		if (client.getWidget(WidgetInfo.LEVEL_UP_LEVEL) != null)
+		{
+			state = FishingSession.PlayerState.LEVELED_UP;
 		}
 
 		state = FishingSession.PlayerState.SHOULD_START_FISHING;
@@ -369,7 +383,6 @@ public class AdonaiFisherPlugin extends Plugin
 
 	private void doClick(Point clickPoint)
 	{
-		debugMsg("doClick: {}, {}", clickPoint.getX(), clickPoint.getY());;
 		executorService.submit(() ->
 		{
 			sendClick(clickPoint);

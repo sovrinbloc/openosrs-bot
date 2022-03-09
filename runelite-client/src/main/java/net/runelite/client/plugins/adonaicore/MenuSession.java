@@ -8,6 +8,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.MenuOpened;
 import net.runelite.api.widgets.menu.ContextMenu;
 import net.runelite.api.widgets.menu.MenuRow;
+import net.runelite.client.external.adonai.mouse.ScreenPosition;
 import net.runelite.client.external.adonaicore.menu.Menus;
 import net.runelite.client.external.adonaicore.objects.Objects;
 import net.runelite.client.external.adonaicore.screen.Screen;
@@ -72,13 +73,21 @@ public class MenuSession
 		if (hNew != null && client.isMenuOpen())
 		{
 			// this works
-			logOnTick(50, "Hovering Over: (Menu Option) {} => (Menu Target) {}", hNew.getOption(), hNew.getTarget());
+			Point screenPosition = ScreenPosition.getScreenPosition(new Point(
+					hNew.getPosition().x,
+					hNew.getPosition().y
+			));
+			logOnTick(50, "Hovering Over: (Menu Option) {} => (Menu Target) {} ({}, {})", hNew.getOption(), hNew.getTarget(), screenPosition.getX(), screenPosition.getY());
 		}
 
 		getAllTargetTileObjects();
 
 		// getting menu objects?
 		List<TileObject> menuObjects = getMenuObjects();
+		if (menuObjects == null)
+		{
+			return;
+		}
 		for (TileObject o : menuObjects)
 		{
 			log.info("MenuObject: {}", o.getName());
@@ -96,6 +105,12 @@ public class MenuSession
 			log.info("row: {}, target: {}", row.getOption(), row.getTarget());
 		}
 	}
+
+	MenuRow getHover()
+	{
+		return this.ctxMenu.getHovering(Calculations.convertToPoint(Adonai.client.getMouseCanvasPosition()));
+	}
+
 
 	// todo: get the row location of each individual
 	private void getAllTargetTileObjects()
@@ -210,6 +225,19 @@ public class MenuSession
 	private void refreshMenuOpened()
 	{
 		ctxMenu = Adonai.client.getAdonaiMenu();
+		for (MenuRow r :
+				ctxMenu.getAllMenuRows())
+		{
+//			log.info("Row full text: {}" , r.getFullText());
+			Point screenPosition = ScreenPosition.getScreenPosition(new Point(
+					r.getPosition().x,
+					r.getPosition().y
+			));
+
+			Point hitPoint = ScreenPosition.getScreenPosition(net.runelite.client.external.adonai.ExtUtils.AdonaiScreen.getClickPoint(r.getHitBox()));
+			log.info("Screen Position of this menu item {}: {}, {}", r.getFullText(), screenPosition.getX(),  screenPosition.getY());
+			log.info("Screen Click Point of this menu item {}: {}, {}", r.getFullText(), hitPoint.getX(),  hitPoint.getY());
+		}
 	}
 
 	private ContextMenu getAdonaiMenu()

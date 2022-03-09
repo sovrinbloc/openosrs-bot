@@ -9,6 +9,7 @@ public class ClickService
 {
 	private static String TRACK_URL = "http://0.0.0.0:4567/track/";
 	private static String CLICK_URL = "http://0.0.0.0:4567/click/";
+	private static String CLICK_FORCE_URL = "http://0.0.0.0:4567/click/force/";
 	private static String MOVE_URL = "http://0.0.0.0:4567/move/";
 	private static String TYPE_URL = "http://0.0.0.0:4567/type";
 	private static String PRESS_URL = "http://0.0.0.0:4567/key/";
@@ -45,6 +46,12 @@ public class ClickService
 	}
 
 	public static void click(int x, int y)
+			throws IOException
+	{
+		sendToServer(getClickUrl(x, y));
+	}
+
+	public static void clickForce(int x, int y)
 			throws IOException
 	{
 		sendToServer(getClickUrl(x, y));

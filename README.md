@@ -1,3 +1,6 @@
+### March 8, 2022
+- Menu Locations work -- the position is embedded in the MenuRow class.
+
 #Bot Development
 ## Menu & Right Click (October 28, 2021)
 1. Working on getting the menu row where the mouse is located.

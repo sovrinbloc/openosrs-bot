@@ -1,0 +1,433 @@
+
+
+//START 
+	public static final int FAIRY_BANK = 1150; 
+//END
+
+//START 
+	public static final int BANK_CHEST = 2693; 
+//END
+
+//START 
+	public static final int BANK_CHEST_4483 = 4483; 
+//END
+
+//START 
+	public static final int BANK_BOOTH = 6084; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_10083 = 10083; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_10355 = 10355; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_10357 = 10357; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_10517 = 10517; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_10527 = 10527; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX = 10529; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_CHEST = 10530; 
+//END
+
+//START 
+	public static final int BANK_CHEST_10562 = 10562; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_10583 = 10583; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_10584 = 10584; 
+//END
+
+//START 
+	public static final int BANK = 10768; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_11338 = 11338; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_12798 = 12798; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_12799 = 12799; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_12800 = 12800; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_12801 = 12801; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_14367 = 14367; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_14368 = 14368; 
+//END
+
+//START 
+	public static final int BANK_CHEST_14382 = 14382; 
+//END
+
+//START 
+	public static final int BANK_CHEST_14886 = 14886; 
+//END
+
+//START 
+	public static final int CLOUD_BANK = 16187; 
+//END
+
+//START 
+	public static final int CLOUD_BANK_16189 = 16189; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_16642 = 16642; 
+//END
+
+//START 
+	public static final int BANK_CHEST_16695 = 16695; 
+//END
+
+//START 
+	public static final int BANK_CHEST_16696 = 16696; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_16700 = 16700; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_18491 = 18491; 
+//END
+
+//START 
+	public static final int BANK_CHEST_19051 = 19051; 
+//END
+
+//START 
+	public static final int BANK_COUNTER = 20127; 
+//END
+
+//START 
+	public static final int PRIVATE_BANK_BOOTH = 20323; 
+//END
+
+//START 
+	public static final int PRIVATE_BANK_BOOTH_20324 = 20324; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_20325 = 20325; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_20326 = 20326; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_20327 = 20327; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_20328 = 20328; 
+//END
+
+//START 
+	public static final int BANK_CHEST_21301 = 21301; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_22819 = 22819; 
+//END
+
+//START 
+	public static final int BANK_SAFE = 22822; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_24101 = 24101; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_24347 = 24347; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_25808 = 25808; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_25937 = 25937; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_26254 = 26254; 
+//END
+
+//START 
+	public static final int BANK_CHEST_26707 = 26707; 
+//END
+
+//START 
+	public static final int BANK_CHEST_26711 = 26711; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_27254 = 27254; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_27260 = 27260; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_27263 = 27263; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_27265 = 27265; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_27267 = 27267; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_27292 = 27292; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_27718 = 27718; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_27719 = 27719; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_27720 = 27720; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_27721 = 27721; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_28429 = 28429; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_28430 = 28430; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_28431 = 28431; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_28432 = 28432; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_28433 = 28433; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_28546 = 28546; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_28547 = 28547; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_28548 = 28548; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_28549 = 28549; 
+//END
+
+//START 
+	public static final int BANK_LIGHT = 28551; 
+//END
+
+//START 
+	public static final int BANK_LIGHT_28552 = 28552; 
+//END
+
+//START 
+	public static final int BANK_PAPERS = 28553; 
+//END
+
+//START 
+	public static final int BANK_CHEST_28594 = 28594; 
+//END
+
+//START 
+	public static final int BANK_CHEST_28595 = 28595; 
+//END
+
+//START 
+	public static final int BANK_CHEST_28816 = 28816; 
+//END
+
+//START 
+	public static final int BANK_CHEST_28861 = 28861; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_29103 = 29103; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_29104 = 29104; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_29105 = 29105; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_29106 = 29106; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_POT = 29108; 
+//END
+
+//START 
+	public static final int BANK_CHEST_29321 = 29321; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_29327 = 29327; 
+//END
+
+//START 
+	public static final int BANK_CHEST_30087 = 30087; 
+//END
+
+//START 
+	public static final int BANK_CHEST_30267 = 30267; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_30268 = 30268; 
+//END
+
+//START 
+	public static final int BANK_CHESTWRECK = 30796; 
+//END
+
+//START 
+	public static final int BANK_CHEST_30926 = 30926; 
+//END
+
+//START 
+	public static final int BANK_CHEST_30989 = 30989; 
+//END
+
+//START 
+	public static final int BANK_COUNTER_31582 = 31582; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_31726 = 31726; 
+//END
+
+//START 
+	public static final int BANK_BOX = 31948; 
+//END
+
+//START 
+	public static final int BANK_BOX_31949 = 31949; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_32665 = 32665; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_32666 = 32666; 
+//END
+
+//START 
+	public static final int BANK_CHEST_34343 = 34343; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_34344 = 34344; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_36086 = 36086; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_36559 = 36559; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_37959 = 37959; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_39238 = 39238; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_39239 = 39239; 
+//END
+
+//START 
+	public static final int BANK_CHEST_40473 = 40473; 
+//END
+
+//START 
+	public static final int BANK_CHEST_41315 = 41315; 
+//END
+
+//START 
+	public static final int BANK_CHEST_41493 = 41493; 
+//END
+
+//START 
+	public static final int BANK_DEPOSIT_BOX_41723 = 41723; 
+//END
+
+//START 
+	public static final int BANK_BOOTH_42837 = 42837; 
+//END
+
+//START
+	public static final int GRAND_EXCHANGE_BOOTH_10061 = 10061;
+//END
+
+//START
+	public static final int GRAND_EXCHANGE_BOOTH = 10060;
+//END

@@ -281,8 +281,8 @@ public abstract class MenuMixin implements RSClient
 					menuEntry.getMenuAction()
 			));
 			// todo: remove this -- for debugging only
-			if (menuEntry.getIdentifier() != 0)
-				System.out.println("Id: " + menuEntry.getIdentifier() + ", Menu information: actionParam0 " + menuEntry.getActionParam0() + " param1 + " + menuEntry.getParam1());
+//			if (menuEntry.getIdentifier() != 0)
+//				System.out.println("Id: " + menuEntry.getIdentifier() + ", Menu information: actionParam0 " + menuEntry.getActionParam0() + " param1 + " + menuEntry.getParam1());
 		}
 		return contextMenu;
 	}

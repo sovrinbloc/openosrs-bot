@@ -8,10 +8,12 @@ import net.runelite.api.Point;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.*;
+import net.runelite.api.widgets.menu.MenuRow;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.external.adonai.TabMap;
+import net.runelite.client.external.adonai.mouse.ScreenPosition;
 import net.runelite.client.external.adonaicore.objects.Objects;
 import net.runelite.client.external.adonaicore.screen.Screen;
 import net.runelite.client.external.adonaicore.toolbox.Calculations;
@@ -138,6 +140,9 @@ public class AdonaiPlugin extends Plugin
 
 		overlayManager.add(aOverlay);
 		adonaiMenu = new MenuSession(client);
+
+		ScreenPosition.initialize(client);
+
 	}
 
 	/**
@@ -212,6 +217,10 @@ public class AdonaiPlugin extends Plugin
 					.distanceTo(localLocation));
 			Messages.sendChatMessage("Is it on the screen?: " + Screen.isOnScreen(object));
 		}
+
+
+		MenuRow hover = adonaiMenu.getHover();
+		log.info("Hovering: {}", hover.getFullText());
 	}
 
 	/**
