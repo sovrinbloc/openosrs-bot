@@ -35,7 +35,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @PluginDescriptor(
 		name = "Adonai Fisher",
-		description = "Fishes"
+		description = "Fishes",
+		enabledByDefault = false
 )
 @Slf4j
 @SuppressWarnings("unused")
@@ -58,7 +59,6 @@ public class AdonaiFisherPlugin extends Plugin
 
 	@Inject
 	private OverlayManager overlayManager;
-
 
 	@Inject
 	private AdonaiFisherOverlay overlay;

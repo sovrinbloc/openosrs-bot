@@ -330,12 +330,15 @@ public class ContextMenu
 	 */
 	public void addMenuRowToTarget(String option, MenuRow row)
 	{
+		// project: adds row to menu options
 		menuRows.add(row);
 		if (menuMap.containsKey(option))
 		{
 			ArrayList<MenuRow> menuRows = menuMap.get(option);
 			menuRows.add(row);
 			menuMap.put(option, menuRows);
+			System.out.println("The option whom we have added a menu row to is: " + option + ", whose row is: \n\t: MenuRow of " + option + ": " + row);
+
 			return;
 		}
 		this.menuMap.put(option, new ArrayList<>(List.of(row)));

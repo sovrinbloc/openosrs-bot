@@ -1,3 +1,99 @@
+
+### March 22, 2022 (Right Clicking Works)
+### Documentation Regarding Menu Items
+```java
+@Override
+protected void startUp()
+{
+    MenuSession adonaiMenu = new MenuSession(client);
+    ScreenPosition.initialize(client);
+}
+
+@Subscribe
+public void onClientTick(ClientTick tick)
+{
+    adonaiMenu.getUpdatedMenu();
+}
+
+/**
+ * @apiNote right clicks
+ * @param npcName
+ * @param menuItem
+ */
+void rightClickNpc(String npcName, String menuItem)
+{
+    assert client.isClientThread();
+    
+    NPC npc = NPCs.findNearestNPC(n -> n.getName().toLowerCase().contains(npcName));
+    if (npc == null)
+    {
+        log.info("NPC Not found");
+        return;
+    }
+    log.info("NPC found");
+    
+    LocalPoint localLocation = npc.getLocalLocation();
+    Point      point         = Perspective.localToCanvas(client, localLocation, client.getPlane());
+    if (point == null)
+    {
+        log.info("No NPC Point");
+        return;
+    }
+    
+    Point npcScreenPosition = ScreenPosition.getScreenPosition(point);
+    log.info("Screen position of NPC: {}, {}", npcScreenPosition.getX(), npcScreenPosition.getY());
+    
+    
+    log.info("Trying to click");
+    // move mouse over tile and right click
+    doMouse(npcScreenPosition, ClickType.Right);
+    // gets the npc tile
+    //		TileObject obj = Objects.getTileObject(updatedMenu.get(0)
+    //				.getMenuTargetIdentifiers());
+    
+    AtomicInteger index = new AtomicInteger(-1);
+    
+    
+    MenuRow menuRow = null;
+    for (MenuRow row : adonaiMenu.getAdonaiMenu().getAllMenuRows())
+    {
+        log.info("Traversing Menu Item. Target: {}, Item: {}, Row: {}", row.getEntry(), row.getFullText(), row);
+        if (!row.getTarget().toLowerCase().contains(npcName.toLowerCase()))
+        {
+            log.info("Could not find the target: {} inside: {}", npcName.toLowerCase(), row.getTarget().toLowerCase());
+            continue;
+        }
+        
+        if (!row.getFullText().toLowerCase().contains(menuItem.toLowerCase()))
+        {
+            log.info("Could not find the menu item: {} inside: {}", menuItem.toLowerCase(), row.getFullText().toLowerCase());
+            continue;
+        }
+        log.info(
+            "Found the menu item: {}, {}",
+            row.getIndex(),
+            adonaiMenu.getAdonaiMenu()
+            .getAllMenuRows().get(row.getIndex())
+            .getFullText()
+        );
+        menuRow = row;
+        break;
+    }
+    
+    
+    log.info("Now having received the menu item, we perform what is necessary.");
+    // send move mouse to row rectangle point on screen
+    Rectangle menuHitBox         = menuRow.getHitBox();
+    Point     menuClickPoint = net.runelite.client.external.adonai.ExtUtils.AdonaiScreen.getClickPoint(menuHitBox);
+    Point     screenPosition = ScreenPosition.getScreenPosition(menuClickPoint);
+    
+    // send left click
+    log.info("Trying to click option ({}) at canvas hitbox position {}, canvas clickPosition {}, (screen clickPosition: {}).", menuRow.getOption(), menuHitBox, menuClickPoint, screenPosition);
+    doMouse(screenPosition, ClickType.Left);
+}
+
+```
+
 ### March 8, 2022
 - Menu Locations work -- the position is embedded in the MenuRow class.
 
@@ -16,7 +112,7 @@
 			// or add the canvas information here
 //			tooltipManager.addFront(new Tooltip("Menu Options" + (Strings.isNullOrEmpty(target) ? "" : " " + target + " [" + client.getMouseCanvasPosition().getX() + ", " +client.getMouseCanvasPosition().getY() + " ]")));```
 3. Inside plugin itself: gotta fix.. Give me the OBJECT that the mouse is over...
-   1. net.runelite.client.plugins.adonaicore.MenuSession.getAllTargetTileObjects
+   1. net.runelite.client.external.adonai.MenuSession.getAllTargetTileObjects
 
 # The plugins hot loading...
 1. Clone the plugins repository

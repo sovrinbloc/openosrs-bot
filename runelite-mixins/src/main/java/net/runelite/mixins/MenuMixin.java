@@ -224,6 +224,7 @@ public abstract class MenuMixin implements RSClient
 	 *
 	 * ActionParam0 & Param1 both point to the x-y elements in the Scene Tile Array to get the object
 	 */
+	// project: figure out how the target is added to this.
 	@Inject
 	@Override
 	public ContextMenu getAdonaiMenu()
@@ -261,7 +262,7 @@ public abstract class MenuMixin implements RSClient
 			{
 				// set argument0, action1 = blank
 			}
-			contextMenu.addMenuRowToTarget(options[i], new MenuRow(
+			MenuRow menuRow = new MenuRow(
 					x + 3,
 					rowY - 12,
 					w - 6,
@@ -279,10 +280,13 @@ public abstract class MenuMixin implements RSClient
 							.getId(),
 					menuEntry.getIdentifier(),
 					menuEntry.getMenuAction()
-			));
+			);
+			contextMenu.addMenuRowToTarget(options[i], menuRow);
+
 			// todo: remove this -- for debugging only
-//			if (menuEntry.getIdentifier() != 0)
-//				System.out.println("Id: " + menuEntry.getIdentifier() + ", Menu information: actionParam0 " + menuEntry.getActionParam0() + " param1 + " + menuEntry.getParam1());
+			if (menuEntry.getIdentifier() != 0)
+				System.out.println("Id: " + menuEntry.getIdentifier() + ", Menu information: actionParam0 " + menuEntry.getActionParam0() + " param1 + " + menuEntry.getParam1());
+				System.out.println("Menu row: " + menuRow);
 		}
 		return contextMenu;
 	}

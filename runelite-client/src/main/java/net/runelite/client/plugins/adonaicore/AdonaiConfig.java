@@ -174,6 +174,30 @@ public interface AdonaiConfig extends Config
 		return 4;
 	}
 
+	@ConfigItem(
+			keyName = "interactWith",
+			name = "Interact with NPC",
+			description = "Choose the NPC to interact with.",
+			position = 14,
+			section = menuSection
+	)
+	default String interactWith()
+	{
+		return "prospector";
+	}
+
+	@ConfigItem(
+			keyName = "menuInteraction",
+			name = "Choose the menu item to interact with",
+			description = "Choose the Menu Item to click....",
+			position = 15,
+			section = menuSection
+	)
+	default String menuInteraction()
+	{
+		return "examine";
+	}
+
 	@Alpha
 	@ConfigItem(
 			keyName = "playerHoverHighlightColor",

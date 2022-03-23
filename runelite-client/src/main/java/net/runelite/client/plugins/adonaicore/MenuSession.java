@@ -60,13 +60,11 @@ public class MenuSession
 	private List<MenuRow> currentMenuRows = new ArrayList<>();
 
 	/**
-	 * Count 2 begin (before, comes Course 1)
 	 * Gets a copy of the menu
-	 * Count 2 end (next, comes Course 3)
 	 */
-	public void getUpdatedMenu()
+	public List<MenuRow> getUpdatedMenu()
 	{
-		refreshMenuOpened();
+		List<MenuRow> menuRows = refreshMenuOpened();
 
 		MenuRow hNew = ctxMenu.getRowHovering(Adonai.client.getMouseCanvasPosition());
 
@@ -77,21 +75,25 @@ public class MenuSession
 					hNew.getPosition().x,
 					hNew.getPosition().y
 			));
+
+			// project: gets the option overed over
 			logOnTick(50, "Hovering Over: (Menu Option) {} => (Menu Target) {} ({}, {})", hNew.getOption(), hNew.getTarget(), screenPosition.getX(), screenPosition.getY());
 		}
 
-		getAllTargetTileObjects();
+//		getAllTargetTileObjects();
 
 		// getting menu objects?
 		List<TileObject> menuObjects = getMenuObjects();
 		if (menuObjects == null)
 		{
-			return;
+			return null;
 		}
 		for (TileObject o : menuObjects)
 		{
 			log.info("MenuObject: {}", o.getName());
 		}
+
+		return menuRows;
 
 	}
 
@@ -106,11 +108,12 @@ public class MenuSession
 		}
 	}
 
-	MenuRow getHover()
+	public MenuRow getHover()
 	{
 		return this.ctxMenu.getHovering(Calculations.convertToPoint(Adonai.client.getMouseCanvasPosition()));
 	}
 
+	public List<MenuRow> workingRows;
 
 	// todo: get the row location of each individual
 	private void getAllTargetTileObjects()
@@ -126,6 +129,7 @@ public class MenuSession
 			i++;
 		}
 
+		workingRows = allMenuRows;
 		for (MenuRow r : allMenuRows)
 		{
 			MenuEntry event = r.getEntry();
@@ -222,13 +226,19 @@ public class MenuSession
 		}
 	}
 
-	private void refreshMenuOpened()
+	/**
+	 * @implNote returns a list of MenuRows
+	 *
+	 * @return
+	 */
+	public  List<MenuRow> refreshMenuOpened()
 	{
 		ctxMenu = Adonai.client.getAdonaiMenu();
+		List<MenuRow> allMenuRows = ctxMenu.getAllMenuRows();
 		for (MenuRow r :
-				ctxMenu.getAllMenuRows())
+				allMenuRows)
 		{
-//			log.info("Row full text: {}" , r.getFullText());
+			log.info("Row full text: {}" , r.getFullText());
 			Point screenPosition = ScreenPosition.getScreenPosition(new Point(
 					r.getPosition().x,
 					r.getPosition().y
@@ -238,9 +248,10 @@ public class MenuSession
 			log.info("Screen Position of this menu item {}: {}, {}", r.getFullText(), screenPosition.getX(),  screenPosition.getY());
 			log.info("Screen Click Point of this menu item {}: {}, {}", r.getFullText(), hitPoint.getX(),  hitPoint.getY());
 		}
+		return allMenuRows;
 	}
 
-	private ContextMenu getAdonaiMenu()
+	public ContextMenu getAdonaiMenu()
 	{
 		return ctxMenu;
 	}
@@ -254,24 +265,31 @@ public class MenuSession
 		}
 	}
 
-	private List<TileObject> getMenuObjects()
+	// project: contains the NPC name (this is what we need to figure out how to get).
+	// todo: figure out how to back-engineer how to get the name of the NPC from the RightClick menu.
+	public  List<TileObject> getMenuObjects()
 	{
 		List<TileObject> tileObjects = new ArrayList<>();
 		if (!client.isMenuOpen())
 		{
 			return null;
 		}
-		for (MenuRow event : ctxMenu.getAllMenuRows())
+
+		// project: critical aspect of finding the target (the NPC whose right click it is) [maybe the fact that the menu is open is why this is working]
+		// whatis: will display the getTarget properly (doesn't show it on examine because it has nothing to do with any NPC).
+		for (MenuRow menuRow : ctxMenu.getAllMenuRows())
 		{
 			logOnTick(50,
 					"Menu data (needed to get the TileObject from the context menu): {}",
-					event.getMenuTargetIdentifiers());
-			logOnTick(50, "Menu entry from the previous menu row: {}", event.getEntry());
+					menuRow.getMenuTargetIdentifiers());
 
-			TileObject obj = Objects.getTileObject(event.getMenuTargetIdentifiers());
+			// project: we need to figure out how and why this works: (menuRow.getEntry()) [it contains the target, whereas other instances cannot get the target]
+			logOnTick(50, "Menu entry from the previous menu row: {}", menuRow.getEntry());
 
-			final int sceneX = event.getEntry().getActionParam0();
-			final int sceneY = event.getEntry().getParam1();
+			TileObject obj = Objects.getTileObject(menuRow.getMenuTargetIdentifiers());
+
+			final int sceneX = menuRow.getEntry().getActionParam0();
+			final int sceneY = menuRow.getEntry().getParam1();
 
 			if (obj != null)
 			{
@@ -333,7 +351,7 @@ public class MenuSession
 		return tileObjects;
 	}
 
-	NPC findNpc(int id)
+	public NPC findNpc(int id)
 	{
 		return Adonai.client.getCachedNPCs()[id];
 	}
@@ -343,7 +361,7 @@ public class MenuSession
 	 *
 	 * @param id the id of the player
 	 */
-	Player findPlayer(int id)
+	public Player findPlayer(int id)
 	{
 		return Adonai.client.getCachedPlayers()[id];
 	}
@@ -351,7 +369,7 @@ public class MenuSession
 	/**
 	 * Gets the menu and all it's options & targets, and related information and stores it.
 	 */
-	void renderAdonaiMenu()
+	public void renderAdonaiMenu()
 	{
 		Adonai.client.drawAdonaiMenu(200);
 		ctxMenu = Adonai.client.getAdonaiMenu();
