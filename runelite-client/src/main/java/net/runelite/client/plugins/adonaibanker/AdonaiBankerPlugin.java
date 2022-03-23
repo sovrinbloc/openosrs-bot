@@ -26,6 +26,7 @@ import net.runelite.client.plugins.adonaicore.Adonai;
 import net.runelite.client.plugins.adonairandoms.RandomEventDismissPlugin;
 
 import javax.inject.Inject;
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -95,7 +96,7 @@ public class AdonaiBankerPlugin extends Plugin
 
 	private void openBank()
 	{
-		GameObject booth         = ExtUtils.AdonaiGameObjects.findNearestGameObject(BankIds.bankBoothIds.stream()
+		GameObject booth = ExtUtils.AdonaiGameObjects.findNearestGameObject(BankIds.bankBoothIds.stream()
 				.mapToInt(i -> i)
 				.toArray());
 		LocalPoint localLocation = booth.getLocalLocation();
@@ -344,15 +345,15 @@ public class AdonaiBankerPlugin extends Plugin
 					}
 				}
 
-				Point  bankCanvas = bankItemContainer.getCanvasLocation();
-				int    width      = bankItemContainer.getWidth();
-				int    height     = bankItemContainer.getHeight();
-				int    x          = bankItemContainer.getBounds().x;
-				int    y          = bankItemContainer.getBounds().y;
-				String bounds     = bankItemContainer.getBounds()
+				Point bankCanvas = bankItemContainer.getCanvasLocation();
+				int   width      = bankItemContainer.getWidth();
+				int   height     = bankItemContainer.getHeight();
+				int   x          = bankItemContainer.getBounds().x;
+				int   y          = bankItemContainer.getBounds().y;
+				String bounds = bankItemContainer.getBounds()
 						.toString();
-				int    originalX  = bankItemContainer.getOriginalX();
-				int    originalY  = bankItemContainer.getOriginalY();
+				int originalX = bankItemContainer.getOriginalX();
+				int originalY = bankItemContainer.getOriginalY();
 				log.info("width, height: ({}, {})", width, height);
 				log.info("bounds: {}, (x, y): ({}, {})", bounds.toString(), x, y);
 				log.info("originalX/Y: (x, y): ({}, {})", originalX, originalY);
@@ -373,5 +374,122 @@ public class AdonaiBankerPlugin extends Plugin
 			// and the bank wasn't laid out this tick, lay it out early
 			final String inputText = client.getVar(VarClientStr.INPUT_TEXT);
 		}
+	}
+
+	public boolean isBankItemOnScreen(int itemId)
+	{
+		// this is the item container (we now need to get
+		final Widget        bankItemContainer = client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER);
+		final ItemContainer bankContainer     = client.getItemContainer(InventoryID.BANK);
+		if (bankItemContainer.isHidden())
+		{
+			return false;
+		}
+
+		Point bankContainerCanvas = bankItemContainer.getCanvasLocation();
+		int   width               = bankItemContainer.getWidth();
+		int   height              = bankItemContainer.getHeight();
+
+		Rectangle bankContainerBounds = bankItemContainer.getBounds();
+		int       x                   = bankContainerBounds.x;
+		int       y                   = bankContainerBounds.y;
+
+
+		final Widget[] children = bankItemContainer.getChildren();
+		for (int i = 0; i < bankContainer.size(); ++i)
+		{
+			Widget child = children[i];
+			if (child == null || child.isSelfHidden() || child.getItemId() <= -1 || child.getId() != itemId)
+			{
+				continue;
+			}
+
+
+
+			// get the attributes of the item to see if it is within the visible container.
+			Rectangle childBounds = child.getBounds();
+			int       childHeight = child.getHeight();
+
+			Point childCanvasPoint = child.getCanvasLocation();
+
+			// check if the item is on the screen
+			return bankContainerBounds.contains(child.getBounds());
+		}
+
+		final Widget bankScrollBar = client.getWidget(WidgetInfo.BANK_SCROLLBAR);
+		if (bankScrollBar.isHidden())
+		{
+
+		}
+		Widget upScroll   = bankScrollBar.getChildren()[4];
+		Widget downScroll = bankScrollBar.getChildren()[5];
+
+		// todo: finish this
+		return true;
+	}
+
+	public boolean scrollToBankItem(int itemId)
+	{
+		// this is the item container (we now need to get
+		final Widget        bankItemContainer = client.getWidget(WidgetInfo.BANK_ITEM_CONTAINER);
+		final ItemContainer bankContainer     = client.getItemContainer(InventoryID.BANK);
+		if (bankItemContainer.isHidden())
+		{
+			return false;
+		}
+		Point bankContainerCanvas = bankItemContainer.getCanvasLocation();
+		int   width               = bankItemContainer.getWidth();
+		int   height              = bankItemContainer.getHeight();
+
+		Rectangle bankContainerBounds = bankItemContainer.getBounds();
+		int       x                   = bankContainerBounds.x;
+		int       y                   = bankContainerBounds.y;
+
+
+		final Widget[] children = bankItemContainer.getChildren();
+		Widget item = null;
+		for (int i = 0; i < bankContainer.size(); ++i)
+		{
+			Widget child = children[i];
+			if (child == null || child.isSelfHidden() || child.getItemId() <= -1 || child.getId() != itemId)
+			{
+				continue;
+			}
+
+			item = child;
+		}
+
+		// get the attributes of the item to see if it is within the visible container.
+		Rectangle childBounds = item.getBounds();
+		int       childHeight = item.getHeight();
+
+		Point childCanvasPoint = item.getCanvasLocation();
+
+		final Widget bankScrollBar = client.getWidget(WidgetInfo.BANK_SCROLLBAR);
+		if (bankScrollBar.isHidden())
+		{
+			return false;
+		}
+		Widget[] bankChildren  = bankScrollBar.getChildren();
+
+		assert bankChildren != null;
+		Widget upScroll   = bankChildren[4];
+		Widget downScroll = bankChildren[5];
+
+		if (bankContainerBounds.contains(item.getBounds()))
+		{
+			return true;
+		}
+
+		boolean scrollDown = false;
+		int yPrime = 0;
+		if (item.getBounds().getY() > bankContainerBounds.getY() + bankContainerBounds.getHeight())
+		{
+			scrollDown = true;
+			yPrime = (int)(item.getBounds().getY() - bankContainerBounds.getY() + bankContainerBounds.getHeight());
+		}
+
+		// todo: finish this
+		return true;
 	}
 }

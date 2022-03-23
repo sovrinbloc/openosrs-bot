@@ -5,6 +5,7 @@ import com.google.common.collect.Table;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.external.adonai.MenuSession;
 import net.runelite.client.external.adonaicore.objects.Objects;
 import net.runelite.client.external.adonaicore.item.GroundItem;
 import net.runelite.client.ui.overlay.Overlay;

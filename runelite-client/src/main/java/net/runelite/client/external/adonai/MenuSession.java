@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.adonaicore;
+package net.runelite.client.external.adonai;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
@@ -14,6 +14,7 @@ import net.runelite.client.external.adonaicore.objects.Objects;
 import net.runelite.client.external.adonaicore.screen.Screen;
 import net.runelite.client.external.adonaicore.toolbox.Calculations;
 import net.runelite.client.external.adonaicore.wrappers.Menu;
+import net.runelite.client.plugins.adonaicore.Adonai;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -27,8 +28,6 @@ public class MenuSession
 	private Client client;
 
 	private ContextMenu ctxMenu;
-
-	private ExtUtils utils = null;
 
 	private int gameTicks = 0;
 
@@ -45,19 +44,14 @@ public class MenuSession
 		// initialize client.
 		this.client = client;
 
-		if (Adonai.isNullInitializeClient(client))
+		if (net.runelite.client.plugins.adonaicore.Adonai.isNullInitializeClient(client))
 		{
 			log.info("Initialized Adonai Client.");
 		}
 
 		ctxMenu = client.getAdonaiMenu();
 		log.info("Client.getAdonaiMenu initialized: entry information... \n\t{}", ctxMenu.getMenuEntries().toString());
-
-		utils = new ExtUtils(client);
 	}
-
-	byte[] oldContextMenu = null;
-	private List<MenuRow> currentMenuRows = new ArrayList<>();
 
 	/**
 	 * Gets a copy of the menu
@@ -66,7 +60,7 @@ public class MenuSession
 	{
 		List<MenuRow> menuRows = refreshMenuOpened();
 
-		MenuRow hNew = ctxMenu.getRowHovering(Adonai.client.getMouseCanvasPosition());
+		MenuRow hNew = ctxMenu.getRowHovering(net.runelite.client.plugins.adonaicore.Adonai.client.getMouseCanvasPosition());
 
 		if (hNew != null && client.isMenuOpen())
 		{
@@ -99,9 +93,9 @@ public class MenuSession
 
 	void printNewMenuItems(MenuOpened event)
 	{
-		ctxMenu = Adonai.client.getAdonaiMenu();
-		Menu menu = new Menu(Adonai.client.getAdonaiMenu(), event);
-		MenuRow activeMenu = this.ctxMenu.getHovering(Calculations.convertToPoint(Adonai.client.getMouseCanvasPosition()));
+		ctxMenu = net.runelite.client.plugins.adonaicore.Adonai.client.getAdonaiMenu();
+		Menu menu = new Menu(client.getAdonaiMenu(), event);
+		MenuRow activeMenu = this.ctxMenu.getHovering(Calculations.convertToPoint(client.getMouseCanvasPosition()));
 		for (MenuRow row : this.ctxMenu.getAllMenuRows())
 		{
 			log.info("row: {}, target: {}", row.getOption(), row.getTarget());
@@ -110,7 +104,7 @@ public class MenuSession
 
 	public MenuRow getHover()
 	{
-		return this.ctxMenu.getHovering(Calculations.convertToPoint(Adonai.client.getMouseCanvasPosition()));
+		return this.ctxMenu.getHovering(Calculations.convertToPoint(client.getMouseCanvasPosition()));
 	}
 
 	public List<MenuRow> workingRows;
@@ -147,8 +141,8 @@ public class MenuSession
 			log.info("target: {}, option: {}, actionParam0: {}, actionParam1: {}, getParam0: {}, getParam1: {}, getId: {}, getIdentifier: {}",
 					event.getTarget(), event.getOption(), event.getActionParam0(), event.getActionParam1(), event.getParam0(), event.getParam1(), event.getIdentifier(), event.getIdentifier());
 
-			Tile tile = Adonai.client.getScene()
-					.getTiles()[Adonai.client.getPlane()][event.getActionParam0()][event.getParam1()];
+			Tile tile = net.runelite.client.plugins.adonaicore.Adonai.client.getScene()
+					.getTiles()[net.runelite.client.plugins.adonaicore.Adonai.client.getPlane()][event.getActionParam0()][event.getParam1()];
 			log.info("Tile: {}", tile);
 
 			/**
@@ -164,7 +158,7 @@ public class MenuSession
 			Screen.getTileLocation(worldPoint);
 			if (tile != null)
 			{
-				Menus.TileType tileObjectType = Menus.getTileObjectType(Adonai.client, tile, event.getIdentifier());
+				Menus.TileType tileObjectType = Menus.getTileObjectType(net.runelite.client.plugins.adonaicore.Adonai.client, tile, event.getIdentifier());
 				log.info("TileObject is of type: {}", tileObjectType.toString());
 
 				TileObject tileObject = null;
@@ -233,7 +227,7 @@ public class MenuSession
 	 */
 	public  List<MenuRow> refreshMenuOpened()
 	{
-		ctxMenu = Adonai.client.getAdonaiMenu();
+		ctxMenu = client.getAdonaiMenu();
 		List<MenuRow> allMenuRows = ctxMenu.getAllMenuRows();
 		for (MenuRow r :
 				allMenuRows)
@@ -244,7 +238,7 @@ public class MenuSession
 					r.getPosition().y
 			));
 
-			Point hitPoint = ScreenPosition.getScreenPosition(net.runelite.client.external.adonai.ExtUtils.AdonaiScreen.getClickPoint(r.getHitBox()));
+			Point hitPoint = ScreenPosition.getScreenPosition(ExtUtils.AdonaiScreen.getClickPoint(r.getHitBox()));
 			log.info("Screen Position of this menu item {}: {}, {}", r.getFullText(), screenPosition.getX(),  screenPosition.getY());
 			log.info("Screen Click Point of this menu item {}: {}, {}", r.getFullText(), hitPoint.getX(),  hitPoint.getY());
 		}
@@ -266,7 +260,6 @@ public class MenuSession
 	}
 
 	// project: contains the NPC name (this is what we need to figure out how to get).
-	// todo: figure out how to back-engineer how to get the name of the NPC from the RightClick menu.
 	public  List<TileObject> getMenuObjects()
 	{
 		List<TileObject> tileObjects = new ArrayList<>();
@@ -353,7 +346,7 @@ public class MenuSession
 
 	public NPC findNpc(int id)
 	{
-		return Adonai.client.getCachedNPCs()[id];
+		return client.getCachedNPCs()[id];
 	}
 
 	/**
@@ -363,7 +356,7 @@ public class MenuSession
 	 */
 	public Player findPlayer(int id)
 	{
-		return Adonai.client.getCachedPlayers()[id];
+		return client.getCachedPlayers()[id];
 	}
 
 	/**
@@ -371,7 +364,7 @@ public class MenuSession
 	 */
 	public void renderAdonaiMenu()
 	{
-		Adonai.client.drawAdonaiMenu(200);
+		client.drawAdonaiMenu(200);
 		ctxMenu = Adonai.client.getAdonaiMenu();
 	}
 }

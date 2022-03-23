@@ -12,6 +12,7 @@ import net.runelite.api.widgets.menu.MenuRow;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.external.adonai.MenuSession;
 import net.runelite.client.external.adonai.TabMap;
 import net.runelite.client.external.adonai.mouse.ScreenPosition;
 import net.runelite.client.external.adonaicore.npc.NPCs;
