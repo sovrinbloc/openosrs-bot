@@ -1,6 +1,6 @@
 ![](https://i.imgur.com/0D5106S.png)
 
-
+[BOT Information](installation/BOT.md)
 
 # OpenOSRS injected RuneLite 
 
