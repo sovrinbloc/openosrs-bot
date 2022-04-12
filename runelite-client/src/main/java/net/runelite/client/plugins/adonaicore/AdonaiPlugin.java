@@ -280,7 +280,7 @@ public class AdonaiPlugin extends Plugin
 	{
 
 		ticks++;
-		if (TRY_TO_RIGHT_CLICK_PROSPECTOR && ticks % 15 == 0)
+		if (TRY_TO_RIGHT_CLICK_PROSPECTOR)
 		{
 			rightClickNpc(config.interactWith(), config.menuInteraction());
 		}
