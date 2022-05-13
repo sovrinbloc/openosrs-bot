@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.Comparator.naturalOrder;
 import static net.runelite.client.external.adonai.ExtUtils.AdonaiDecorativeObjects.findNearestDecorObject;
@@ -1087,6 +1088,15 @@ public class ExtUtils<operator, T2>
 			Inventory.itemManager = itemManager;
 		}
 
+		/**
+		 * Inputs an array of InventoryItems and returns an array of InventoryItems.
+		 *
+		 * @see Item
+		 * @see InventoryItem
+		 *
+		 * @param items
+		 * @return
+		 */
 		public static InventoryItem[] convertToInventoryItems(final Item[] items)
 		{
 			final InventoryItem[] out = new InventoryItem[items.length];
@@ -1099,6 +1109,17 @@ public class ExtUtils<operator, T2>
 			return out;
 		}
 
+		/**
+		 * Searches player's inventory for the item, gets the Item and composition,
+		 *  and converts it into an InventoryItem
+		 *
+		 * @see net.runelite.api.Item
+		 * @see InventoryItem
+		 *
+		 * @param item
+		 * @param slot
+		 * @return
+		 */
 		@NotNull
 		private static ExtUtils.Inventory.InventoryItem getInventoryItem(Item item, int slot)
 		{
@@ -1214,41 +1235,6 @@ public class ExtUtils<operator, T2>
 		}
 
 		@NotNull
-		public static List<Rectangle> getNonStackableInventoryRectanglesExceptById(List<Integer> ids)
-		{
-			List<InventoryItem> items = Inventory.getItemsExceptById(ids);
-			log.info("Items size (except necessity items [by id]): {}", items.size());
-
-			return getInventoryItemsBounds(items);
-		}
-
-		@NotNull
-		public static List<Rectangle> getAllNonStackableInventoryRectangles(List<Integer> ids)
-		{
-			List<InventoryItem> items = Inventory.getItemsExceptById(ids);
-			log.info("Items size (except necessity items [by id]): {}", items.size());
-
-			return getInventoryItemsBounds(items);
-		}
-
-		public static int getAllNonStackableInventoryCount()
-		{
-			List<Integer>       ids   = new ArrayList<>();
-			List<InventoryItem> items = Inventory.getItemsExceptById(ids);
-
-			return getInventoryItemsBounds(items).size();
-		}
-
-		@NotNull
-		public static List<Rectangle> getNonStackableInventoryRectanglesExceptByName(List<String> names)
-		{
-			List<InventoryItem> items = Inventory.getItemsExceptByName(names);
-			log.info("Items size (except necessity items [by name]): {}", items.size());
-
-			return getInventoryItemsBounds(items);
-		}
-
-		@NotNull
 		private static List<Rectangle> getInventoryItemsBounds(List<InventoryItem> itemsExcept)
 		{
 			// list of unique item ids
@@ -1348,6 +1334,63 @@ public class ExtUtils<operator, T2>
 			return itemSize;
 		}
 
+		@NotNull
+		public static List<Rectangle> getNonStackableInventoryRectanglesExceptById(List<Integer> ids)
+		{
+			List<InventoryItem> items = Inventory.getItemsExceptById(ids);
+			log.info("Items size (except necessity items [by id]): {}", items.size());
+
+			return getInventoryItemsBounds(items);
+		}
+
+		@NotNull
+		public static List<Rectangle> getNonStackableInventoryRectanglesExceptByName(List<String> names)
+		{
+			List<InventoryItem> items = Inventory.getItemsExceptByName(names);
+			log.info("Items size (except necessity items [by name]): {}", items.size());
+
+			return getInventoryItemsBounds(items);
+		}
+
+		@NotNull
+		public static List<Rectangle> getAllNonStackableInventoryRectangles(List<Integer> ids)
+		{
+			List<InventoryItem> items = Inventory.getItemsExceptById(ids);
+			log.info("Items size (except necessity items [by id]): {}", items.size());
+
+			return getInventoryItemsBounds(items);
+		}
+
+		public static int getAllNonStackableInventoryCount()
+		{
+			List<Integer>       ids   = new ArrayList<>();
+			List<InventoryItem> items = Inventory.getItemsExceptById(ids);
+
+			return getInventoryItemsBounds(items).size();
+		}
+
+
+		/**
+		 * Added by Joseph Alai 4/17/2022
+		 * @param names
+		 *
+		 * @return
+		 */
+		@NotNull
+		public static List<InventoryItem> getNonStackableInventory(List<String> names)
+		{
+			ItemContainer       itemContainer = client.getItemContainer(InventoryID.INVENTORY);
+
+			return Arrays.stream(Inventory.convertToInventoryItems(itemContainer.getItems())).collect(Collectors.toList());
+		}
+
+		@NotNull
+		public static List<Rectangle> getNonStackableInventoryBounds(List<String> names)
+		{
+			ItemContainer       itemContainer = client.getItemContainer(InventoryID.INVENTORY);
+
+			return getInventoryItemsBounds(Arrays.stream(Inventory.convertToInventoryItems(itemContainer.getItems())).collect(Collectors.toList()));
+		}
 
 		@Data
 		public static class InventoryItem implements Clickable
