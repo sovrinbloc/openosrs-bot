@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Tomas Slusny <slusnucky@gmail.com>
+ * Copyright (c) 2021 Abex
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,16 +22,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.discord;
+package net.runelite.client.external.adonaicore.menu.examine;
 
-import lombok.EqualsAndHashCode;
-import lombok.Value;
-import net.runelite.http.api.ws.messages.party.PartyMemberMessage;
+import java.util.Objects;
 
-@Value
-@EqualsAndHashCode(callSuper = true)
-class DiscordUserInfo extends PartyMemberMessage
+class CacheKey
 {
-	private final String userId;
-	private final String avatarId;
+	private final ExamineType type;
+	private final int id;
+
+	public CacheKey(ExamineType type, int id)
+	{
+		this.type = type;
+		this.id = id;
+	}
+
 }

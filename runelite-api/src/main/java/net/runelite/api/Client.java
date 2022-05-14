@@ -41,6 +41,7 @@ import net.runelite.api.clan.ClanID;
 import net.runelite.api.clan.ClanSettings;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.PlayerChanged;
 import net.runelite.api.hooks.Callbacks;
 import net.runelite.api.hooks.DrawCallbacks;
@@ -48,6 +49,7 @@ import net.runelite.api.vars.AccountType;
 import net.runelite.api.widgets.ItemQuantityMode;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.api.widgets.menu.ContextMenu;
 import org.slf4j.Logger;
 import org.intellij.lang.annotations.MagicConstant;
 
@@ -782,6 +784,13 @@ public interface Client extends OAuthApi, GameEngine
 	 * @param cameraYawTarget
 	 */
 	void setCameraYawTarget(int cameraYawTarget);
+
+	/**
+	 * Set the target camera pitch
+	 *
+	 * @param cameraPitchTarget
+	 */
+	void setCameraPitchTarget(int cameraPitchTarget);
 
 	/**
 	 * Checks whether the client window is currently resized.
@@ -2141,6 +2150,43 @@ public interface Client extends OAuthApi, GameEngine
 	 * @param alpha background transparency of the menu
 	 */
 	void draw2010Menu(int alpha);
+
+	/**
+	 * Draws a menu in the 2010 interface style.
+	 *
+	 * @param alpha background transparency of the menu
+	 */
+	void drawAdonaiMenu(int alpha);
+
+	/**
+	 * Gets the menu attributes for the Adonai Menu
+	 */
+	ContextMenu getAdonaiMenu();
+
+	/**
+	 * Gets the menu attributes for the Adonai Menu
+	 */
+	ContextMenu getOriginalMenu();
+
+	/**
+	 * gets the left click menu entry
+	 */
+	MenuEntryAdded getLeftClickMenuEntry();
+
+	/**
+	 * Sets the left click menu entry
+	 */
+	void setLeftClickMenuEntry(final MenuEntryAdded entry);
+
+	/**
+	 * Gets the menu attributes for the Adonai Menu
+	 */
+	ContextMenu get2010Menu();
+
+	/**
+	 * Gets all the menu contents.
+	 */
+	void getRawMenuContents();
 
 	/**
 	 * Get client pixels. Each integer represents an ARGB colored pixel.

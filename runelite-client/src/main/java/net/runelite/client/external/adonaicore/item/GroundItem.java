@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, PandahRS <https://github.com/PandahRS>
+ * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,14 +22,56 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.discord;
+package net.runelite.client.external.adonaicore.item;
 
-enum DiscordAreaType
+import lombok.Builder;
+import lombok.Data;
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
+
+import javax.annotation.Nullable;
+import java.time.Instant;
+
+@Data
+@Builder
+public class GroundItem
 {
-	BOSSES,
-	CITIES,
-	DUNGEONS,
-	MINIGAMES,
-	RAIDS,
-	REGIONS
+	private int id;
+	private int itemId;
+	private String name;
+	private int quantity;
+	private WorldPoint location;
+	private int height;
+	private int haPrice;
+	private int gePrice;
+	private int offset;
+	private boolean tradeable;
+	@Nullable
+	private Instant spawnTime;
+	private boolean stackable;
+
+	int getHaPrice()
+	{
+		return haPrice * quantity;
+	}
+
+	int getGePrice()
+	{
+		return gePrice * quantity;
+	}
+
+	private void getGroundItems(Tile tile)
+	{
+		ItemLayer itemLayer = tile.getItemLayer();
+		if (itemLayer != null)
+		{
+			Node current = itemLayer.getBottom();
+			while (current instanceof TileItem)
+			{
+				TileItem item = (TileItem) current;
+				current = current.getNext();
+			}
+		}
+	}
+
 }
